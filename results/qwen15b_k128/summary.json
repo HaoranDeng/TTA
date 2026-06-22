@@ -1,0 +1,56 @@
+{
+  "baseline": {
+    "mmlu_zero_shot": {
+      "accuracy": 0.3125,
+      "correct": 5,
+      "seconds": 0.5078934450284578,
+      "total": 16
+    },
+    "ppl": {
+      "nll": 2.9922768473625183,
+      "ppl": 19.931010738465297,
+      "seconds": 0.5433205210138112,
+      "tokens": 1016
+    }
+  },
+  "device": "cuda",
+  "dtype": "torch.float16",
+  "load_seconds": 11.03611284296494,
+  "model_id": "Qwen/Qwen2.5-1.5B",
+  "pq_lut": {
+    "calibration_seconds": 0.9436059140134603,
+    "hardware_aggregate": {
+      "act_center_values": 65142784.0,
+      "act_code_bits_per_token": 111328.0,
+      "adds_per_token": 40298496.0,
+      "base_lut_entries": 260571136.0,
+      "base_lut_mib_fp16": 497.0,
+      "base_lut_mib_fp32": 994.0,
+      "centroid_distance_scalar_ops_per_token": 65142784.0,
+      "centroid_distance_vectors_per_token": 2035712.0,
+      "dense_mac_per_token": 1310195712.0,
+      "expanded_lut_entries": 5240782848.0,
+      "expanded_lut_mib_fp16": 9996.0,
+      "lookups_per_token": 40943616.0,
+      "quantized_linears": 196,
+      "train_seconds": 30.985785531287547,
+      "weight_center_values": 65142784.0,
+      "weight_code_bits": 286605312.0,
+      "weight_code_count": 40943616.0,
+      "weight_codes_mib_packed": 34.166015625
+    },
+    "mmlu_zero_shot": {
+      "accuracy": 0.25,
+      "correct": 4,
+      "seconds": 6.330447535961866,
+      "total": 16
+    },
+    "ppl": {
+      "nll": 9.491342902183533,
+      "ppl": 13244.569550817403,
+      "seconds": 3.303976907976903,
+      "tokens": 1016
+    },
+    "quantization_seconds": 34.13926976302173
+  }
+}

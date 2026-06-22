@@ -40,16 +40,47 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--target-regex", default=DEFAULT_TARGET_REGEX)
     parser.add_argument("--include-lm-head", action="store_true")
     parser.add_argument("--max-linears", type=int, default=None)
-    parser.add_argument("--subdim", type=int, default=32)
-    parser.add_argument("--ka", type=int, default=8)
-    parser.add_argument("--kw", type=int, default=16)
+    parser.add_argument("--method", choices=["pq", "lutllm"], default="pq")
+    parser.add_argument("--subdim", type=int, default=None)
+    parser.add_argument("--ka", type=int, default=None)
+    parser.add_argument("--kw", type=int, default=None)
     parser.add_argument("--kmeans-iters", type=int, default=4)
     parser.add_argument("--sample-limit", type=int, default=2048)
     parser.add_argument("--encode-chunk", type=int, default=8192)
     parser.add_argument("--lut-dtype", choices=["float16", "bfloat16", "float32"], default="float16")
+    parser.add_argument("--distance", choices=["l2", "chebyshev"], default=None)
+    parser.add_argument("--weight-group-size", type=int, default=None)
+    parser.add_argument("--lut-quant-bits", type=int, default=None)
     parser.add_argument("--seed", type=int, default=123)
     parser.add_argument("--skip-pq", action="store_true")
-    return parser.parse_args()
+    args = parser.parse_args()
+    if args.method == "lutllm":
+        if args.subdim is None:
+            args.subdim = 2
+        if args.ka is None:
+            args.ka = 64
+        if args.kw is None:
+            args.kw = 16
+        if args.distance is None:
+            args.distance = "chebyshev"
+        if args.weight_group_size is None:
+            args.weight_group_size = 256
+        if args.lut_quant_bits is None:
+            args.lut_quant_bits = 8
+    else:
+        if args.subdim is None:
+            args.subdim = 32
+        if args.ka is None:
+            args.ka = 8
+        if args.kw is None:
+            args.kw = 16
+        if args.distance is None:
+            args.distance = "l2"
+        if args.weight_group_size is None:
+            args.weight_group_size = 0
+        if args.lut_quant_bits is None:
+            args.lut_quant_bits = 0
+    return args
 
 
 def save_json(path: Path, obj: Any) -> None:
@@ -118,6 +149,7 @@ def main() -> None:
     pq_mmlu_public = None
     if not args.skip_pq:
         pq_config = PQConfig(
+            method=args.method,
             subdim=args.subdim,
             ka=args.ka,
             kw=args.kw,
@@ -125,9 +157,12 @@ def main() -> None:
             sample_limit=args.sample_limit,
             encode_chunk=args.encode_chunk,
             lut_dtype=args.lut_dtype,
+            distance=args.distance,
+            weight_group_size=args.weight_group_size,
+            lut_quant_bits=args.lut_quant_bits,
             seed=args.seed,
         )
-        print("Calibrating and replacing Linear layers with PQ+LUT", flush=True)
+        print(f"Calibrating and replacing Linear layers with {args.method} LUT modules", flush=True)
         report = quantize_model_linears(
             model,
             calib_batches,

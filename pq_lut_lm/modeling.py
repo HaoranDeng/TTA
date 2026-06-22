@@ -80,6 +80,7 @@ def _aggregate_stats(module_stats: Iterable[dict[str, Any]]) -> dict[str, Any]:
         "act_center_values",
         "weight_center_values",
         "base_lut_entries",
+        "base_lut_bits",
         "expanded_lut_entries",
         "weight_code_count",
         "weight_code_bits",
@@ -96,6 +97,7 @@ def _aggregate_stats(module_stats: Iterable[dict[str, Any]]) -> dict[str, Any]:
         agg[key] = sum(float(s[key]) for s in stats)
     agg["base_lut_mib_fp16"] = agg["base_lut_entries"] * 2 / 2**20
     agg["base_lut_mib_fp32"] = agg["base_lut_entries"] * 4 / 2**20
+    agg["base_lut_mib_quantized"] = agg["base_lut_bits"] / 8 / 2**20
     agg["expanded_lut_mib_fp16"] = agg["expanded_lut_entries"] * 2 / 2**20
     agg["weight_codes_mib_packed"] = agg["weight_code_bits"] / 8 / 2**20
     return agg

@@ -64,6 +64,38 @@ python run_eval.py \
 By default, all transformer block linear layers matching
 `(q_proj|k_proj|v_proj|o_proj|gate_proj|up_proj|down_proj)$` are quantized. `lm_head` is excluded unless `--include-lm-head` is passed.
 
+## LUT-LLM-Style Mode
+
+The default `--method pq` is the original baseline in this repo. It uses one weight codebook per input sub-vector across a whole linear layer.
+
+Use `--method lutllm` for a closer post-training approximation of the LUT-LLM artifact:
+
+- `subdim=2`, matching the vector length used by the released HLS testbench.
+- `Ka=64` activation centroids and `Kw=16` weight centroids.
+- `weight_group_size=256`, so each input vector position has separate weight codebooks per output block.
+- Chebyshev nearest-centroid search, matching the artifact reference code.
+- 8-bit min/max quantization of the 2D LUT values before expansion/dequantization.
+
+Example:
+
+```bash
+python run_eval.py \
+  --method lutllm \
+  --model-id Qwen/Qwen2.5-1.5B \
+  --output-dir results/qwen15b_lutllm_7linear \
+  --seq-len 64 \
+  --ppl-tokens 512 \
+  --calib-tokens 512 \
+  --calib-batches 4 \
+  --calib-vectors-per-layer 256 \
+  --mmlu-samples 8 \
+  --kmeans-iters 1 \
+  --sample-limit 256 \
+  --max-linears 7
+```
+
+This is still not the full LUT-LLM training recipe. The paper describes QAT with STE and fused lookup/reduce kernels; this repo currently implements a PTQ approximation of the visible quantization layout.
+
 ## Output Files
 
 Each run writes:
