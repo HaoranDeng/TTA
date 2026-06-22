@@ -99,9 +99,9 @@ The 7B run uses compact LUT storage to avoid materializing the theoretical expan
 | Run | Model | Method | Config | Baseline PPL | Quant PPL | Baseline MMLU | Quant MMLU | Compact LUT | Weight Codes | Lookups / Token |
 |---|---|---|---|---:|---:|---:|---:|---:|---:|---:|
 | `scai7_pq_qwen7b_s8_k64_affine_compact` | `Qwen/Qwen2.5-7B` | PQ | `subdim=8`, `Ka=64`, `Kw=64`, affine | 13.31 | 3,047.48 | 25.0% | 0.0% | 1,106.00 MiB | 583.41 MiB | 815,661,056 |
-| `scai7_lutllm_qwen7b_all_compact` | `Qwen/Qwen2.5-7B` | LUT-LLM-style | `subdim=2`, `Ka=64`, `Kw=16`, compact | pending | pending | pending | pending | pending | pending | pending |
+| `scai7_lutllm_qwen7b_all_compact` | `Qwen/Qwen2.5-7B` | LUT-LLM-style | `subdim=2`, `Ka=64`, `Kw=16`, compact | 13.31 | 2,420.01 | 25.0% | 25.0% | 12,446.00 MiB | 1,555.75 MiB | 3,262,644,224 |
 
-For the completed 7B PQ compact run, the theoretical expanded LUT would be `99,568.00 MiB` FP16, while compact storage is `1,106.00 MiB`. This is the representation that matters for FPGA sizing.
+For the completed 7B PQ compact run, the theoretical expanded LUT would be `99,568.00 MiB` FP16, while compact storage is `1,106.00 MiB`. For the 7B LUT-LLM-style compact run, the theoretical expanded LUT would be `398,272.00 MiB` FP16, while compact 8-bit LUT storage is `12,446.00 MiB`. The compact representation is the one that matters for FPGA sizing.
 
 ## Hardware Estimate: 16x16 Codebook
 
