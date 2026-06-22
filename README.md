@@ -10,6 +10,58 @@ The goal is not to provide a fast GPU implementation. The PyTorch implementation
 - How many LUT entries, activation codes, weight codes, table lookups, and additions would an FPGA design need?
 - How does a baseline model compare with the PQ+LUT model on simple metrics such as WikiText perplexity and zero-shot MMLU accuracy?
 
+## Current Results
+
+Detailed logs and JSON artifacts are under `results/`. The main writeups are:
+
+- `PAPER_REPRO.md`: LUT-LLM paper reproduction path for Qwen 3 1.7B.
+- `RESULTS.md`: earlier PTQ PQ+LUT feasibility runs on Qwen2.5 1.5B and 7B.
+
+### LUT-LLM Paper Reproduction Status
+
+The official `LUT-FPGA/LUT-LLM` artifact contains FPGA/HLS code and performance modeling, but it does not include the full PyTorch QAT/STE training code, fused lookup/reduce training kernels, GPTVQ scripts, or exact evaluation harness used for the paper's Table III. This repo implements a transparent PyTorch reproduction scaffold with the same model family and datasets, but it is not yet a byte-identical reproduction of the paper.
+
+Paper Table III reference for Qwen 3 1.7B:
+
+| Method | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | SQuADv2 | MMLU-Pro |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Paper FP16 | 87.6 | 86.5 | 92.9 | 91.2 | 80.9 | 93.7 | 72.8 | 33.1 |
+| Paper LUT-LLM final | 86.9 | 82.8 | 90.4 | 89.5 | 76.5 | 90.6 | 69.7 | 30.8 |
+
+Our prompt-based evaluator baselines on scai7, 128 samples per task:
+
+| Run | Model | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | SQuADv2 F1 | MMLU-Pro |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `paper_baseline_qwen3_1p7b_128` | `Qwen/Qwen3-1.7B` | 42.2 | 70.3 | 46.1 | 28.1 | 52.3 | 77.3 | 12.2 | 23.4 |
+| `paper_baseline_qwen3_1p7b_base_128` | `Qwen/Qwen3-1.7B-Base` | 41.4 | 74.2 | 74.2 | 56.2 | 52.3 | 57.0 | 36.0 | 28.9 |
+
+The baseline mismatch shows that the exact paper evaluation protocol is not captured by this simple prompt evaluator.
+
+Simplified full-layer QAT smoke on scai7:
+
+| Stage | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| FP16 baseline, same 16 rows | 25.0 | 62.5 | 37.5 | 37.5 | 62.5 | 87.5 | 43.8 |
+| + Act. Quant., simplified STE | 25.0 | 37.5 | 62.5 | 62.5 | 62.5 | 56.2 | 6.2 |
+| + Weight Quant., final LUT | 43.8 | 37.5 | 62.5 | 56.2 | 62.5 | 50.0 | 6.2 |
+
+Final LUT hardware scale for `Qwen/Qwen3-1.7B`:
+
+| Quantized Linears | Compact INT8 LUT | Weight Codes Packed | Lookups / Token | Act Code Bits / Token | Theoretical Expanded LUT FP16 |
+|---:|---:|---:|---:|---:|---:|
+| 196 | 2,688.0 MiB | 336.0 MiB | 704,643,072 | 1,548,288 | 86,016.0 MiB |
+
+### Earlier PQ/LUT PTQ Feasibility Results
+
+These are not paper reproductions. They are full-layer post-training quantization tests that show the naive PTQ path is too lossy.
+
+| Model | Method | Codebook | Baseline PPL | Quant PPL | Quant MMLU Smoke | Compact LUT | Lookups / Token |
+|---|---|---|---:|---:|---:|---:|---:|
+| `Qwen/Qwen2.5-1.5B` | LUT-LLM-style + affine | `subdim=2, Ka=64, Kw=16` | 24.78 | 658.91 | 25.0% | 2,499 MiB | 655,097,856 |
+| `Qwen/Qwen2.5-1.5B` | PQ + affine | `subdim=8, Ka=128, Kw=64` | 24.78 | 2,656.55 | 0.0% | 994 MiB | 163,774,464 |
+| `Qwen/Qwen2.5-7B` | LUT-LLM-style compact | `subdim=2, Ka=64, Kw=16` | 13.31 | 2,420.01 | 25.0% | 12,446 MiB | 3,262,644,224 |
+| `Qwen/Qwen2.5-7B` | PQ compact + affine | `subdim=8, Ka=64, Kw=64` | 13.31 | 3,047.48 | 0.0% | 1,106 MiB | 815,661,056 |
+
 ## Quick Start
 
 ```bash
