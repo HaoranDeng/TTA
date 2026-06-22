@@ -1,0 +1,49 @@
+{
+  "aggregate": {
+    "act_center_values": 3584.0,
+    "act_code_bits_per_token": 56.0,
+    "adds_per_token": 24192.0,
+    "base_lut_entries": 448.0,
+    "base_lut_mib_fp16": 0.0008544921875,
+    "base_lut_mib_fp32": 0.001708984375,
+    "centroid_distance_scalar_ops_per_token": 3584.0,
+    "centroid_distance_vectors_per_token": 112.0,
+    "dense_mac_per_token": 802816.0,
+    "expanded_lut_entries": 100352.0,
+    "expanded_lut_mib_fp16": 0.19140625,
+    "lookups_per_token": 25088.0,
+    "quantized_linears": 1,
+    "train_seconds": 0.37164478801423684,
+    "weight_center_values": 3584.0,
+    "weight_code_bits": 50176.0,
+    "weight_code_count": 25088.0,
+    "weight_codes_mib_packed": 0.0059814453125
+  },
+  "calibration_seconds": 0.013708338956348598,
+  "modules": [
+    {
+      "Ka": 4,
+      "Kw": 4,
+      "M": 28,
+      "act_center_values": 3584,
+      "act_code_bits_per_token": 56,
+      "adds_per_token": 24192,
+      "base_lut_entries": 448,
+      "centroid_distance_scalar_ops_per_token": 3584,
+      "centroid_distance_vectors_per_token": 112,
+      "dense_mac_per_token": 802816,
+      "expanded_lut_entries": 100352,
+      "in_features": 896,
+      "lookups_per_token": 25088,
+      "lut_dtype": "float16",
+      "name": "model.layers.0.self_attn.q_proj",
+      "out_features": 896,
+      "subdim": 32,
+      "train_seconds": 0.37164478801423684,
+      "weight_center_values": 3584,
+      "weight_code_bits": 50176,
+      "weight_code_count": 25088
+    }
+  ],
+  "quantization_seconds": 0.3723021700279787
+}
