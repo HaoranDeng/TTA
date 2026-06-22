@@ -1,0 +1,234 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import time
+from pathlib import Path
+from typing import Any
+
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+from pq_lut_lm.activation_quant import (
+    convert_ste_act_quant_to_lut,
+    replace_with_ste_act_quant,
+    trainable_act_center_parameters,
+)
+from pq_lut_lm.eval_utils import load_wikitext_texts, make_lm_batches
+from pq_lut_lm.modeling import DEFAULT_TARGET_REGEX
+from pq_lut_lm.paper_eval import evaluate_paper_tasks
+from pq_lut_lm.pq_linear import PQConfig
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model-id", default="Qwen/Qwen3-1.7B")
+    parser.add_argument("--output-dir", required=True)
+    parser.add_argument("--device", default="cuda")
+    parser.add_argument("--dtype", choices=["float16", "bfloat16", "float32"], default="bfloat16")
+    parser.add_argument("--trust-remote-code", action="store_true")
+    parser.add_argument("--seq-len", type=int, default=64)
+    parser.add_argument("--train-tokens", type=int, default=8192)
+    parser.add_argument("--calib-tokens", type=int, default=1024)
+    parser.add_argument("--calib-batches", type=int, default=4)
+    parser.add_argument("--calib-vectors-per-layer", type=int, default=256)
+    parser.add_argument("--train-steps", type=int, default=20)
+    parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--paper-samples", type=int, default=16)
+    parser.add_argument("--skip-squad", action="store_true")
+    parser.add_argument("--target-regex", default=DEFAULT_TARGET_REGEX)
+    parser.add_argument("--include-lm-head", action="store_true")
+    parser.add_argument("--max-linears", type=int, default=None)
+    parser.add_argument("--subdim", type=int, default=2)
+    parser.add_argument("--ka", type=int, default=64)
+    parser.add_argument("--kw", type=int, default=16)
+    parser.add_argument("--kmeans-iters", type=int, default=1)
+    parser.add_argument("--sample-limit", type=int, default=256)
+    parser.add_argument("--encode-chunk", type=int, default=8192)
+    parser.add_argument("--distance", choices=["l2", "chebyshev"], default="chebyshev")
+    parser.add_argument("--weight-group-size", type=int, default=256)
+    parser.add_argument("--lut-quant-bits", type=int, default=8)
+    parser.add_argument("--lut-storage", choices=["expanded", "compact"], default="expanded")
+    parser.add_argument("--eval-baseline", action="store_true")
+    parser.add_argument("--eval-act-quant", action="store_true")
+    parser.add_argument("--eval-final-lut", action="store_true")
+    parser.add_argument("--seed", type=int, default=123)
+    return parser.parse_args()
+
+
+def save_json(path: Path, obj: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as f:
+        json.dump(obj, f, indent=2, sort_keys=True)
+
+
+def dtype_from_arg(name: str) -> torch.dtype:
+    return {"float16": torch.float16, "bfloat16": torch.bfloat16, "float32": torch.float32}[name]
+
+
+def public_eval(result: dict[str, Any]) -> dict[str, Any]:
+    return result
+
+
+def main() -> None:
+    args = parse_args()
+    torch.manual_seed(args.seed)
+    out_dir = Path(args.output_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    save_json(out_dir / "config.json", vars(args))
+
+    device = torch.device(args.device if torch.cuda.is_available() or args.device == "cpu" else "cpu")
+    dtype = dtype_from_arg(args.dtype)
+    if device.type == "cpu":
+        dtype = torch.float32
+
+    print(f"Loading tokenizer: {args.model_id}", flush=True)
+    tokenizer = AutoTokenizer.from_pretrained(args.model_id, trust_remote_code=args.trust_remote_code)
+    if tokenizer.pad_token_id is None:
+        tokenizer.pad_token = tokenizer.eos_token
+
+    print(f"Loading model: {args.model_id}", flush=True)
+    load_start = time.perf_counter()
+    model = AutoModelForCausalLM.from_pretrained(
+        args.model_id,
+        dtype=dtype,
+        low_cpu_mem_usage=True,
+        trust_remote_code=args.trust_remote_code,
+    ).to(device)
+    model.eval()
+    load_seconds = time.perf_counter() - load_start
+
+    texts = load_wikitext_texts("train")
+    train_batches = make_lm_batches(tokenizer, texts, args.seq_len, args.train_tokens, batch_size=1)
+    calib_batches = make_lm_batches(tokenizer, texts, args.seq_len, args.calib_tokens, batch_size=1)[: args.calib_batches]
+
+    summary: dict[str, Any] = {
+        "model_id": args.model_id,
+        "device": str(device),
+        "dtype": str(dtype),
+        "load_seconds": load_seconds,
+        "paper_samples": args.paper_samples,
+    }
+
+    if args.eval_baseline:
+        print("Evaluating FP16 baseline on paper tasks", flush=True)
+        summary["fp16_baseline"] = public_eval(
+            evaluate_paper_tasks(model, tokenizer, device, args.paper_samples, include_squad=not args.skip_squad)
+        )
+        save_json(out_dir / "summary.json", summary)
+
+    print("Freezing dense model weights", flush=True)
+    for p in model.parameters():
+        p.requires_grad_(False)
+
+    config = PQConfig(
+        method="lutllm",
+        subdim=args.subdim,
+        ka=args.ka,
+        kw=args.kw,
+        kmeans_iters=args.kmeans_iters,
+        sample_limit=args.sample_limit,
+        encode_chunk=args.encode_chunk,
+        lut_dtype="float16",
+        lut_storage=args.lut_storage,
+        distance=args.distance,
+        weight_group_size=args.weight_group_size,
+        lut_quant_bits=args.lut_quant_bits,
+        output_correction="none",
+        seed=args.seed,
+    )
+
+    print("Initializing STE activation quantizers", flush=True)
+    act_report = replace_with_ste_act_quant(
+        model,
+        calib_batches,
+        config,
+        target_regex=args.target_regex,
+        include_lm_head=args.include_lm_head,
+        max_linears=args.max_linears,
+        max_vectors_per_layer=args.calib_vectors_per_layer,
+        device=device,
+    )
+    save_json(out_dir / "act_quant_hardware_stats.json", {
+        "modules": act_report.module_stats,
+        "aggregate": act_report.aggregate,
+        "calibration_seconds": act_report.calibration_seconds,
+        "initialization_seconds": act_report.initialization_seconds,
+    })
+
+    params = trainable_act_center_parameters(model)
+    print(f"Training {sum(p.numel() for p in params):,} activation-center parameters", flush=True)
+    opt = torch.optim.AdamW(params, lr=args.lr)
+    train_losses = []
+    if device.type == "cuda":
+        torch.cuda.synchronize(device)
+    train_start = time.perf_counter()
+    model.train()
+    for step in range(args.train_steps):
+        batch = train_batches[step % len(train_batches)]
+        batch = {k: v.to(device) for k, v in batch.items()}
+        labels = batch["input_ids"].clone()
+        opt.zero_grad(set_to_none=True)
+        out = model(**batch, labels=labels)
+        loss = out.loss
+        loss.backward()
+        opt.step()
+        value = float(loss.detach().cpu().item())
+        train_losses.append(value)
+        print(f"step {step + 1}/{args.train_steps} loss={value:.4f}", flush=True)
+    if device.type == "cuda":
+        torch.cuda.synchronize(device)
+    summary["act_qat_training"] = {
+        "steps": args.train_steps,
+        "seconds": time.perf_counter() - train_start,
+        "losses": train_losses,
+    }
+    model.eval()
+    save_json(out_dir / "summary.json", summary)
+
+    if args.eval_act_quant:
+        print("Evaluating +Act. Quant. on paper tasks", flush=True)
+        summary["act_quant"] = public_eval(
+            evaluate_paper_tasks(model, tokenizer, device, args.paper_samples, include_squad=not args.skip_squad)
+        )
+        save_json(out_dir / "summary.json", summary)
+
+    print("Converting trained activation quantizers to activation-weight LUT modules", flush=True)
+    lut_report = convert_ste_act_quant_to_lut(
+        model,
+        calib_batches,
+        config,
+        target_regex=args.target_regex,
+        include_lm_head=args.include_lm_head,
+        max_linears=args.max_linears,
+        max_vectors_per_layer=args.calib_vectors_per_layer,
+        device=device,
+    )
+    save_json(out_dir / "final_lut_hardware_stats.json", {
+        "modules": lut_report.module_stats,
+        "aggregate": lut_report.aggregate,
+        "calibration_seconds": lut_report.calibration_seconds,
+        "quantization_seconds": lut_report.quantization_seconds,
+    })
+    summary["final_lut"] = {
+        "hardware_aggregate": lut_report.aggregate,
+        "calibration_seconds": lut_report.calibration_seconds,
+        "quantization_seconds": lut_report.quantization_seconds,
+    }
+    save_json(out_dir / "summary.json", summary)
+
+    if args.eval_final_lut:
+        print("Evaluating +Weight Quant. final LUT on paper tasks", flush=True)
+        summary["final_lut"]["paper_eval"] = public_eval(
+            evaluate_paper_tasks(model, tokenizer, device, args.paper_samples, include_squad=not args.skip_squad)
+        )
+        save_json(out_dir / "summary.json", summary)
+
+    print(json.dumps(summary, indent=2, sort_keys=True), flush=True)
+
+
+if __name__ == "__main__":
+    os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+    main()

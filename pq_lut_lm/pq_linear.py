@@ -85,10 +85,11 @@ def kmeans(
 ) -> torch.Tensor:
     """Small deterministic k-means used for calibration."""
     x = x.float().contiguous()
-    if sample_limit > 0 and x.shape[0] > sample_limit:
+    effective_sample_limit = max(sample_limit, k) if sample_limit > 0 else sample_limit
+    if effective_sample_limit > 0 and x.shape[0] > effective_sample_limit:
         gen = torch.Generator(device=x.device)
         gen.manual_seed(seed)
-        idx = torch.randperm(x.shape[0], generator=gen, device=x.device)[:sample_limit]
+        idx = torch.randperm(x.shape[0], generator=gen, device=x.device)[:effective_sample_limit]
         x = x[idx].contiguous()
 
     n, _ = x.shape
@@ -226,6 +227,7 @@ class PQLUTLinear(nn.Module):
         calibration_inputs: torch.Tensor,
         config: PQConfig,
         source_name: str,
+        act_centers_override: torch.Tensor | None = None,
     ) -> "PQLUTLinear":
         if linear.in_features % config.subdim != 0:
             raise ValueError(
@@ -260,15 +262,18 @@ class PQLUTLinear(nn.Module):
         for mi in range(m):
             lo = mi * config.subdim
             hi = lo + config.subdim
-            ca = kmeans_padded(
-                calib[:, lo:hi],
-                config.ka,
-                config.kmeans_iters,
-                config.seed + 1009 * mi,
-                config.sample_limit,
-                config.encode_chunk,
-                config.distance,
-            )
+            if act_centers_override is None:
+                ca = kmeans_padded(
+                    calib[:, lo:hi],
+                    config.ka,
+                    config.kmeans_iters,
+                    config.seed + 1009 * mi,
+                    config.sample_limit,
+                    config.encode_chunk,
+                    config.distance,
+                )
+            else:
+                ca = act_centers_override[mi].to(device=device, dtype=torch.float32)
             act_centers[mi] = ca
 
             for gi in range(group_count):

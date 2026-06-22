@@ -1,0 +1,191 @@
+{
+  "act_qat_training": {
+    "losses": [
+      6.4219489097595215,
+      5.236907482147217,
+      8.104601860046387,
+      8.608238220214844,
+      7.682373523712158,
+      6.289261341094971,
+      6.693877220153809,
+      8.532227516174316,
+      7.394288063049316,
+      6.743165493011475,
+      6.999701976776123,
+      8.077177047729492,
+      7.65608549118042,
+      7.142383098602295,
+      9.2076416015625,
+      8.20081615447998,
+      7.210148811340332,
+      7.911247730255127,
+      9.085256576538086,
+      8.491862297058105
+    ],
+    "seconds": 1.7508423370309174,
+    "steps": 20
+  },
+  "act_quant": {
+    "mmlu_pro": {
+      "accuracy": 0.0625,
+      "correct": 1,
+      "seconds": 9.26672747102566,
+      "total": 16
+    },
+    "mnli": {
+      "accuracy": 0.25,
+      "correct": 4,
+      "seconds": 1.6308200731873512,
+      "total": 16
+    },
+    "mrpc": {
+      "accuracy": 0.375,
+      "correct": 6,
+      "seconds": 1.379973887000233,
+      "total": 16
+    },
+    "qnli": {
+      "accuracy": 0.625,
+      "correct": 10,
+      "seconds": 1.2256282661110163,
+      "total": 16
+    },
+    "qqp": {
+      "accuracy": 0.625,
+      "correct": 10,
+      "seconds": 0.8754147021099925,
+      "total": 16
+    },
+    "rte": {
+      "accuracy": 0.625,
+      "correct": 10,
+      "seconds": 1.4883521751035005,
+      "total": 16
+    },
+    "sst2": {
+      "accuracy": 0.5625,
+      "correct": 9,
+      "seconds": 0.6784414639696479,
+      "total": 16
+    }
+  },
+  "device": "cuda",
+  "dtype": "torch.bfloat16",
+  "final_lut": {
+    "calibration_seconds": 7.96264032414183,
+    "hardware_aggregate": {
+      "act_center_values": 33030144.0,
+      "act_code_bits_per_token": 1548288.0,
+      "adds_per_token": 704069632.0,
+      "base_lut_bits": 22548578304.0,
+      "base_lut_entries": 2818572288.0,
+      "base_lut_mib_fp16": 5376.0,
+      "base_lut_mib_fp32": 10752.0,
+      "base_lut_mib_quantized": 2688.0,
+      "centroid_distance_scalar_ops_per_token": 33030144.0,
+      "centroid_distance_vectors_per_token": 16515072.0,
+      "dense_mac_per_token": 1409286144.0,
+      "expanded_lut_entries": 45097156608.0,
+      "expanded_lut_mib_fp16": 86016.0,
+      "lookups_per_token": 704643072.0,
+      "quantized_linears": 196,
+      "train_seconds": 1481.7195274755359,
+      "weight_center_values": 88080384.0,
+      "weight_code_bits": 2818572288.0,
+      "weight_code_count": 704643072.0,
+      "weight_codes_mib_packed": 336.0
+    },
+    "paper_eval": {
+      "mmlu_pro": {
+        "accuracy": 0.0625,
+        "correct": 1,
+        "seconds": 144.93296762602404,
+        "total": 16
+      },
+      "mnli": {
+        "accuracy": 0.4375,
+        "correct": 7,
+        "seconds": 70.71205461886711,
+        "total": 16
+      },
+      "mrpc": {
+        "accuracy": 0.375,
+        "correct": 6,
+        "seconds": 70.5856427301187,
+        "total": 16
+      },
+      "qnli": {
+        "accuracy": 0.625,
+        "correct": 10,
+        "seconds": 70.1636330310721,
+        "total": 16
+      },
+      "qqp": {
+        "accuracy": 0.5625,
+        "correct": 9,
+        "seconds": 70.36574878497049,
+        "total": 16
+      },
+      "rte": {
+        "accuracy": 0.625,
+        "correct": 10,
+        "seconds": 71.25516019901261,
+        "total": 16
+      },
+      "sst2": {
+        "accuracy": 0.5,
+        "correct": 8,
+        "seconds": 69.97340699494816,
+        "total": 16
+      }
+    },
+    "quantization_seconds": 1482.6395112578757
+  },
+  "fp16_baseline": {
+    "mmlu_pro": {
+      "accuracy": 0.4375,
+      "correct": 7,
+      "seconds": 0.4938479720149189,
+      "total": 16
+    },
+    "mnli": {
+      "accuracy": 0.25,
+      "correct": 4,
+      "seconds": 0.5285919290035963,
+      "total": 16
+    },
+    "mrpc": {
+      "accuracy": 0.625,
+      "correct": 10,
+      "seconds": 0.2664249329827726,
+      "total": 16
+    },
+    "qnli": {
+      "accuracy": 0.375,
+      "correct": 6,
+      "seconds": 0.261207700939849,
+      "total": 16
+    },
+    "qqp": {
+      "accuracy": 0.375,
+      "correct": 6,
+      "seconds": 0.2686393160838634,
+      "total": 16
+    },
+    "rte": {
+      "accuracy": 0.625,
+      "correct": 10,
+      "seconds": 0.34032610105350614,
+      "total": 16
+    },
+    "sst2": {
+      "accuracy": 0.875,
+      "correct": 14,
+      "seconds": 0.24831252405419946,
+      "total": 16
+    }
+  },
+  "load_seconds": 7.673980267951265,
+  "model_id": "Qwen/Qwen3-1.7B",
+  "paper_samples": 16
+}

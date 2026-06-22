@@ -2,6 +2,8 @@
 
 Minimal experiments for applying product-quantized lookup-table linear layers to real causal language models.
 
+For the paper-targeted LUT-LLM reproduction path, see `PAPER_REPRO.md`. That path uses Qwen 3 1.7B, GLUE, SQuAD v2, MMLU-Pro, and a simplified STE activation-QAT implementation.
+
 The goal is not to provide a fast GPU implementation. The PyTorch implementation is deliberately simple so it can answer early research questions:
 
 - What happens to language-model quality when selected `nn.Linear` layers are replaced by PQ+LUT approximations?

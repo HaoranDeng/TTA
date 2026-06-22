@@ -1,0 +1,10 @@
+{
+  "device": "cuda",
+  "dtype": "bfloat16",
+  "model_id": "Qwen/Qwen3-1.7B-Base",
+  "output_dir": "results/paper_baseline_qwen3_1p7b_base_128",
+  "paper_samples": 128,
+  "seed": 123,
+  "skip_squad": false,
+  "trust_remote_code": false
+}
