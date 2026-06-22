@@ -48,9 +48,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--sample-limit", type=int, default=2048)
     parser.add_argument("--encode-chunk", type=int, default=8192)
     parser.add_argument("--lut-dtype", choices=["float16", "bfloat16", "float32"], default="float16")
+    parser.add_argument("--lut-storage", choices=["expanded", "compact"], default="expanded")
     parser.add_argument("--distance", choices=["l2", "chebyshev"], default=None)
     parser.add_argument("--weight-group-size", type=int, default=None)
     parser.add_argument("--lut-quant-bits", type=int, default=None)
+    parser.add_argument("--output-correction", choices=["none", "bias", "affine"], default="none")
     parser.add_argument("--seed", type=int, default=123)
     parser.add_argument("--skip-pq", action="store_true")
     args = parser.parse_args()
@@ -157,9 +159,11 @@ def main() -> None:
             sample_limit=args.sample_limit,
             encode_chunk=args.encode_chunk,
             lut_dtype=args.lut_dtype,
+            lut_storage=args.lut_storage,
             distance=args.distance,
             weight_group_size=args.weight_group_size,
             lut_quant_bits=args.lut_quant_bits,
+            output_correction=args.output_correction,
             seed=args.seed,
         )
         print(f"Calibrating and replacing Linear layers with {args.method} LUT modules", flush=True)

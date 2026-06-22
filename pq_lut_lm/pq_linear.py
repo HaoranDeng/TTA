@@ -19,9 +19,11 @@ class PQConfig:
     sample_limit: int = 2048
     encode_chunk: int = 8192
     lut_dtype: str = "float16"
+    lut_storage: str = "expanded"
     distance: str = "l2"
     weight_group_size: int = 0
     lut_quant_bits: int = 0
+    output_correction: str = "none"
     seed: int = 123
 
     def to_dict(self) -> dict[str, Any]:
@@ -41,6 +43,10 @@ def _lut_dtype(name: str) -> torch.dtype:
     if name == "float32":
         return torch.float32
     raise ValueError(f"Unsupported LUT dtype: {name}")
+
+
+def _lut_dtype_bits(name: str) -> int:
+    return {"float16": 16, "bfloat16": 16, "float32": 32}[name]
 
 
 @torch.no_grad()
@@ -151,19 +157,24 @@ def _num_weight_groups(out_features: int, weight_group_size: int) -> int:
     return math.ceil(out_features / weight_group_size)
 
 
-def _quantize_lut(lut: torch.Tensor, bits: int) -> tuple[torch.Tensor, float, float]:
+def _quantize_lut(lut: torch.Tensor, bits: int) -> tuple[torch.Tensor, torch.Tensor, float, float]:
     if bits <= 0:
-        return lut, 1.0, 0.0
+        return lut, lut, 1.0, 0.0
     qmax = float((1 << bits) - 1)
     min_val = float(lut.min().item())
     max_val = float(lut.max().item())
     if max_val <= min_val:
-        return torch.zeros_like(lut), 1.0, 0.0
+        q = torch.zeros_like(lut, dtype=torch.uint8)
+        return q, torch.zeros_like(lut), 1.0, 0.0
     scale = (max_val - min_val) / qmax
     zeropoint = -min_val / scale
     q = torch.round(lut / scale + zeropoint).clamp_(0, qmax)
     dequant = (q - zeropoint) * scale
-    return dequant, scale, zeropoint
+    if bits <= 8:
+        q = q.to(torch.uint8)
+    else:
+        q = q.to(torch.int16)
+    return q, dequant, scale, zeropoint
 
 
 class PQLUTLinear(nn.Module):
@@ -178,8 +189,11 @@ class PQLUTLinear(nn.Module):
         weight_centers: torch.Tensor,
         weight_codes: torch.Tensor,
         expanded_lut: torch.Tensor,
+        compact_lut: torch.Tensor,
         lut_scales: torch.Tensor,
         lut_zeropoints: torch.Tensor,
+        correction_scale: torch.Tensor,
+        correction_bias: torch.Tensor,
         config: PQConfig,
         source_name: str,
         train_seconds: float,
@@ -194,8 +208,11 @@ class PQLUTLinear(nn.Module):
         self.register_buffer("weight_centers", weight_centers, persistent=True)
         self.register_buffer("weight_codes", weight_codes, persistent=True)
         self.register_buffer("expanded_lut", expanded_lut, persistent=True)
+        self.register_buffer("compact_lut", compact_lut, persistent=True)
         self.register_buffer("lut_scales", lut_scales, persistent=True)
         self.register_buffer("lut_zeropoints", lut_zeropoints, persistent=True)
+        self.register_buffer("correction_scale", correction_scale, persistent=True)
+        self.register_buffer("correction_bias", correction_bias, persistent=True)
         if bias is None:
             self.bias = None
         else:
@@ -222,11 +239,19 @@ class PQLUTLinear(nn.Module):
         m = in_features // config.subdim
         group_count = _num_weight_groups(out_features, config.weight_group_size)
         lut_dtype = _lut_dtype(config.lut_dtype)
+        if config.lut_storage not in {"expanded", "compact"}:
+            raise ValueError(f"Unsupported LUT storage mode: {config.lut_storage}")
 
         act_centers = torch.empty((m, config.ka, config.subdim), device=device, dtype=torch.float32)
         weight_centers = torch.empty((m, group_count, config.kw, config.subdim), device=device, dtype=torch.float32)
         weight_codes = torch.empty((m, out_features), device=device, dtype=torch.long)
-        expanded_lut = torch.empty((m, config.ka, out_features), device=device, dtype=lut_dtype)
+        if config.lut_storage == "expanded":
+            expanded_lut = torch.empty((m, config.ka, out_features), device=device, dtype=lut_dtype)
+            compact_lut = torch.empty((0,), device=device, dtype=torch.uint8)
+        else:
+            expanded_lut = torch.empty((0,), device=device, dtype=lut_dtype)
+            compact_dtype = torch.uint8 if config.lut_quant_bits > 0 and config.lut_quant_bits <= 8 else lut_dtype
+            compact_lut = torch.empty((m, group_count, config.ka, config.kw), device=device, dtype=compact_dtype)
         lut_scales = torch.empty((m, group_count), device=device, dtype=torch.float32)
         lut_zeropoints = torch.empty((m, group_count), device=device, dtype=torch.float32)
 
@@ -261,16 +286,19 @@ class PQLUTLinear(nn.Module):
                 )
                 wc = assign_to_centers(ww, cw, chunk=config.encode_chunk, distance=config.distance)
                 lut = ca @ cw.t()
-                lut, scale, zeropoint = _quantize_lut(lut, config.lut_quant_bits)
+                stored_lut, dequant_lut, scale, zeropoint = _quantize_lut(lut, config.lut_quant_bits)
                 weight_centers[mi, gi] = cw
                 weight_codes[mi, g_lo:g_hi] = wc
-                expanded_lut[mi, :, g_lo:g_hi] = lut[:, wc].to(lut_dtype)
+                if config.lut_storage == "expanded":
+                    expanded_lut[mi, :, g_lo:g_hi] = dequant_lut[:, wc].to(lut_dtype)
+                else:
+                    compact_lut[mi, gi] = stored_lut.to(compact_lut.dtype)
                 lut_scales[mi, gi] = scale
                 lut_zeropoints[mi, gi] = zeropoint
         _sync(device)
         train_seconds = time.perf_counter() - start
 
-        return cls(
+        pq = cls(
             in_features=in_features,
             out_features=out_features,
             bias=linear.bias,
@@ -278,12 +306,38 @@ class PQLUTLinear(nn.Module):
             weight_centers=weight_centers,
             weight_codes=weight_codes,
             expanded_lut=expanded_lut,
+            compact_lut=compact_lut,
             lut_scales=lut_scales,
             lut_zeropoints=lut_zeropoints,
+            correction_scale=torch.ones((out_features,), device=device, dtype=torch.float32),
+            correction_bias=torch.zeros((out_features,), device=device, dtype=torch.float32),
             config=config,
             source_name=source_name,
             train_seconds=train_seconds,
         )
+        if config.output_correction != "none":
+            pq._fit_output_correction(linear, calib)
+        return pq
+
+    @torch.no_grad()
+    def _fit_output_correction(self, linear: nn.Linear, calib: torch.Tensor) -> None:
+        if self.config.output_correction not in {"bias", "affine"}:
+            raise ValueError(f"Unsupported output correction: {self.config.output_correction}")
+        orig = linear(calib).float()
+        approx = self(calib).float()
+        if self.config.output_correction == "bias":
+            self.correction_bias.copy_((orig - approx).mean(dim=0))
+            return
+        approx_mean = approx.mean(dim=0)
+        orig_mean = orig.mean(dim=0)
+        centered_approx = approx - approx_mean
+        centered_orig = orig - orig_mean
+        var = (centered_approx * centered_approx).mean(dim=0).clamp_min(1e-6)
+        cov = (centered_approx * centered_orig).mean(dim=0)
+        scale = (cov / var).clamp(-8.0, 8.0)
+        bias = orig_mean - scale * approx_mean
+        self.correction_scale.copy_(scale)
+        self.correction_bias.copy_(bias)
 
     @torch.no_grad()
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -291,10 +345,28 @@ class PQLUTLinear(nn.Module):
         flat = x.reshape(-1, self.in_features)
         codes = encode_activation(flat, self.act_centers, distance=self.config.distance)
         out = torch.zeros((flat.shape[0], self.out_features), device=flat.device, dtype=torch.float32)
+        if self.config.lut_storage == "compact":
+            group_count = _num_weight_groups(self.out_features, self.config.weight_group_size)
+            for mi in range(codes.shape[1]):
+                code_m = codes[:, mi]
+                for gi in range(group_count):
+                    g_lo = gi * self.config.weight_group_size if self.config.weight_group_size > 0 else 0
+                    g_hi = min((gi + 1) * self.config.weight_group_size, self.out_features) if self.config.weight_group_size > 0 else self.out_features
+                    weight_code = self.weight_codes[mi, g_lo:g_hi]
+                    vals = self.compact_lut[mi, gi][code_m[:, None], weight_code[None, :]].float()
+                    if self.config.lut_quant_bits > 0:
+                        vals = (vals - self.lut_zeropoints[mi, gi]) * self.lut_scales[mi, gi]
+                    out[:, g_lo:g_hi].add_(vals)
+            if self.bias is not None:
+                out.add_(self.bias.float())
+            out.mul_(self.correction_scale).add_(self.correction_bias)
+            return out.to(dtype=x.dtype).reshape(*original_shape, self.out_features)
+
         for mi in range(codes.shape[1]):
             out.add_(self.expanded_lut[mi, codes[:, mi], :].float())
         if self.bias is not None:
             out.add_(self.bias.float())
+        out.mul_(self.correction_scale).add_(self.correction_bias)
         return out.to(dtype=x.dtype).reshape(*original_shape, self.out_features)
 
     def hardware_stats(self) -> dict[str, Any]:
@@ -302,7 +374,7 @@ class PQLUTLinear(nn.Module):
         group_count = _num_weight_groups(self.out_features, self.config.weight_group_size)
         act_code_bits = math.ceil(math.log2(self.config.ka))
         weight_code_bits = math.ceil(math.log2(self.config.kw))
-        lut_bits = self.config.lut_quant_bits if self.config.lut_quant_bits > 0 else self.expanded_lut.element_size() * 8
+        lut_bits = self.config.lut_quant_bits if self.config.lut_quant_bits > 0 else _lut_dtype_bits(self.config.lut_dtype)
         base_lut_entries = m * group_count * self.config.ka * self.config.kw
         expanded_lut_entries = m * self.config.ka * self.out_features
         return {
@@ -318,6 +390,8 @@ class PQLUTLinear(nn.Module):
             "Kw": self.config.kw,
             "distance": self.config.distance,
             "lut_quant_bits": self.config.lut_quant_bits,
+            "lut_storage": self.config.lut_storage,
+            "output_correction": self.config.output_correction,
             "act_center_values": m * self.config.ka * self.config.subdim,
             "weight_center_values": m * group_count * self.config.kw * self.config.subdim,
             "base_lut_entries": base_lut_entries,

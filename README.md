@@ -96,6 +96,11 @@ python run_eval.py \
 
 This is still not the full LUT-LLM training recipe. The paper describes QAT with STE and fused lookup/reduce kernels; this repo currently implements a PTQ approximation of the visible quantization layout.
 
+Two extra switches are useful for the scai7 full-layer runs:
+
+- `--lut-storage compact` stores the base `M * groups * Ka * Kw` LUT instead of the expanded `M * Ka * out_features` LUT. This is slower in PyTorch but avoids huge expanded LUT tensors for 7B experiments.
+- `--output-correction {bias,affine}` fits a simple per-output post-hoc correction on calibration activations. This is not part of the LUT-LLM paper, but it is a useful PTQ diagnostic because it separates scale/bias error from centroid/codebook error.
+
 ## Output Files
 
 Each run writes:

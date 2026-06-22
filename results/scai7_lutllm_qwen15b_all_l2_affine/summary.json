@@ -1,0 +1,58 @@
+{
+  "baseline": {
+    "mmlu_zero_shot": {
+      "accuracy": 0.5,
+      "correct": 4,
+      "seconds": 0.17424608510918915,
+      "total": 8
+    },
+    "ppl": {
+      "nll": 3.209860533475876,
+      "ppl": 24.775630612537682,
+      "seconds": 0.306724573019892,
+      "tokens": 504
+    }
+  },
+  "device": "cuda",
+  "dtype": "torch.float16",
+  "load_seconds": 14.040535985957831,
+  "model_id": "Qwen/Qwen2.5-1.5B",
+  "pq_lut": {
+    "calibration_seconds": 0.10471237590536475,
+    "hardware_aggregate": {
+      "act_center_values": 32571392.0,
+      "act_code_bits_per_token": 1526784.0,
+      "adds_per_token": 654452736.0,
+      "base_lut_bits": 20963131392.0,
+      "base_lut_entries": 2620391424.0,
+      "base_lut_mib_fp16": 4998.0,
+      "base_lut_mib_fp32": 9996.0,
+      "base_lut_mib_quantized": 2499.0,
+      "centroid_distance_scalar_ops_per_token": 32571392.0,
+      "centroid_distance_vectors_per_token": 16285696.0,
+      "dense_mac_per_token": 1310195712.0,
+      "expanded_lut_entries": 41926262784.0,
+      "expanded_lut_mib_fp16": 79968.0,
+      "lookups_per_token": 655097856.0,
+      "quantized_linears": 196,
+      "train_seconds": 1428.5845833614003,
+      "weight_center_values": 81887232.0,
+      "weight_code_bits": 2620391424.0,
+      "weight_code_count": 655097856.0,
+      "weight_codes_mib_packed": 312.375
+    },
+    "mmlu_zero_shot": {
+      "accuracy": 0.0,
+      "correct": 0,
+      "seconds": 37.38264832110144,
+      "total": 8
+    },
+    "ppl": {
+      "nll": 6.939914703369141,
+      "ppl": 1032.6821268974718,
+      "seconds": 34.525478084106,
+      "tokens": 504
+    },
+    "quantization_seconds": 1434.117602584185
+  }
+}

@@ -58,6 +58,51 @@ Hardware estimates for these partial runs:
 
 The 1.5B partial result is much closer than the earlier whole-model naive PQ baseline, but it only replaces one transformer block. Full-model replication likely needs the paper's training recipe rather than pure KMeans PTQ.
 
+## Full-Layer scai7 Runs
+
+Date: 2026-06-22  
+GPU: NVIDIA H200 on scai7  
+Evaluation: WikiText-2 raw test with 504 scored tokens for 1.5B, 126 scored tokens for 7B compact; MMLU zero-shot smoke set with 8 rows for 1.5B and 4 rows for 7B compact. The MMLU numbers below are useful as regression signals, not benchmark-quality MMLU.
+
+All 1.5B runs quantize every transformer block linear matching `(q_proj|k_proj|v_proj|o_proj|gate_proj|up_proj|down_proj)$`, 196 linears total. `lm_head` remains dense.
+
+### LUT-LLM-Style Full-Layer PTQ
+
+These runs use the LUT-LLM-style codebook shape: `subdim=2`, `Ka=64`, `Kw=16`, `weight_group_size=256`, and 8-bit LUT values. The compact FPGA LUT has `M * groups * Ka * Kw` entries; the PyTorch expanded LUT is only for unfused GPU evaluation speed.
+
+| Run | Distance | Correction | Baseline PPL | LUT PPL | Baseline MMLU | LUT MMLU | Compact LUT | Weight Codes | Lookups / Token | Act Code Bits / Token |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `scai7_lutllm_qwen15b_all` | Chebyshev | none | 24.78 | 32,418.57 | 50.0% | 25.0% | 2,499.00 MiB | 312.38 MiB | 655,097,856 | 1,526,784 |
+| `scai7_lutllm_qwen15b_all_affine` | Chebyshev | affine output | 24.78 | 658.91 | 50.0% | 25.0% | 2,499.00 MiB | 312.38 MiB | 655,097,856 | 1,526,784 |
+| `scai7_lutllm_qwen15b_all_l2` | L2 | none | 24.78 | 11,574.71 | 50.0% | 37.5% | 2,499.00 MiB | 312.38 MiB | 655,097,856 | 1,526,784 |
+| `scai7_lutllm_qwen15b_all_l2_affine` | L2 | affine output | 24.78 | 1,032.68 | 50.0% | 0.0% | 2,499.00 MiB | 312.38 MiB | 655,097,856 | 1,526,784 |
+
+The output affine correction is the only tested LUT-LLM-style PTQ change that substantially improved PPL. It reduced the all-layer 1.5B PPL from `32,418.57` to `658.91` with Chebyshev assignment. L2 plus affine was worse at `1,032.68`. These results are still far from the FP16 baseline PPL of `24.78`, which supports the earlier conclusion: reproducing LUT-LLM's reported accuracy likely requires the paper's QAT/STE training path, not only post-training KMeans plus LUT substitution.
+
+### PQ Full-Layer Variants
+
+These are standard independent activation/weight PQ variants with L2 assignment and per-output affine correction. They keep FP16 LUT values in this prototype (`lut_quant_bits=0`).
+
+| Run | PQ Config | Baseline PPL | PQ PPL | Baseline MMLU | PQ MMLU | Compact LUT | Weight Codes | Lookups / Token | Act Code Bits / Token |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `scai7_pq_qwen15b_s16_k64_affine` | `subdim=16`, `Ka=64`, `Kw=64` | 24.78 | 4,500.05 | 50.0% | 25.0% | 248.50 MiB | 58.57 MiB | 81,887,232 | 190,848 |
+| `scai7_pq_qwen15b_s8_k64_affine` | `subdim=8`, `Ka=64`, `Kw=64` | 24.78 | 2,761.34 | 50.0% | 25.0% | 497.00 MiB | 117.14 MiB | 163,774,464 | 381,696 |
+| `scai7_pq_qwen15b_s4_k64_affine` | `subdim=4`, `Ka=64`, `Kw=64` | 24.78 | 211,263.19 | 50.0% | 25.0% | 994.00 MiB | 234.28 MiB | 327,548,928 | 763,392 |
+| `scai7_pq_qwen15b_s8_ka128_kw64_affine` | `subdim=8`, `Ka=128`, `Kw=64` | 24.78 | 2,656.55 | 50.0% | 0.0% | 994.00 MiB | 117.14 MiB | 163,774,464 | 445,312 |
+
+Among these PQ runs, `subdim=8`, `Ka=128`, `Kw=64` had the lowest PPL (`2,656.55`), while `subdim=8`, `Ka=64`, `Kw=64` was close (`2,761.34`) with lower activation-code and LUT footprint. Smaller `subdim=4` was not better; it increased lookup and LUT cost and made PPL much worse. The MMLU smoke set is too small to rank close methods reliably.
+
+### 7B Compact Check
+
+The 7B run uses compact LUT storage to avoid materializing the theoretical expanded LUT in GPU memory. The PyTorch compact forward is slower but closer to the FPGA representation.
+
+| Run | Model | Method | Config | Baseline PPL | Quant PPL | Baseline MMLU | Quant MMLU | Compact LUT | Weight Codes | Lookups / Token |
+|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|
+| `scai7_pq_qwen7b_s8_k64_affine_compact` | `Qwen/Qwen2.5-7B` | PQ | `subdim=8`, `Ka=64`, `Kw=64`, affine | 13.31 | 3,047.48 | 25.0% | 0.0% | 1,106.00 MiB | 583.41 MiB | 815,661,056 |
+| `scai7_lutllm_qwen7b_all_compact` | `Qwen/Qwen2.5-7B` | LUT-LLM-style | `subdim=2`, `Ka=64`, `Kw=16`, compact | pending | pending | pending | pending | pending | pending | pending |
+
+For the completed 7B PQ compact run, the theoretical expanded LUT would be `99,568.00 MiB` FP16, while compact storage is `1,106.00 MiB`. This is the representation that matters for FPGA sizing.
+
 ## Hardware Estimate: 16x16 Codebook
 
 All estimates are per token for one full model forward through the quantized linear modules. `lookups_per_token` assumes one compact LUT lookup per output feature per PQ subspace.
