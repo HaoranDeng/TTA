@@ -367,8 +367,14 @@ class PQLUTLinear(nn.Module):
             out.mul_(self.correction_scale).add_(self.correction_bias)
             return out.to(dtype=x.dtype).reshape(*original_shape, self.out_features)
 
-        for mi in range(codes.shape[1]):
-            out.add_(self.expanded_lut[mi, codes[:, mi], :].float())
+        n, m = codes.shape
+        chunk_m = 32
+        for start in range(0, m, chunk_m):
+            end = min(start + chunk_m, m)
+            offsets = torch.arange(start, end, device=codes.device, dtype=codes.dtype) * self.config.ka
+            idx = (codes[:, start:end].t() + offsets[:, None]).reshape(-1)
+            vals = self.expanded_lut[start:end].reshape(-1, self.out_features).index_select(0, idx)
+            out.add_(vals.reshape(end - start, n, self.out_features).float().sum(dim=0))
         if self.bias is not None:
             out.add_(self.bias.float())
         out.mul_(self.correction_scale).add_(self.correction_bias)
