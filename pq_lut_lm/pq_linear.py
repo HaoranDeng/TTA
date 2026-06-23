@@ -352,16 +352,27 @@ class PQLUTLinear(nn.Module):
         out = torch.zeros((flat.shape[0], self.out_features), device=flat.device, dtype=torch.float32)
         if self.config.lut_storage == "compact":
             group_count = _num_weight_groups(self.out_features, self.config.weight_group_size)
-            for mi in range(codes.shape[1]):
-                code_m = codes[:, mi]
+            n, m = codes.shape
+            chunk_m = 16
+            ka_kw = self.config.ka * self.config.kw
+            for start in range(0, m, chunk_m):
+                end = min(start + chunk_m, m)
+                chunk_codes = codes[:, start:end].t()
+                chunk_offsets = (
+                    torch.arange(end - start, device=codes.device, dtype=codes.dtype).view(-1, 1, 1) * ka_kw
+                )
                 for gi in range(group_count):
                     g_lo = gi * self.config.weight_group_size if self.config.weight_group_size > 0 else 0
                     g_hi = min((gi + 1) * self.config.weight_group_size, self.out_features) if self.config.weight_group_size > 0 else self.out_features
-                    weight_code = self.weight_codes[mi, g_lo:g_hi]
-                    vals = self.compact_lut[mi, gi][code_m[:, None], weight_code[None, :]].float()
+                    weight_code = self.weight_codes[start:end, g_lo:g_hi]
+                    idx = chunk_offsets + chunk_codes[:, :, None] * self.config.kw + weight_code[:, None, :]
+                    vals = self.compact_lut[start:end, gi].reshape(-1).index_select(0, idx.reshape(-1))
+                    vals = vals.reshape(end - start, n, g_hi - g_lo).float()
                     if self.config.lut_quant_bits > 0:
-                        vals = (vals - self.lut_zeropoints[mi, gi]) * self.lut_scales[mi, gi]
-                    out[:, g_lo:g_hi].add_(vals)
+                        scales = self.lut_scales[start:end, gi].view(end - start, 1, 1)
+                        zeropoints = self.lut_zeropoints[start:end, gi].view(end - start, 1, 1)
+                        vals = (vals - zeropoints) * scales
+                    out[:, g_lo:g_hi].add_(vals.sum(dim=0))
             if self.bias is not None:
                 out.add_(self.bias.float())
             out.mul_(self.correction_scale).add_(self.correction_bias)
