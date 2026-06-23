@@ -22,6 +22,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dtype", choices=["float16", "bfloat16", "float32"], default="bfloat16")
     parser.add_argument("--trust-remote-code", action="store_true")
     parser.add_argument("--paper-samples", type=int, default=32)
+    parser.add_argument("--prompt-style", choices=["plain", "chat"], default="plain")
     parser.add_argument("--skip-squad", action="store_true")
     parser.add_argument("--seed", type=int, default=123)
     return parser.parse_args()
@@ -72,6 +73,7 @@ def main() -> None:
         device,
         max_samples_per_task=args.paper_samples,
         include_squad=not args.skip_squad,
+        prompt_style=args.prompt_style,
     )
     summary = {
         "model_id": args.model_id,

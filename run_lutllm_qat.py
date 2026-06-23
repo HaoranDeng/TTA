@@ -39,6 +39,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--train-steps", type=int, default=20)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--paper-samples", type=int, default=16)
+    parser.add_argument("--prompt-style", choices=["plain", "chat"], default="plain")
     parser.add_argument("--skip-squad", action="store_true")
     parser.add_argument("--target-regex", default=DEFAULT_TARGET_REGEX)
     parser.add_argument("--include-lm-head", action="store_true")
@@ -57,6 +58,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--eval-baseline", action="store_true")
     parser.add_argument("--eval-act-quant", action="store_true")
     parser.add_argument("--eval-final-lut", action="store_true")
+    parser.add_argument("--skip-final-lut", action="store_true")
     parser.add_argument("--seed", type=int, default=123)
     return parser.parse_args()
 
@@ -115,6 +117,7 @@ def main() -> None:
             batch_size=1,
             max_length=args.seq_len,
             include_squad=not args.skip_squad,
+            prompt_style=args.prompt_style,
         )
         calib_batches = strip_labels(train_batches[: args.calib_batches])
     else:
@@ -132,7 +135,14 @@ def main() -> None:
     if args.eval_baseline:
         print("Evaluating FP16 baseline on paper tasks", flush=True)
         summary["fp16_baseline"] = public_eval(
-            evaluate_paper_tasks(model, tokenizer, device, args.paper_samples, include_squad=not args.skip_squad)
+            evaluate_paper_tasks(
+                model,
+                tokenizer,
+                device,
+                args.paper_samples,
+                include_squad=not args.skip_squad,
+                prompt_style=args.prompt_style,
+            )
         )
         save_json(out_dir / "summary.json", summary)
 
@@ -209,9 +219,20 @@ def main() -> None:
     if args.eval_act_quant:
         print("Evaluating +Act. Quant. on paper tasks", flush=True)
         summary["act_quant"] = public_eval(
-            evaluate_paper_tasks(model, tokenizer, device, args.paper_samples, include_squad=not args.skip_squad)
+            evaluate_paper_tasks(
+                model,
+                tokenizer,
+                device,
+                args.paper_samples,
+                include_squad=not args.skip_squad,
+                prompt_style=args.prompt_style,
+            )
         )
         save_json(out_dir / "summary.json", summary)
+
+    if args.skip_final_lut:
+        print(json.dumps(summary, indent=2, sort_keys=True), flush=True)
+        return
 
     print("Converting trained activation quantizers to activation-weight LUT modules", flush=True)
     lut_report = convert_ste_act_quant_to_lut(
@@ -240,7 +261,14 @@ def main() -> None:
     if args.eval_final_lut:
         print("Evaluating +Weight Quant. final LUT on paper tasks", flush=True)
         summary["final_lut"]["paper_eval"] = public_eval(
-            evaluate_paper_tasks(model, tokenizer, device, args.paper_samples, include_squad=not args.skip_squad)
+            evaluate_paper_tasks(
+                model,
+                tokenizer,
+                device,
+                args.paper_samples,
+                include_squad=not args.skip_squad,
+                prompt_style=args.prompt_style,
+            )
         )
         save_json(out_dir / "summary.json", summary)
 

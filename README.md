@@ -34,8 +34,9 @@ Our prompt-based evaluator baselines on scai7, 128 samples per task:
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
 | `paper_baseline_qwen3_1p7b_128` | `Qwen/Qwen3-1.7B` | 42.2 | 70.3 | 46.1 | 28.1 | 52.3 | 77.3 | 12.2 | 23.4 |
 | `paper_baseline_qwen3_1p7b_base_128` | `Qwen/Qwen3-1.7B-Base` | 41.4 | 74.2 | 74.2 | 56.2 | 52.3 | 57.0 | 36.0 | 28.9 |
+| `paper_baseline_qwen3_1p7b_chat_128` | `Qwen/Qwen3-1.7B`, chat template | 29.7 | 68.0 | 56.2 | 51.6 | 52.3 | 81.2 | 33.9 | 10.9 |
 
-The baseline mismatch shows that the exact paper evaluation protocol is not captured by this simple prompt evaluator.
+The baseline mismatch shows that the exact paper evaluation protocol is not captured by this simple prompt evaluator. Chat-template prompting helps some tasks but still does not match the paper baseline.
 
 Simplified full-layer QAT smoke on scai7:
 
@@ -44,6 +45,17 @@ Simplified full-layer QAT smoke on scai7:
 | FP16 baseline, same 16 rows | 25.0 | 62.5 | 37.5 | 37.5 | 62.5 | 87.5 | 43.8 |
 | + Act. Quant., simplified STE | 25.0 | 37.5 | 62.5 | 62.5 | 62.5 | 56.2 | 6.2 |
 | + Weight Quant., final LUT | 43.8 | 37.5 | 62.5 | 56.2 | 62.5 | 50.0 | 6.2 |
+
+Stronger paper-supervised QAT attempts:
+
+| Run | Scope | Train | Eval | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | SQuADv2 F1 | MMLU-Pro |
+|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `paper_lutllm_qwen3_1p7b_all_paperqat100_affine` | 196 linears | 100 steps | final LUT, 32 rows/task | 40.6 | 37.5 | 40.6 | 68.8 | 56.2 | 43.8 | - | 6.2 |
+| `paper_lutllm_qwen3_1p7b_all_paperqat1000_actonly` | 196 linears | 1000 steps | Act Quant, 128 rows/task | 35.9 | 68.0 | 46.1 | 32.0 | 52.3 | 53.9 | - | 13.3 |
+| `paper_lutllm_qwen3_1p7b_7linear_paperqat500_affine` | 7 linears | 500 steps | Act Quant, 64 rows/task | 48.4 | 67.2 | 75.0 | 71.9 | 50.0 | 75.0 | 9.8 | 14.1 |
+| `paper_lutllm_qwen3_1p7b_7linear_paperqat500_affine` | 7 linears | 500 steps | final LUT, 64 rows/task | 48.4 | 67.2 | 53.1 | 46.9 | 50.0 | 75.0 | 4.1 | 14.1 |
+
+The best full-layer `+ Act Quant.` attempt so far still falls well short of the paper's `+ Act. Quant.` row. Training loss decreases, but accuracy does not recover, so the remaining gap is likely in the unavailable QAT/GPTVQ/evaluation details rather than just in running a few more steps.
 
 Final LUT hardware scale for `Qwen/Qwen3-1.7B`:
 

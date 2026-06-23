@@ -16,6 +16,33 @@ from .eval_utils import score_completions
 GLUE_TASKS = ["mnli", "mrpc", "qnli", "qqp", "rte", "sst2"]
 
 
+def format_prompt_for_style(tokenizer: Any, prompt: str, prompt_style: str) -> str:
+    if prompt_style == "plain":
+        return prompt
+    if prompt_style != "chat":
+        raise ValueError(f"Unsupported prompt style: {prompt_style}")
+    messages = [{"role": "user", "content": prompt}]
+    try:
+        return tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True,
+            enable_thinking=False,
+        )
+    except TypeError:
+        return tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True,
+        )
+
+
+def format_completion_for_style(completion: str, prompt_style: str) -> str:
+    if prompt_style == "chat":
+        return completion.strip()
+    return completion
+
+
 def _take(ds: Any, max_samples: int) -> list[dict[str, Any]]:
     rows = list(ds)
     if max_samples > 0:
@@ -85,6 +112,7 @@ def evaluate_glue_task(
     task: str,
     max_samples: int,
     device: torch.device,
+    prompt_style: str = "plain",
 ) -> dict[str, Any]:
     rows = load_glue_rows(task, max_samples)
     correct = 0
@@ -95,6 +123,8 @@ def evaluate_glue_task(
     model.eval()
     for row in rows:
         prompt, labels, gold = glue_prompt_and_labels(task, row)
+        prompt = format_prompt_for_style(tokenizer, prompt, prompt_style)
+        labels = [format_completion_for_style(label, prompt_style) for label in labels]
         scores = score_completions(model, tokenizer, prompt, labels, device)
         pred = int(max(range(len(scores)), key=lambda i: scores[i]))
         correct += int(pred == gold)
@@ -140,6 +170,7 @@ def evaluate_mmlu_pro(
     tokenizer: Any,
     max_samples: int,
     device: torch.device,
+    prompt_style: str = "plain",
 ) -> dict[str, Any]:
     rows = load_mmlu_pro_rows(max_samples)
     correct = 0
@@ -151,6 +182,8 @@ def evaluate_mmlu_pro(
     model.eval()
     for row in rows:
         prompt, labels = format_mmlu_pro_prompt(row)
+        prompt = format_prompt_for_style(tokenizer, prompt, prompt_style)
+        labels = [format_completion_for_style(label, prompt_style) for label in labels]
         scores = score_completions(model, tokenizer, prompt, labels, device)
         pred = int(max(range(len(scores)), key=lambda i: scores[i]))
         gold = int(row["answer_index"])
@@ -208,6 +241,7 @@ def evaluate_squad_v2(
     max_samples: int,
     device: torch.device,
     max_new_tokens: int = 24,
+    prompt_style: str = "plain",
 ) -> dict[str, Any]:
     rows = _take(load_dataset("squad_v2", split="validation"), max_samples)
     total_f1 = 0.0
@@ -223,6 +257,7 @@ def evaluate_squad_v2(
             f"Question: {row['question']}\n"
             "Answer:"
         )
+        prompt = format_prompt_for_style(tokenizer, prompt, prompt_style)
         ids = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=2048).to(device)
         out = model.generate(
             **ids,
@@ -268,6 +303,7 @@ def make_paper_supervised_batches(
     batch_size: int,
     max_length: int,
     include_squad: bool = True,
+    prompt_style: str = "plain",
 ) -> list[dict[str, torch.Tensor]]:
     examples: list[tuple[str, str]] = []
     per_task = max(1, max_samples_per_task)
@@ -280,6 +316,8 @@ def make_paper_supervised_batches(
     pad_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
     encoded = []
     for prompt, completion in examples:
+        prompt = format_prompt_for_style(tokenizer, prompt, prompt_style)
+        completion = format_completion_for_style(completion, prompt_style)
         prompt_ids = tokenizer(prompt, return_tensors="pt", add_special_tokens=False).input_ids[0]
         full_ids = tokenizer(prompt + completion, return_tensors="pt", add_special_tokens=False).input_ids[0]
         if full_ids.numel() > max_length:
@@ -325,14 +363,15 @@ def evaluate_paper_tasks(
     device: torch.device,
     max_samples_per_task: int,
     include_squad: bool = True,
+    prompt_style: str = "plain",
 ) -> dict[str, Any]:
     results: dict[str, Any] = {}
     for task in GLUE_TASKS:
-        metric = evaluate_glue_task(model, tokenizer, task, max_samples_per_task, device)
+        metric = evaluate_glue_task(model, tokenizer, task, max_samples_per_task, device, prompt_style=prompt_style)
         results[task] = {k: v for k, v in metric.items() if k != "predictions"}
     if include_squad:
-        metric = evaluate_squad_v2(model, tokenizer, max_samples_per_task, device)
+        metric = evaluate_squad_v2(model, tokenizer, max_samples_per_task, device, prompt_style=prompt_style)
         results["squad_v2"] = {k: v for k, v in metric.items() if k != "predictions"}
-    metric = evaluate_mmlu_pro(model, tokenizer, max_samples_per_task, device)
+    metric = evaluate_mmlu_pro(model, tokenizer, max_samples_per_task, device, prompt_style=prompt_style)
     results["mmlu_pro"] = {k: v for k, v in metric.items() if k != "predictions"}
     return results

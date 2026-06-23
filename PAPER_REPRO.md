@@ -50,9 +50,10 @@ These runs use 128 validation/test examples per task. They are not directly comp
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
 | `paper_baseline_qwen3_1p7b_128` | `Qwen/Qwen3-1.7B` | 42.2 | 70.3 | 46.1 | 28.1 | 52.3 | 77.3 | 12.2 | 23.4 |
 | `paper_baseline_qwen3_1p7b_base_128` | `Qwen/Qwen3-1.7B-Base` | 41.4 | 74.2 | 74.2 | 56.2 | 52.3 | 57.0 | 36.0 | 28.9 |
+| `paper_baseline_qwen3_1p7b_chat_128` | `Qwen/Qwen3-1.7B`, chat template | 29.7 | 68.0 | 56.2 | 51.6 | 52.3 | 81.2 | 33.9 | 10.9 |
 | Paper FP16 | Qwen 3 1.7B | 87.6 | 86.5 | 92.9 | 91.2 | 80.9 | 93.7 | 72.8 | 33.1 |
 
-The baseline mismatch is large on GLUE and SQuAD, so the exact paper numbers cannot be reproduced by this prompt evaluator alone.
+The baseline mismatch is large on GLUE and SQuAD, so the exact paper numbers cannot be reproduced by this prompt evaluator alone. Applying Qwen3's chat template improves SQuAD, QNLI, QQP, and SST-2 relative to the raw prompt on this small sample, but it hurts MMLU-Pro and still does not approach the paper's FP16 baseline. This points to a missing evaluation or task-adaptation protocol rather than a simple prompt-format issue.
 
 ### Simplified Full-Layer QAT Smoke
 
@@ -81,6 +82,71 @@ Hardware aggregate for final LUT:
 | 196 | 2,688.0 MiB | 336.0 MiB | 704,643,072 | 1,548,288 | 86,016.0 MiB |
 
 This confirms the paper-shaped codebook and lookup scale for Qwen 3 1.7B, but the accuracy is not paper-level. The main reason is that the run uses a simplified PyTorch STE path with 20 steps and no GPTVQ, while the paper reports an optimized QAT recipe costing about 10 A100 GPU-hours.
+
+### Paper-Supervised QAT Runs
+
+The initial 20-step smoke used WikiText continuation loss, which is not aligned with Table III tasks. The follow-up runs use `--train-source paper`, which trains on supervised prompt+gold-answer examples from GLUE, SQuADv2, and MMLU-Pro-style data. They also enable `--output-correction affine` during final LUT conversion as a lightweight approximation to reduce final layer-output error. This is still not the paper's GPTVQ implementation.
+
+Run: `paper_lutllm_qwen3_1p7b_all_paperqat100_affine`
+
+Config:
+
+- Model: `Qwen/Qwen3-1.7B`.
+- Quantized linears: all 196 target transformer block linears.
+- QAT: 100 supervised steps, 32 training examples per paper task, sequence length 128.
+- Evaluation: 32 examples per GLUE task and MMLU-Pro; SQuAD skipped because final LUT evaluation is slow in the unfused PyTorch prototype.
+
+| Stage | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| FP16 baseline, same 32 rows | 28.1 | 62.5 | 56.2 | 31.2 | 56.2 | 87.5 | 28.1 |
+| + Act. Quant., paper-supervised STE | 37.5 | 62.5 | 56.2 | 34.4 | 56.2 | 62.5 | 6.2 |
+| + Weight Quant., final LUT | 40.6 | 37.5 | 40.6 | 68.8 | 56.2 | 43.8 | 6.2 |
+
+Hardware aggregate for final LUT:
+
+| Quantized Linears | Compact INT8 LUT | Weight Codes Packed | Lookups / Token | Act Code Bits / Token | Theoretical Expanded LUT FP16 |
+|---:|---:|---:|---:|---:|---:|
+| 196 | 2,688.0 MiB | 336.0 MiB | 704,643,072 | 1,548,288 | 86,016.0 MiB |
+
+Run: `paper_lutllm_qwen3_1p7b_7linear_paperqat500_affine`
+
+Config:
+
+- Model: `Qwen/Qwen3-1.7B`.
+- Quantized linears: first 7 target linears only.
+- QAT: 500 supervised steps, 128 training examples per paper task, sequence length 256.
+- Evaluation: 64 examples per GLUE task, SQuADv2, and MMLU-Pro.
+
+| Stage | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | SQuADv2 F1 | MMLU-Pro |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| FP16 baseline, same 64 rows | 32.8 | 67.2 | 53.1 | 34.4 | 50.0 | 85.9 | 10.5 | 20.3 |
+| + Act. Quant., paper-supervised STE | 48.4 | 67.2 | 75.0 | 71.9 | 50.0 | 75.0 | 9.8 | 14.1 |
+| + Weight Quant., final LUT | 48.4 | 67.2 | 53.1 | 46.9 | 50.0 | 75.0 | 4.1 | 14.1 |
+
+Hardware aggregate for final LUT:
+
+| Quantized Linears | Compact INT8 LUT | Weight Codes Packed | Lookups / Token |
+|---:|---:|---:|---:|
+| 7 | 96.0 MiB | 12.0 MiB | 25,165,824 |
+
+The 7-linear run shows that supervised task loss can train the activation centroids: training loss dropped from `12.945` to `0.130`, and Act Quant improved several prompt-eval metrics on the small sample. The full-layer run still does not reproduce paper accuracy; likely missing factors are exact evaluation harness, full QAT duration and kernel behavior, adjustable-gradient STE details, and GPTVQ.
+
+Run: `paper_lutllm_qwen3_1p7b_all_paperqat1000_actonly`
+
+Config:
+
+- Model: `Qwen/Qwen3-1.7B`.
+- Quantized linears: all 196 target transformer block linears.
+- QAT: 1000 supervised steps, 256 training examples per paper task, sequence length 256.
+- Evaluation: 128 examples per GLUE task and MMLU-Pro; SQuAD skipped.
+- Final LUT conversion skipped to isolate the paper's `+ Act. Quant.` stage.
+
+| Stage | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| FP16 baseline, same 128 rows | 42.2 | 70.3 | 46.1 | 28.1 | 52.3 | 77.3 | 23.4 |
+| + Act. Quant., paper-supervised STE | 35.9 | 68.0 | 46.1 | 32.0 | 52.3 | 53.9 | 13.3 |
+
+The 1000-step full-layer activation-only run reduced supervised training loss from `7.541` to `4.772`, but it still did not approach the paper's `+ Act. Quant.` accuracy. This strengthens the conclusion that reproducing Table III requires missing pieces from the paper implementation: exact evaluation/task-adaptation setup, full QAT recipe, adjustable-gradient STE details, and GPTVQ/fused-kernel behavior.
 
 ## Commands
 
@@ -138,3 +204,13 @@ python3 run_lutllm_qat.py \
 ```
 
 The `--train-source paper` mode trains activation codebooks on supervised GLUE/SQuAD/MMLU-Pro-style prompt+answer examples instead of WikiText continuation loss. `--output-correction affine` fits a post-hoc per-output affine correction during final LUT conversion; this is not GPTVQ, but it is a useful lightweight approximation for reducing final layer-output error.
+
+Prompt-style baseline check:
+
+```bash
+python3 run_paper_eval.py \
+  --model-id Qwen/Qwen3-1.7B \
+  --output-dir results/paper_baseline_qwen3_1p7b_chat_128 \
+  --paper-samples 128 \
+  --prompt-style chat
+```
