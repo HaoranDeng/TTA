@@ -70,6 +70,14 @@ def glue_prompt_and_labels(task: str, row: dict[str, Any]) -> tuple[str, list[st
     raise ValueError(f"Unsupported GLUE task: {task}")
 
 
+def make_glue_supervised_examples(task: str, max_samples: int) -> list[tuple[str, str]]:
+    examples = []
+    for row in load_glue_rows(task, max_samples):
+        prompt, labels, gold = glue_prompt_and_labels(task, row)
+        examples.append((prompt, labels[gold]))
+    return examples
+
+
 @torch.no_grad()
 def evaluate_glue_task(
     model: torch.nn.Module,
@@ -107,6 +115,25 @@ def load_mmlu_pro_rows(max_samples: int, split: str = "test") -> list[dict[str, 
     return list(islice(ds, max_samples if max_samples > 0 else None))
 
 
+def format_mmlu_pro_prompt(row: dict[str, Any]) -> tuple[str, list[str]]:
+    letters = [chr(ord("A") + i) for i in range(10)]
+    options = row["options"]
+    prompt = f"Question: {row['question']}\n"
+    for i, option in enumerate(options):
+        prompt += f"{letters[i]}. {option}\n"
+    prompt += "Answer:"
+    labels = [f" {letters[i]}" for i in range(len(options))]
+    return prompt, labels
+
+
+def make_mmlu_pro_supervised_examples(max_samples: int) -> list[tuple[str, str]]:
+    examples = []
+    for row in load_mmlu_pro_rows(max_samples, split="validation"):
+        prompt, labels = format_mmlu_pro_prompt(row)
+        examples.append((prompt, labels[int(row["answer_index"])]))
+    return examples
+
+
 @torch.no_grad()
 def evaluate_mmlu_pro(
     model: torch.nn.Module,
@@ -123,12 +150,7 @@ def evaluate_mmlu_pro(
     start = time.perf_counter()
     model.eval()
     for row in rows:
-        options = row["options"]
-        prompt = f"Question: {row['question']}\n"
-        for i, option in enumerate(options):
-            prompt += f"{letters[i]}. {option}\n"
-        prompt += "Answer:"
-        labels = [f" {letters[i]}" for i in range(len(options))]
+        prompt, labels = format_mmlu_pro_prompt(row)
         scores = score_completions(model, tokenizer, prompt, labels, device)
         pred = int(max(range(len(scores)), key=lambda i: scores[i]))
         gold = int(row["answer_index"])
@@ -223,6 +245,77 @@ def evaluate_squad_v2(
         "seconds": time.perf_counter() - start,
         "predictions": predictions,
     }
+
+
+def make_squad_supervised_examples(max_samples: int) -> list[tuple[str, str]]:
+    examples = []
+    for row in _take(load_dataset("squad_v2", split="train"), max_samples):
+        answers = row["answers"].get("text", [])
+        answer = answers[0] if answers else " No Answer"
+        prompt = (
+            "Answer the question from the context. If the answer is not in the context, answer No Answer.\n"
+            f"Context: {row['context']}\n"
+            f"Question: {row['question']}\n"
+            "Answer:"
+        )
+        examples.append((prompt, " " + answer.strip()))
+    return examples
+
+
+def make_paper_supervised_batches(
+    tokenizer: Any,
+    max_samples_per_task: int,
+    batch_size: int,
+    max_length: int,
+    include_squad: bool = True,
+) -> list[dict[str, torch.Tensor]]:
+    examples: list[tuple[str, str]] = []
+    per_task = max(1, max_samples_per_task)
+    for task in GLUE_TASKS:
+        examples.extend(make_glue_supervised_examples(task, per_task))
+    examples.extend(make_mmlu_pro_supervised_examples(per_task))
+    if include_squad:
+        examples.extend(make_squad_supervised_examples(per_task))
+
+    pad_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
+    encoded = []
+    for prompt, completion in examples:
+        prompt_ids = tokenizer(prompt, return_tensors="pt", add_special_tokens=False).input_ids[0]
+        full_ids = tokenizer(prompt + completion, return_tensors="pt", add_special_tokens=False).input_ids[0]
+        if full_ids.numel() > max_length:
+            full_ids = full_ids[-max_length:]
+            prompt_len = min(prompt_ids.numel(), full_ids.numel() - 1)
+        else:
+            prompt_len = prompt_ids.numel()
+        labels = full_ids.clone()
+        labels[:prompt_len] = -100
+        encoded.append((full_ids, labels))
+
+    batches = []
+    rows: list[tuple[torch.Tensor, torch.Tensor]] = []
+    for item in encoded:
+        rows.append(item)
+        if len(rows) == batch_size:
+            batches.append(_collate_supervised(rows, pad_id))
+            rows = []
+    if rows:
+        batches.append(_collate_supervised(rows, pad_id))
+    return batches
+
+
+def _collate_supervised(
+    rows: list[tuple[torch.Tensor, torch.Tensor]],
+    pad_id: int,
+) -> dict[str, torch.Tensor]:
+    max_len = max(ids.numel() for ids, _ in rows)
+    input_ids = torch.full((len(rows), max_len), pad_id, dtype=torch.long)
+    labels = torch.full((len(rows), max_len), -100, dtype=torch.long)
+    attention_mask = torch.zeros_like(input_ids)
+    for i, (ids, row_labels) in enumerate(rows):
+        input_ids[i, : ids.numel()] = ids
+        labels[i, : row_labels.numel()] = row_labels
+        attention_mask[i, : ids.numel()] = 1
+    return {"input_ids": input_ids, "attention_mask": attention_mask, "labels": labels}
 
 
 @torch.no_grad()

@@ -113,3 +113,28 @@ python3 run_lutllm_qat.py \
   --eval-act-quant \
   --eval-final-lut
 ```
+
+Stronger paper-supervised QAT mode:
+
+```bash
+python3 run_lutllm_qat.py \
+  --model-id Qwen/Qwen3-1.7B \
+  --output-dir results/paper_lutllm_qwen3_1p7b_all_paperqat100_affine \
+  --train-source paper \
+  --task-train-samples 32 \
+  --paper-samples 32 \
+  --skip-squad \
+  --seq-len 128 \
+  --calib-batches 8 \
+  --calib-vectors-per-layer 256 \
+  --train-steps 100 \
+  --lr 3e-4 \
+  --kmeans-iters 1 \
+  --sample-limit 256 \
+  --output-correction affine \
+  --eval-baseline \
+  --eval-act-quant \
+  --eval-final-lut
+```
+
+The `--train-source paper` mode trains activation codebooks on supervised GLUE/SQuAD/MMLU-Pro-style prompt+answer examples instead of WikiText continuation loss. `--output-correction affine` fits a post-hoc per-output affine correction during final LUT conversion; this is not GPTVQ, but it is a useful lightweight approximation for reducing final layer-output error.

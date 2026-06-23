@@ -18,7 +18,7 @@ from pq_lut_lm.activation_quant import (
 )
 from pq_lut_lm.eval_utils import load_wikitext_texts, make_lm_batches
 from pq_lut_lm.modeling import DEFAULT_TARGET_REGEX
-from pq_lut_lm.paper_eval import evaluate_paper_tasks
+from pq_lut_lm.paper_eval import evaluate_paper_tasks, make_paper_supervised_batches
 from pq_lut_lm.pq_linear import PQConfig
 
 
@@ -30,7 +30,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dtype", choices=["float16", "bfloat16", "float32"], default="bfloat16")
     parser.add_argument("--trust-remote-code", action="store_true")
     parser.add_argument("--seq-len", type=int, default=64)
+    parser.add_argument("--train-source", choices=["wikitext", "paper"], default="wikitext")
     parser.add_argument("--train-tokens", type=int, default=8192)
+    parser.add_argument("--task-train-samples", type=int, default=32)
     parser.add_argument("--calib-tokens", type=int, default=1024)
     parser.add_argument("--calib-batches", type=int, default=4)
     parser.add_argument("--calib-vectors-per-layer", type=int, default=256)
@@ -51,6 +53,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--weight-group-size", type=int, default=256)
     parser.add_argument("--lut-quant-bits", type=int, default=8)
     parser.add_argument("--lut-storage", choices=["expanded", "compact"], default="expanded")
+    parser.add_argument("--output-correction", choices=["none", "bias", "affine"], default="none")
     parser.add_argument("--eval-baseline", action="store_true")
     parser.add_argument("--eval-act-quant", action="store_true")
     parser.add_argument("--eval-final-lut", action="store_true")
@@ -70,6 +73,10 @@ def dtype_from_arg(name: str) -> torch.dtype:
 
 def public_eval(result: dict[str, Any]) -> dict[str, Any]:
     return result
+
+
+def strip_labels(batches: list[dict[str, torch.Tensor]]) -> list[dict[str, torch.Tensor]]:
+    return [{k: v for k, v in batch.items() if k != "labels"} for batch in batches]
 
 
 def main() -> None:
@@ -101,8 +108,18 @@ def main() -> None:
     load_seconds = time.perf_counter() - load_start
 
     texts = load_wikitext_texts("train")
-    train_batches = make_lm_batches(tokenizer, texts, args.seq_len, args.train_tokens, batch_size=1)
-    calib_batches = make_lm_batches(tokenizer, texts, args.seq_len, args.calib_tokens, batch_size=1)[: args.calib_batches]
+    if args.train_source == "paper":
+        train_batches = make_paper_supervised_batches(
+            tokenizer,
+            max_samples_per_task=args.task_train_samples,
+            batch_size=1,
+            max_length=args.seq_len,
+            include_squad=not args.skip_squad,
+        )
+        calib_batches = strip_labels(train_batches[: args.calib_batches])
+    else:
+        train_batches = make_lm_batches(tokenizer, texts, args.seq_len, args.train_tokens, batch_size=1)
+        calib_batches = make_lm_batches(tokenizer, texts, args.seq_len, args.calib_tokens, batch_size=1)[: args.calib_batches]
 
     summary: dict[str, Any] = {
         "model_id": args.model_id,
@@ -136,7 +153,7 @@ def main() -> None:
         distance=args.distance,
         weight_group_size=args.weight_group_size,
         lut_quant_bits=args.lut_quant_bits,
-        output_correction="none",
+        output_correction=args.output_correction,
         seed=args.seed,
     )
 
@@ -169,9 +186,10 @@ def main() -> None:
     for step in range(args.train_steps):
         batch = train_batches[step % len(train_batches)]
         batch = {k: v.to(device) for k, v in batch.items()}
-        labels = batch["input_ids"].clone()
+        labels = batch.get("labels", batch["input_ids"].clone())
         opt.zero_grad(set_to_none=True)
-        out = model(**batch, labels=labels)
+        model_inputs = {k: v for k, v in batch.items() if k != "labels"}
+        out = model(**model_inputs, labels=labels)
         loss = out.loss
         loss.backward()
         opt.step()
