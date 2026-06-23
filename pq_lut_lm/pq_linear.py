@@ -371,7 +371,7 @@ class PQLUTLinear(nn.Module):
         chunk_m = 32
         for start in range(0, m, chunk_m):
             end = min(start + chunk_m, m)
-            offsets = torch.arange(start, end, device=codes.device, dtype=codes.dtype) * self.config.ka
+            offsets = torch.arange(end - start, device=codes.device, dtype=codes.dtype) * self.config.ka
             idx = (codes[:, start:end].t() + offsets[:, None]).reshape(-1)
             vals = self.expanded_lut[start:end].reshape(-1, self.out_features).index_select(0, idx)
             out.add_(vals.reshape(end - start, n, self.out_features).float().sum(dim=0))

@@ -260,7 +260,7 @@ def _activation_lut_forward(codes: torch.Tensor, lut: torch.Tensor, chunk_m: int
     ka = lut.shape[1]
     for start in range(0, m, chunk_m):
         end = min(start + chunk_m, m)
-        offsets = torch.arange(start, end, device=codes.device, dtype=codes.dtype) * ka
+        offsets = torch.arange(end - start, device=codes.device, dtype=codes.dtype) * ka
         idx = (codes[:, start:end].t() + offsets[:, None]).reshape(-1)
         vals = lut[start:end].reshape(-1, lut.shape[2]).index_select(0, idx)
         out = out + vals.reshape(end - start, n, lut.shape[2]).float().sum(dim=0)
