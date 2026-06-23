@@ -501,28 +501,28 @@ def convert_activation_lut_to_pq_lut(
 ) -> QuantizationReport:
     if device is None:
         device = next(model.parameters()).device
-    target = []
+    target_names = []
     for name, module in model.named_modules():
         if isinstance(module, ActivationLUTLinear):
-            target.append((name, module))
-            if max_linears is not None and len(target) >= max_linears:
+            target_names.append(name)
+            if max_linears is not None and len(target_names) >= max_linears:
                 break
-    if not target:
+    if not target_names:
         raise RuntimeError("No ActivationLUTLinear modules found")
 
     calibration_inputs, calibration_seconds = collect_calibration_inputs(
         model,
         calibration_batches,
-        [name for name, _ in target],
+        target_names,
         max_vectors_per_layer=max_vectors_per_layer,
         device=device,
     )
     module_stats: list[dict[str, Any]] = []
-    modules = dict(model.named_modules())
     if device.type == "cuda":
         torch.cuda.synchronize(device)
     start = time.perf_counter()
-    for name, wrapped in target:
+    for name in target_names:
+        modules = dict(model.named_modules())
         current = modules[name]
         if not isinstance(current, ActivationLUTLinear):
             continue
@@ -536,7 +536,9 @@ def convert_activation_lut_to_pq_lut(
         )
         _set_submodule(model, name, pq)
         module_stats.append(pq.hardware_stats())
-        modules = dict(model.named_modules())
+        del modules, current, reconstructed
+        if device.type == "cuda":
+            torch.cuda.empty_cache()
     if device.type == "cuda":
         torch.cuda.synchronize(device)
     quantization_seconds = time.perf_counter() - start
