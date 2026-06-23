@@ -52,16 +52,19 @@ Stronger paper-supervised QAT attempts:
 |---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
 | `paper_lutllm_qwen3_1p7b_all_paperqat100_affine` | 196 linears | 100 steps | final LUT, 32 rows/task | 40.6 | 37.5 | 40.6 | 68.8 | 56.2 | 43.8 | - | 6.2 |
 | `paper_lutllm_qwen3_1p7b_all_paperqat1000_actonly` | 196 linears | 1000 steps | Act Quant, 128 rows/task | 35.9 | 68.0 | 46.1 | 32.0 | 52.3 | 53.9 | - | 13.3 |
+| `paper_lutllm_qwen3_1p7b_all_actlutfit5_int4_fast16` | 196 linears | direct LUT fit | Act LUT, 16 rows/task | 25.0 | 62.5 | 50.0 | 43.8 | 62.5 | 50.0 | - | 6.2 |
+| `paper_lutllm_qwen3_1p7b_all_actlutfit5_int4_expanded_final16_fast` | 196 linears | direct LUT fit | reconstructed final LUT, 16 rows/task | 25.0 | 62.5 | 31.2 | 37.5 | 62.5 | 50.0 | - | 6.2 |
 | `paper_lutllm_qwen3_1p7b_7linear_paperqat500_affine` | 7 linears | 500 steps | Act Quant, 64 rows/task | 48.4 | 67.2 | 75.0 | 71.9 | 50.0 | 75.0 | 9.8 | 14.1 |
 | `paper_lutllm_qwen3_1p7b_7linear_paperqat500_affine` | 7 linears | 500 steps | final LUT, 64 rows/task | 48.4 | 67.2 | 53.1 | 46.9 | 50.0 | 75.0 | 4.1 | 14.1 |
 
-The best full-layer `+ Act Quant.` attempt so far still falls well short of the paper's `+ Act. Quant.` row. Training loss decreases, but accuracy does not recover, so the remaining gap is likely in the unavailable QAT/GPTVQ/evaluation details rather than just in running a few more steps.
+The best full-layer `+ Act Quant.` attempt so far still falls well short of the paper's `+ Act. Quant.` row. A follow-up direct activation-LUT fitting path, inferred from the paper's "trained LUT -> reconstructed weights" description, also does not recover accuracy. The remaining gap is likely in the unavailable QAT/GPTVQ/evaluation details rather than just in running a few more steps.
 
 Final LUT hardware scale for `Qwen/Qwen3-1.7B`:
 
-| Quantized Linears | Compact INT8 LUT | Weight Codes Packed | Lookups / Token | Act Code Bits / Token | Theoretical Expanded LUT FP16 |
-|---:|---:|---:|---:|---:|---:|
-| 196 | 2,688.0 MiB | 336.0 MiB | 704,643,072 | 1,548,288 | 86,016.0 MiB |
+| Final LUT Bits | Quantized Linears | Compact LUT | Weight Codes Packed | Lookups / Token | Act Code Bits / Token | Theoretical Expanded LUT FP16 |
+|---:|---:|---:|---:|---:|---:|---:|
+| 8 | 196 | 2,688.0 MiB | 336.0 MiB | 704,643,072 | 1,548,288 | 86,016.0 MiB |
+| 4 | 196 | 1,344.0 MiB | 336.0 MiB | 704,643,072 | 1,548,288 | 86,016.0 MiB |
 
 ### Earlier PQ/LUT PTQ Feasibility Results
 

@@ -35,8 +35,9 @@ New files:
 
 - `run_paper_eval.py`: Qwen causal-LM evaluator for GLUE, SQuAD v2, and MMLU-Pro.
 - `run_lutllm_qat.py`: simplified LUT-LLM-style activation QAT with STE, followed by activation-weight LUT conversion.
+- `run_act_lut_fit.py`: layerwise direct activation-LUT fitting, least-squares reconstruction of dense weights from trained tables, and final activation-weight VQ.
 - `pq_lut_lm/paper_eval.py`: prompt-based GLUE/MMLU-Pro log-likelihood scoring and SQuADv2 short generation/F1.
-- `pq_lut_lm/activation_quant.py`: trainable activation VQ wrapper with STE.
+- `pq_lut_lm/activation_quant.py`: trainable activation VQ wrapper with STE, direct activation-LUT modules, and LUT-to-weight reconstruction.
 
 Important limitation: this is not yet a byte-identical reproduction of the paper. The missing pieces are the paper's custom fused QAT kernels, adjustable-gradient STE details, GPTVQ implementation, and exact benchmark harness/prompts. The current code is a transparent PyTorch reproduction scaffold that runs the same model family and datasets but not the undisclosed training/eval stack.
 
@@ -148,6 +149,35 @@ Config:
 
 The 1000-step full-layer activation-only run reduced supervised training loss from `7.541` to `4.772`, but it still did not approach the paper's `+ Act. Quant.` accuracy. This strengthens the conclusion that reproducing Table III requires missing pieces from the paper implementation: exact evaluation/task-adaptation setup, full QAT recipe, adjustable-gradient STE details, and GPTVQ/fused-kernel behavior.
 
+### Direct Activation-LUT Fitting Inference
+
+The paper says the final flow reconstructs weights from trained lookup tables before applying GPTVQ. The public artifact does not include that training code, but the HLS path confirms the hardware-facing shape: 64 activation centroids, 16 weight centroids, 4-bit packed final LUT entries in the `*_final_v2` kernels, 4-bit weight indices, and scale/zero dequantization before emitting FP32 streams.
+
+To test that inferred flow, `run_act_lut_fit.py` fits each activation lookup table directly against the dense linear output, reconstructs dense weights with a least-squares solve `pinv(activation_centers) @ trained_table`, and then applies the existing activation-weight VQ path. This is still not GPTVQ or the paper's end-to-end fused STE training; it is a diagnostic reproduction attempt for the missing "trained LUT -> reconstructed weights" step.
+
+7-linear runs, 64 rows/task, SQuAD skipped:
+
+| Run | Stage | LUT Bits | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `paper_lutllm_qwen3_1p7b_7linear_actlutfit5_int4_fast` | direct Act LUT | 16-bit expanded | 35.9 | 67.2 | 53.1 | 35.9 | 50.0 | 73.4 | 12.5 |
+| `paper_lutllm_qwen3_1p7b_7linear_actlutfit5_int4_fast` | reconstructed final LUT | 4-bit | 34.4 | 32.8 | 46.9 | 64.1 | 50.0 | 53.1 | 7.8 |
+| `paper_lutllm_qwen3_1p7b_7linear_actlutfit5_int8_final_fast` | reconstructed final LUT | 8-bit | 32.8 | 37.5 | 45.3 | 59.4 | 50.0 | 57.8 | 9.4 |
+
+Full-layer runs, 16 rows/task, SQuAD skipped:
+
+| Run | Stage | Quantized Linears | LUT Bits | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `paper_lutllm_qwen3_1p7b_all_actlutfit5_int4_fast16` | direct Act LUT | 196 | 16-bit expanded | 25.0 | 62.5 | 50.0 | 43.8 | 62.5 | 50.0 | 6.2 |
+| `paper_lutllm_qwen3_1p7b_all_actlutfit5_int4_expanded_final16_fast` | reconstructed final LUT | 196 | 4-bit | 25.0 | 62.5 | 31.2 | 37.5 | 62.5 | 50.0 | 6.2 |
+
+Hardware aggregate for the full-layer reconstructed final LUT:
+
+| Quantized Linears | Compact 4-bit LUT | Weight Codes Packed | Lookups / Token | Act Code Bits / Token | Expanded LUT FP16 Used For PyTorch Eval |
+|---:|---:|---:|---:|---:|---:|
+| 196 | 1,344.0 MiB | 336.0 MiB | 704,643,072 | 1,548,288 | 86,016.0 MiB |
+
+This experiment did not reproduce the paper's `+ Act. Quant.` or final LUT accuracy. It also shows that 4-bit versus 8-bit final LUT precision is not the dominant issue in this scaffold: the 7-linear INT8 final run only improves a few points relative to INT4 and remains far from the paper. The likely missing pieces remain end-to-end QAT over the whole model, the exact adjustable-gradient STE/fused lookup kernels, GPTVQ rather than local k-means weight VQ, and the paper's evaluation/task-adaptation protocol.
+
 ## Commands
 
 Baseline:
@@ -204,6 +234,31 @@ python3 run_lutllm_qat.py \
 ```
 
 The `--train-source paper` mode trains activation codebooks on supervised GLUE/SQuAD/MMLU-Pro-style prompt+answer examples instead of WikiText continuation loss. `--output-correction affine` fits a post-hoc per-output affine correction during final LUT conversion; this is not GPTVQ, but it is a useful lightweight approximation for reducing final layer-output error.
+
+Direct activation-LUT fitting with reconstructed final LUT:
+
+```bash
+python3 run_act_lut_fit.py \
+  --model-id Qwen/Qwen3-1.7B \
+  --output-dir results/paper_lutllm_qwen3_1p7b_all_actlutfit5_int4_expanded_final16_fast \
+  --calib-source paper \
+  --task-calib-samples 64 \
+  --paper-samples 16 \
+  --skip-squad \
+  --seq-len 256 \
+  --calib-batches 16 \
+  --calib-vectors-per-layer 256 \
+  --fit-steps 5 \
+  --fit-lr 1e-2 \
+  --fit-batch-size 128 \
+  --kmeans-iters 1 \
+  --sample-limit 256 \
+  --lut-quant-bits 4 \
+  --lut-storage expanded \
+  --eval-final-lut
+```
+
+The `--lut-storage expanded` flag is for faster PyTorch evaluation only. Hardware estimates still report the compact 4-bit base LUT and packed weight-code sizes.
 
 Prompt-style baseline check:
 

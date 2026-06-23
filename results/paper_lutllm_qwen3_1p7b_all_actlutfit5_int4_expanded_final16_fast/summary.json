@@ -1,0 +1,104 @@
+{
+  "act_lut_fit": {
+    "calibration_seconds": 11.848418244160712,
+    "fit_seconds": 120.25960107287392,
+    "hardware_aggregate": {
+      "act_center_values": 33030144.0,
+      "act_code_bits_per_token": 1548288.0,
+      "adds_per_token": 704069632.0,
+      "base_lut_bits": 721554505728.0,
+      "base_lut_entries": 45097156608.0,
+      "base_lut_mib_fp16": 86016.0,
+      "base_lut_mib_fp32": 172032.0,
+      "base_lut_mib_quantized": 86016.0,
+      "centroid_distance_scalar_ops_per_token": 33030144.0,
+      "centroid_distance_vectors_per_token": 16515072.0,
+      "dense_mac_per_token": 1409286144.0,
+      "expanded_lut_entries": 45097156608.0,
+      "expanded_lut_mib_fp16": 86016.0,
+      "lookups_per_token": 704643072.0,
+      "quantized_linears": 196,
+      "train_seconds": 120.16252899705432,
+      "weight_center_values": 0.0,
+      "weight_code_bits": 0.0,
+      "weight_code_count": 0.0,
+      "weight_codes_mib_packed": 0.0
+    }
+  },
+  "device": "cuda",
+  "dtype": "torch.bfloat16",
+  "inferred_lutllm_path": "fit activation lookup-table values locally, reconstruct dense weights from trained tables with least squares, then apply activation-weight VQ",
+  "load_seconds": 5.796129529830068,
+  "model_id": "Qwen/Qwen3-1.7B",
+  "paper_samples": 16,
+  "reconstructed_final_lut": {
+    "calibration_seconds": 20.673930261051282,
+    "hardware_aggregate": {
+      "act_center_values": 33030144.0,
+      "act_code_bits_per_token": 1548288.0,
+      "adds_per_token": 704069632.0,
+      "base_lut_bits": 11274289152.0,
+      "base_lut_entries": 2818572288.0,
+      "base_lut_mib_fp16": 5376.0,
+      "base_lut_mib_fp32": 10752.0,
+      "base_lut_mib_quantized": 1344.0,
+      "centroid_distance_scalar_ops_per_token": 33030144.0,
+      "centroid_distance_vectors_per_token": 16515072.0,
+      "dense_mac_per_token": 1409286144.0,
+      "expanded_lut_entries": 45097156608.0,
+      "expanded_lut_mib_fp16": 86016.0,
+      "lookups_per_token": 704643072.0,
+      "quantized_linears": 196,
+      "train_seconds": 1174.043770091841,
+      "weight_center_values": 88080384.0,
+      "weight_code_bits": 2818572288.0,
+      "weight_code_count": 704643072.0,
+      "weight_codes_mib_packed": 336.0
+    },
+    "paper_eval": {
+      "mmlu_pro": {
+        "accuracy": 0.0625,
+        "correct": 1,
+        "seconds": 132.8775259470567,
+        "total": 16
+      },
+      "mnli": {
+        "accuracy": 0.25,
+        "correct": 4,
+        "seconds": 22.433789193164557,
+        "total": 16
+      },
+      "mrpc": {
+        "accuracy": 0.625,
+        "correct": 10,
+        "seconds": 18.89995968504809,
+        "total": 16
+      },
+      "qnli": {
+        "accuracy": 0.3125,
+        "correct": 5,
+        "seconds": 16.62307509011589,
+        "total": 16
+      },
+      "qqp": {
+        "accuracy": 0.375,
+        "correct": 6,
+        "seconds": 11.487969940062612,
+        "total": 16
+      },
+      "rte": {
+        "accuracy": 0.625,
+        "correct": 10,
+        "seconds": 20.07894741697237,
+        "total": 16
+      },
+      "sst2": {
+        "accuracy": 0.5,
+        "correct": 8,
+        "seconds": 8.55518633290194,
+        "total": 16
+      }
+    },
+    "quantization_seconds": 1237.8738247770816
+  }
+}
