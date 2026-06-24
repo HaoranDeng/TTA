@@ -178,10 +178,14 @@ def make_glue_few_shot_prefix(task: str, shot_count: int, prompt_template: str =
     return "\n\n".join(rendered) + "\n\n"
 
 
-def make_glue_supervised_examples(task: str, max_samples: int) -> list[tuple[str, str]]:
+def make_glue_supervised_examples(
+    task: str,
+    max_samples: int,
+    prompt_template: str = "simple",
+) -> list[tuple[str, str]]:
     examples = []
     for row in load_glue_rows(task, max_samples):
-        prompt, labels, gold = glue_prompt_and_labels(task, row)
+        prompt, labels, gold = glue_prompt_and_labels(task, row, prompt_template=prompt_template)
         examples.append((prompt, labels[gold]))
     return examples
 
@@ -247,10 +251,13 @@ def format_mmlu_pro_prompt(row: dict[str, Any], prompt_template: str = "simple")
     return prompt, labels
 
 
-def make_mmlu_pro_supervised_examples(max_samples: int) -> list[tuple[str, str]]:
+def make_mmlu_pro_supervised_examples(
+    max_samples: int,
+    prompt_template: str = "simple",
+) -> list[tuple[str, str]]:
     examples = []
     for row in load_mmlu_pro_rows(max_samples, split="validation"):
-        prompt, labels = format_mmlu_pro_prompt(row)
+        prompt, labels = format_mmlu_pro_prompt(row, prompt_template=prompt_template)
         examples.append((prompt, labels[int(row["answer_index"])]))
     return examples
 
@@ -409,12 +416,13 @@ def make_paper_supervised_batches(
     max_length: int,
     include_squad: bool = True,
     prompt_style: str = "plain",
+    prompt_template: str = "simple",
 ) -> list[dict[str, torch.Tensor]]:
     examples: list[tuple[str, str]] = []
     per_task = max(1, max_samples_per_task)
     for task in GLUE_TASKS:
-        examples.extend(make_glue_supervised_examples(task, per_task))
-    examples.extend(make_mmlu_pro_supervised_examples(per_task))
+        examples.extend(make_glue_supervised_examples(task, per_task, prompt_template=prompt_template))
+    examples.extend(make_mmlu_pro_supervised_examples(per_task, prompt_template=prompt_template))
     if include_squad:
         examples.extend(make_squad_supervised_examples(per_task))
 

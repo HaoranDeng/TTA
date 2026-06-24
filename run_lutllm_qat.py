@@ -40,6 +40,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--paper-samples", type=int, default=16)
     parser.add_argument("--prompt-style", choices=["plain", "chat"], default="plain")
+    parser.add_argument("--prompt-template", choices=["simple", "instruction"], default="simple")
+    parser.add_argument("--glue-shot-count", type=int, default=0)
+    parser.add_argument("--mmlu-shot-count", type=int, default=0)
     parser.add_argument("--skip-squad", action="store_true")
     parser.add_argument("--target-regex", default=DEFAULT_TARGET_REGEX)
     parser.add_argument("--include-lm-head", action="store_true")
@@ -118,6 +121,7 @@ def main() -> None:
             max_length=args.seq_len,
             include_squad=not args.skip_squad,
             prompt_style=args.prompt_style,
+            prompt_template=args.prompt_template,
         )
         calib_batches = strip_labels(train_batches[: args.calib_batches])
     else:
@@ -142,6 +146,9 @@ def main() -> None:
                 args.paper_samples,
                 include_squad=not args.skip_squad,
                 prompt_style=args.prompt_style,
+                prompt_template=args.prompt_template,
+                glue_shot_count=args.glue_shot_count,
+                mmlu_shot_count=args.mmlu_shot_count,
             )
         )
         save_json(out_dir / "summary.json", summary)
@@ -226,6 +233,9 @@ def main() -> None:
                 args.paper_samples,
                 include_squad=not args.skip_squad,
                 prompt_style=args.prompt_style,
+                prompt_template=args.prompt_template,
+                glue_shot_count=args.glue_shot_count,
+                mmlu_shot_count=args.mmlu_shot_count,
             )
         )
         save_json(out_dir / "summary.json", summary)
@@ -268,6 +278,9 @@ def main() -> None:
                 args.paper_samples,
                 include_squad=not args.skip_squad,
                 prompt_style=args.prompt_style,
+                prompt_template=args.prompt_template,
+                glue_shot_count=args.glue_shot_count,
+                mmlu_shot_count=args.mmlu_shot_count,
             )
         )
         save_json(out_dir / "summary.json", summary)
