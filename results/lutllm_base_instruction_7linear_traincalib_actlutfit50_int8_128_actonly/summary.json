@@ -1,0 +1,83 @@
+{
+  "act_lut_fit": {
+    "calibration_seconds": 1.3618633300065994,
+    "fit_seconds": 24.427645278861746,
+    "hardware_aggregate": {
+      "act_center_values": 1179648.0,
+      "act_code_bits_per_token": 55296.0,
+      "adds_per_token": 25145344.0,
+      "base_lut_bits": 25769803776.0,
+      "base_lut_entries": 1610612736.0,
+      "base_lut_mib_fp16": 3072.0,
+      "base_lut_mib_fp32": 6144.0,
+      "base_lut_mib_quantized": 3072.0,
+      "centroid_distance_scalar_ops_per_token": 1179648.0,
+      "centroid_distance_vectors_per_token": 589824.0,
+      "dense_mac_per_token": 50331648.0,
+      "expanded_lut_entries": 1610612736.0,
+      "expanded_lut_mib_fp16": 3072.0,
+      "lookups_per_token": 25165824.0,
+      "quantized_linears": 7,
+      "train_seconds": 24.422847451874986,
+      "weight_center_values": 0.0,
+      "weight_code_bits": 0.0,
+      "weight_code_count": 0.0,
+      "weight_codes_mib_packed": 0.0
+    },
+    "paper_eval": {
+      "mmlu_pro": {
+        "accuracy": 0.265625,
+        "correct": 34,
+        "seconds": 64.70771163795143,
+        "total": 128
+      },
+      "mnli": {
+        "accuracy": 0.8359375,
+        "correct": 107,
+        "seconds": 8.736910962034017,
+        "total": 128
+      },
+      "mrpc": {
+        "accuracy": 0.640625,
+        "correct": 82,
+        "seconds": 7.034084785031155,
+        "total": 128
+      },
+      "qnli": {
+        "accuracy": 0.828125,
+        "correct": 106,
+        "seconds": 6.510046450886875,
+        "total": 128
+      },
+      "qqp": {
+        "accuracy": 0.78125,
+        "correct": 100,
+        "seconds": 5.164941806113347,
+        "total": 128
+      },
+      "rte": {
+        "accuracy": 0.828125,
+        "correct": 106,
+        "seconds": 8.751532731112093,
+        "total": 128
+      },
+      "squad_v2": {
+        "f1": 37.67502029220779,
+        "seconds": 24.954569850116968,
+        "total": 128
+      },
+      "sst2": {
+        "accuracy": 0.8203125,
+        "correct": 105,
+        "seconds": 4.261353749083355,
+        "total": 128
+      }
+    }
+  },
+  "device": "cuda",
+  "dtype": "torch.bfloat16",
+  "inferred_lutllm_path": "fit activation lookup-table values locally, reconstruct dense weights from trained tables with least squares, then apply activation-weight VQ",
+  "load_seconds": 7.183447764953598,
+  "model_id": "Qwen/Qwen3-1.7B-Base",
+  "paper_samples": 128
+}

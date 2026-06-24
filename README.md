@@ -28,15 +28,33 @@ Paper Table III reference for Qwen 3 1.7B:
 | Paper FP16 | 87.6 | 86.5 | 92.9 | 91.2 | 80.9 | 93.7 | 72.8 | 33.1 |
 | Paper LUT-LLM final | 86.9 | 82.8 | 90.4 | 89.5 | 76.5 | 90.6 | 69.7 | 30.8 |
 
-Our prompt-based evaluator baselines on scai7, 128 samples per task:
+Most recent scai7 reproduction finding:
+
+- The public paper artifact does not expose the exact benchmark harness or the customized checkpoint. The paper text says the FPGA prototype uses a customized Qwen 3 1.7B model and describes continuing training on FineWeb and WikiQA.
+- The closest public-checkpoint baseline found so far is `Qwen/Qwen3-1.7B-Base` with the new `--prompt-template instruction` evaluator. It matches the paper's MMLU-Pro baseline closely, but SQuAD v2 remains far below the paper.
+- New quantization runs therefore use `Qwen/Qwen3-1.7B-Base`, instruction prompts, `Ka=64`, `Kw=16`, `subdim=2`, INT8 compact final LUTs, and GLUE train split for supervised calibration/training batches.
+
+Updated public-checkpoint baselines:
 
 | Run | Model | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | SQuADv2 F1 | MMLU-Pro |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `baseline_qwen3_1p7b_base_instruction_128` | `Qwen/Qwen3-1.7B-Base`, instruction prompt | 78.9 | 68.0 | 78.1 | 85.2 | 80.5 | 86.7 | 36.0 | 33.6 |
 | `paper_baseline_qwen3_1p7b_128` | `Qwen/Qwen3-1.7B` | 42.2 | 70.3 | 46.1 | 28.1 | 52.3 | 77.3 | 12.2 | 23.4 |
 | `paper_baseline_qwen3_1p7b_base_128` | `Qwen/Qwen3-1.7B-Base` | 41.4 | 74.2 | 74.2 | 56.2 | 52.3 | 57.0 | 36.0 | 28.9 |
 | `paper_baseline_qwen3_1p7b_chat_128` | `Qwen/Qwen3-1.7B`, chat template | 29.7 | 68.0 | 56.2 | 51.6 | 52.3 | 81.2 | 33.9 | 10.9 |
 
-The baseline mismatch shows that the exact paper evaluation protocol is not captured by this simple prompt evaluator. Chat-template prompting helps some tasks but still does not match the paper baseline.
+Current best 7-linear LUT-LLM reproduction attempts on the corrected Base+instruction protocol:
+
+| Run | Stage | Samples | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | SQuADv2 F1 | MMLU-Pro |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `lutllm_base_instruction_7linear_traincalib_actlutfit50_int8_64` | FP16 baseline | 64 | 82.8 | 67.2 | 81.2 | 84.4 | 78.1 | 87.5 | - | 39.1 |
+| same | direct Act LUT | 64 | 89.1 | 62.5 | 81.2 | 75.0 | 79.7 | 84.4 | - | 32.8 |
+| same | reconstructed final LUT | 64 | 67.2 | 73.4 | 68.8 | 54.7 | 54.7 | 62.5 | - | 21.9 |
+| `lutllm_base_instruction_7linear_traincalib_steqat300_int8_64` | simplified STE Act Quant | 64 | 70.3 | 62.5 | 79.7 | 79.7 | 85.9 | 90.6 | - | 28.1 |
+| same | final LUT | 64 | 45.3 | 57.8 | 78.1 | 68.8 | 70.3 | 85.9 | - | 21.9 |
+| `lutllm_base_instruction_7linear_traincalib_actlutfit50_int8_128_actonly` | direct Act LUT | 128 | 83.6 | 64.1 | 82.8 | 78.1 | 82.8 | 82.0 | 37.7 | 26.6 |
+
+For the 7-linear final LUT runs, compact INT8 LUT storage is `96.0 MiB`, packed weight codes are `12.0 MiB`, and the model performs `25,165,824` table lookups per token over the quantized linears. Direct activation-LUT mode before weight VQ has a larger FP16 expanded table footprint, `3,072.0 MiB`, with the same lookup count. Full 196-linear hardware scale remains `2,688.0 MiB` compact INT8 LUT, `336.0 MiB` packed weight codes, and `704,643,072` lookups per token.
 
 Simplified full-layer QAT smoke on scai7:
 

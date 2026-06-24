@@ -47,6 +47,24 @@ Important limitation: this is not yet a byte-identical reproduction of the paper
 
 These runs use 128 validation/test examples per task. They are not directly comparable to Table III because the paper's exact evaluation harness is not public in the artifact, and this repo uses simple prompt-based scoring/generation.
 
+Updated protocol search: the original plain prompts were the main cause of the huge FP16 mismatch on MMLU-Pro and several GLUE tasks. A small grid over public Qwen3 checkpoints found that `Qwen/Qwen3-1.7B-Base` with `--prompt-template instruction --prompt-style plain` is the closest public-checkpoint baseline. It matches the paper's MMLU-Pro baseline, but SQuAD v2 is still much lower, consistent with the paper's statement that the prototype uses a customized Qwen 3 1.7B checkpoint rather than the raw public HF checkpoint.
+
+Prompt grid, 64 examples/task, SQuAD skipped:
+
+| Run | Model / Prompt | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| `baseline_prompt_grid_qwen3_1p7b_64/simple_g0_m0_plain` | `Qwen3-1.7B`, simple | 32.8 | 67.2 | 53.1 | 34.4 | 50.0 | 85.9 | 20.3 |
+| `baseline_prompt_grid_qwen3_1p7b_64/instruction_g3_m3_chat` | `Qwen3-1.7B`, instruction, 3-shot, chat | 51.6 | 70.3 | 62.5 | 67.2 | 81.2 | 96.9 | 29.7 |
+| `baseline_prompt_grid_qwen3_1p7b_base_64/instruction_g0_m0_plain` | `Qwen3-1.7B-Base`, instruction | 82.8 | 67.2 | 81.2 | 84.4 | 78.1 | 87.5 | 39.1 |
+| `baseline_prompt_grid_qwen3_1p7b_base_64/instruction_g3_m3_plain` | `Qwen3-1.7B-Base`, instruction, 3-shot | 85.9 | 71.9 | 82.8 | 85.9 | 73.4 | 96.9 | 31.2 |
+
+Best 128-example public-checkpoint baseline:
+
+| Run | Model / Prompt | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | SQuADv2 F1 | MMLU-Pro |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `baseline_qwen3_1p7b_base_instruction_128` | `Qwen/Qwen3-1.7B-Base`, instruction | 78.9 | 68.0 | 78.1 | 85.2 | 80.5 | 86.7 | 36.0 | 33.6 |
+| Paper FP16 | customized Qwen 3 1.7B | 87.6 | 86.5 | 92.9 | 91.2 | 80.9 | 93.7 | 72.8 | 33.1 |
+
 | Run | Model | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | SQuADv2 F1 | MMLU-Pro |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
 | `paper_baseline_qwen3_1p7b_128` | `Qwen/Qwen3-1.7B` | 42.2 | 70.3 | 46.1 | 28.1 | 52.3 | 77.3 | 12.2 | 23.4 |
@@ -55,6 +73,8 @@ These runs use 128 validation/test examples per task. They are not directly comp
 | Paper FP16 | Qwen 3 1.7B | 87.6 | 86.5 | 92.9 | 91.2 | 80.9 | 93.7 | 72.8 | 33.1 |
 
 The baseline mismatch is large on GLUE and SQuAD, so the exact paper numbers cannot be reproduced by this prompt evaluator alone. Applying Qwen3's chat template improves SQuAD, QNLI, QQP, and SST-2 relative to the raw prompt on this small sample, but it hurts MMLU-Pro and still does not approach the paper's FP16 baseline. This points to a missing evaluation or task-adaptation protocol rather than a simple prompt-format issue.
+
+Note: after commit `7c78c60`, supervised GLUE calibration/training batches use the GLUE train split. Earlier paper-supervised diagnostic runs were useful for debugging the quantizer but should not be treated as strict held-out evaluation if they were produced before this fix.
 
 ### Simplified Full-Layer QAT Smoke
 
@@ -148,6 +168,36 @@ Config:
 | + Act. Quant., paper-supervised STE | 35.9 | 68.0 | 46.1 | 32.0 | 52.3 | 53.9 | 13.3 |
 
 The 1000-step full-layer activation-only run reduced supervised training loss from `7.541` to `4.772`, but it still did not approach the paper's `+ Act. Quant.` accuracy. This strengthens the conclusion that reproducing Table III requires missing pieces from the paper implementation: exact evaluation/task-adaptation setup, full QAT recipe, adjustable-gradient STE details, and GPTVQ/fused-kernel behavior.
+
+### Corrected Base+Instruction 7-Linear Runs
+
+After the prompt grid above, the most useful public-checkpoint reproduction path is `Qwen/Qwen3-1.7B-Base` with instruction prompts. These runs quantize only the first 7 target linears so we can iterate quickly while preserving the paper-shaped codebooks: `subdim=2`, `Ka=64`, `Kw=16`, Chebyshev activation assignment, `weight_group_size=256`, and INT8 compact final LUTs. Supervised calibration/training uses GLUE train split after commit `7c78c60`.
+
+64 examples/task, SQuAD skipped:
+
+| Run | Stage | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| `lutllm_base_instruction_7linear_traincalib_actlutfit50_int8_64` | FP16 baseline | 82.8 | 67.2 | 81.2 | 84.4 | 78.1 | 87.5 | 39.1 |
+| same | direct Act LUT | 89.1 | 62.5 | 81.2 | 75.0 | 79.7 | 84.4 | 32.8 |
+| same | reconstructed final LUT | 67.2 | 73.4 | 68.8 | 54.7 | 54.7 | 62.5 | 21.9 |
+| `lutllm_base_instruction_7linear_traincalib_steqat300_int8_64` | simplified STE Act Quant | 70.3 | 62.5 | 79.7 | 79.7 | 85.9 | 90.6 | 28.1 |
+| same | final LUT | 45.3 | 57.8 | 78.1 | 68.8 | 70.3 | 85.9 | 21.9 |
+
+128 examples/task with SQuAD, act-only direct LUT:
+
+| Run | Stage | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | SQuADv2 F1 | MMLU-Pro |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `baseline_qwen3_1p7b_base_instruction_128` | FP16 baseline | 78.9 | 68.0 | 78.1 | 85.2 | 80.5 | 86.7 | 36.0 | 33.6 |
+| `lutllm_base_instruction_7linear_traincalib_actlutfit50_int8_128_actonly` | direct Act LUT | 83.6 | 64.1 | 82.8 | 78.1 | 82.8 | 82.0 | 37.7 | 26.6 |
+
+Hardware aggregate for these 7-linear runs:
+
+| Stage | Compact LUT / Expanded Table | Weight Codes Packed | Lookups / Token | Act Code Bits / Token |
+|---|---:|---:|---:|---:|
+| direct Act LUT | 3,072.0 MiB FP16 expanded table | 0.0 MiB | 25,165,824 | 55,296 |
+| final activation-weight LUT | 96.0 MiB compact INT8 LUT | 12.0 MiB | 25,165,824 | 55,296 |
+
+Interpretation: once the baseline protocol is corrected, direct activation-LUT fitting can roughly preserve some GLUE tasks and gives MMLU-Pro in the same range as the paper's `+ Act. Quant.` row on the 64-sample run. The final weight-VQ conversion is still much worse than the paper's final row, which points specifically to the missing GPTVQ and trained-LUT reconstruction details rather than just to prompt formatting.
 
 ### Direct Activation-LUT Fitting Inference
 
