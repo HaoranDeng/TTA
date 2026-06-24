@@ -74,6 +74,24 @@ def assign_to_centers(
 
 
 @torch.no_grad()
+def assign_to_centers_batched(
+    x: torch.Tensor,
+    centers: torch.Tensor,
+    distance: str = "l2",
+) -> torch.Tensor:
+    """Nearest-center assignment for x [B, N, D] and centers [B, K, D]."""
+    x = x.float().contiguous()
+    centers = centers.float().contiguous()
+    if distance == "chebyshev":
+        dist = (x[:, :, None, :] - centers[:, None, :, :]).abs().amax(dim=3)
+    elif distance == "l2":
+        dist = ((x[:, :, None, :] - centers[:, None, :, :]) ** 2).sum(dim=3)
+    else:
+        raise ValueError(f"Unsupported distance metric: {distance}")
+    return dist.argmin(dim=2)
+
+
+@torch.no_grad()
 def kmeans(
     x: torch.Tensor,
     k: int,
@@ -200,6 +218,55 @@ def kmeans_padded_batched(
 
 
 @torch.no_grad()
+def kmeans_padded_rows_batched(
+    x: torch.Tensor,
+    k: int,
+    iters: int,
+    seed: int,
+    sample_limit: int,
+    distance: str = "l2",
+) -> torch.Tensor:
+    """Run k-means independently for many small row sets.
+
+    Input x is [B, N, D], output is [B, K, D]. This is used for LUT-LLM
+    weight VQ, where each batch item is one (input subspace, output group).
+    """
+    x = x.float().contiguous()
+    b, n, _ = x.shape
+    if n <= 0:
+        raise ValueError("No rows for batched k-means")
+    effective_sample_limit = max(sample_limit, k) if sample_limit > 0 else sample_limit
+    if effective_sample_limit > 0 and n > effective_sample_limit:
+        gen = torch.Generator(device=x.device)
+        gen.manual_seed(seed)
+        idx = torch.randperm(n, generator=gen, device=x.device)[:effective_sample_limit]
+        x = x[:, idx, :].contiguous()
+        n = x.shape[1]
+
+    effective_k = min(k, n)
+    gen = torch.Generator(device=x.device)
+    gen.manual_seed(seed)
+    init_idx = torch.randint(n, (b, effective_k), generator=gen, device=x.device)
+    b_idx = torch.arange(b, device=x.device).view(b, 1)
+    centers = x[b_idx, init_idx].contiguous()
+
+    for _ in range(iters):
+        codes = assign_to_centers_batched(x, centers, distance=distance)
+        one_hot = torch.nn.functional.one_hot(codes, num_classes=effective_k).to(dtype=x.dtype)
+        counts = one_hot.sum(dim=1)
+        sums = torch.einsum("bnk,bnd->bkd", one_hot, x)
+        nonempty = counts > 0
+        updated = sums / counts.clamp_min(1.0).unsqueeze(2)
+        centers = torch.where(nonempty.unsqueeze(2), updated, centers)
+
+    if effective_k == k:
+        return centers
+    pad_count = k - effective_k
+    repeats = centers[:, torch.arange(pad_count, device=centers.device) % effective_k, :]
+    return torch.cat([centers, repeats], dim=1)
+
+
+@torch.no_grad()
 def encode_activation(x: torch.Tensor, act_centers: torch.Tensor, distance: str = "l2") -> torch.Tensor:
     """Encode flattened activations [N, in_features] into PQ codes [N, M]."""
     n, in_features = x.shape
@@ -245,6 +312,28 @@ def _quantize_lut(lut: torch.Tensor, bits: int) -> tuple[torch.Tensor, torch.Ten
     else:
         q = q.to(torch.int16)
     return q, dequant, scale, zeropoint
+
+
+def _quantize_lut_batched(lut: torch.Tensor, bits: int) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    if bits <= 0:
+        ones = torch.ones((lut.shape[0],), device=lut.device, dtype=torch.float32)
+        zeros = torch.zeros((lut.shape[0],), device=lut.device, dtype=torch.float32)
+        return lut, lut, ones, zeros
+    qmax = float((1 << bits) - 1)
+    min_val = lut.amin(dim=(1, 2))
+    max_val = lut.amax(dim=(1, 2))
+    valid = max_val > min_val
+    scale = torch.where(valid, (max_val - min_val) / qmax, torch.ones_like(max_val))
+    zeropoint = torch.where(valid, -min_val / scale, torch.zeros_like(max_val))
+    q = torch.round(lut / scale[:, None, None] + zeropoint[:, None, None]).clamp_(0, qmax)
+    q = torch.where(valid[:, None, None], q, torch.zeros_like(q))
+    dequant = (q - zeropoint[:, None, None]) * scale[:, None, None]
+    dequant = torch.where(valid[:, None, None], dequant, torch.zeros_like(dequant))
+    if bits <= 8:
+        q = q.to(torch.uint8)
+    else:
+        q = q.to(torch.int16)
+    return q, dequant, scale.float(), zeropoint.float()
 
 
 class PQLUTLinear(nn.Module):
@@ -328,47 +417,47 @@ class PQLUTLinear(nn.Module):
 
         _sync(device)
         start = time.perf_counter()
-        for mi in range(m):
-            lo = mi * config.subdim
-            hi = lo + config.subdim
-            if act_centers_override is None:
-                ca = kmeans_padded(
-                    calib[:, lo:hi],
+        if act_centers_override is None:
+            act_centers.copy_(
+                kmeans_padded_batched(
+                    calib,
                     config.ka,
                     config.kmeans_iters,
-                    config.seed + 1009 * mi,
+                    config.seed,
                     config.sample_limit,
                     config.encode_chunk,
                     config.distance,
+                    config.subdim,
                 )
-            else:
-                ca = act_centers_override[mi].to(device=device, dtype=torch.float32)
-            act_centers[mi] = ca
+            )
+        else:
+            act_centers.copy_(act_centers_override.to(device=device, dtype=torch.float32))
 
-            for gi in range(group_count):
-                g_lo = gi * config.weight_group_size if config.weight_group_size > 0 else 0
-                g_hi = min((gi + 1) * config.weight_group_size, out_features) if config.weight_group_size > 0 else out_features
-                ww = weight[g_lo:g_hi, lo:hi]
-                cw = kmeans_padded(
-                    ww,
-                    config.kw,
-                    config.kmeans_iters,
-                    config.seed + 2003 * mi + 9176 * gi,
-                    config.sample_limit,
-                    config.encode_chunk,
-                    config.distance,
-                )
-                wc = assign_to_centers(ww, cw, chunk=config.encode_chunk, distance=config.distance)
-                lut = ca @ cw.t()
-                stored_lut, dequant_lut, scale, zeropoint = _quantize_lut(lut, config.lut_quant_bits)
-                weight_centers[mi, gi] = cw
-                weight_codes[mi, g_lo:g_hi] = wc
-                if config.lut_storage == "expanded":
-                    expanded_lut[mi, :, g_lo:g_hi] = dequant_lut[:, wc].to(lut_dtype)
-                else:
-                    compact_lut[mi, gi] = stored_lut.to(compact_lut.dtype)
-                lut_scales[mi, gi] = scale
-                lut_zeropoints[mi, gi] = zeropoint
+        weight_by_subspace = weight.view(out_features, m, config.subdim).permute(1, 0, 2).contiguous()
+        for gi in range(group_count):
+            g_lo = gi * config.weight_group_size if config.weight_group_size > 0 else 0
+            g_hi = min((gi + 1) * config.weight_group_size, out_features) if config.weight_group_size > 0 else out_features
+            ww = weight_by_subspace[:, g_lo:g_hi, :]
+            cw = kmeans_padded_rows_batched(
+                ww,
+                config.kw,
+                config.kmeans_iters,
+                config.seed + 9176 * gi,
+                config.sample_limit,
+                config.distance,
+            )
+            wc = assign_to_centers_batched(ww, cw, distance=config.distance)
+            lut = torch.einsum("mks,mws->mkw", act_centers, cw)
+            stored_lut, dequant_lut, scale, zeropoint = _quantize_lut_batched(lut, config.lut_quant_bits)
+            weight_centers[:, gi] = cw
+            weight_codes[:, g_lo:g_hi] = wc
+            if config.lut_storage == "expanded":
+                gather_idx = wc[:, None, :].expand(-1, config.ka, -1)
+                expanded_lut[:, :, g_lo:g_hi] = dequant_lut.gather(2, gather_idx).to(lut_dtype)
+            else:
+                compact_lut[:, gi] = stored_lut.to(compact_lut.dtype)
+            lut_scales[:, gi] = scale
+            lut_zeropoints[:, gi] = zeropoint
         _sync(device)
         train_seconds = time.perf_counter() - start
 
