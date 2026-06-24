@@ -417,6 +417,7 @@ def replace_with_fitted_activation_lut(
         aggregate=_aggregate_stats(module_stats),
         calibration_seconds=calibration_seconds,
         quantization_seconds=time.perf_counter() - start,
+        calibration_inputs=calibration_inputs,
     )
 
 
@@ -491,6 +492,7 @@ def convert_activation_lut_to_pq_lut(
     max_linears: int | None = None,
     max_vectors_per_layer: int = 1024,
     device: torch.device | None = None,
+    calibration_inputs_override: dict[str, torch.Tensor] | None = None,
 ) -> QuantizationReport:
     if device is None:
         device = next(model.parameters()).device
@@ -503,13 +505,17 @@ def convert_activation_lut_to_pq_lut(
     if not target_names:
         raise RuntimeError("No ActivationLUTLinear modules found")
 
-    calibration_inputs, calibration_seconds = collect_calibration_inputs(
-        model,
-        calibration_batches,
-        target_names,
-        max_vectors_per_layer=max_vectors_per_layer,
-        device=device,
-    )
+    if calibration_inputs_override is None:
+        calibration_inputs, calibration_seconds = collect_calibration_inputs(
+            model,
+            calibration_batches,
+            target_names,
+            max_vectors_per_layer=max_vectors_per_layer,
+            device=device,
+        )
+    else:
+        calibration_inputs = {name: calibration_inputs_override[name] for name in target_names}
+        calibration_seconds = 0.0
     module_stats: list[dict[str, Any]] = []
     if device.type == "cuda":
         torch.cuda.synchronize(device)

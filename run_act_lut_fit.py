@@ -240,6 +240,7 @@ def main() -> None:
         max_linears=args.max_linears,
         max_vectors_per_layer=args.calib_vectors_per_layer,
         device=device,
+        calibration_inputs_override=act_report.calibration_inputs,
     )
     summary["reconstructed_final_lut"] = {
         "hardware_aggregate": final_report.aggregate,

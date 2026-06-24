@@ -21,6 +21,7 @@ class QuantizationReport:
     aggregate: dict[str, Any]
     calibration_seconds: float
     quantization_seconds: float
+    calibration_inputs: dict[str, torch.Tensor] | None = None
 
 
 class _ActivationCollector:
