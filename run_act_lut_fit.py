@@ -15,7 +15,7 @@ from pq_lut_lm.activation_quant import (
     convert_activation_lut_to_pq_lut,
     replace_with_fitted_activation_lut,
 )
-from pq_lut_lm.eval_utils import load_wikitext_texts, make_lm_batches
+from pq_lut_lm.eval_utils import evaluate_ppl, load_wikitext_texts, make_lm_batches
 from pq_lut_lm.modeling import DEFAULT_TARGET_REGEX
 from pq_lut_lm.paper_eval import evaluate_paper_tasks, make_paper_supervised_batches
 from pq_lut_lm.pq_linear import PQConfig
@@ -39,6 +39,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--fit-batch-size", type=int, default=128)
     parser.add_argument("--fit-lut-dtype", choices=["float16", "bfloat16", "float32"], default="float32")
     parser.add_argument("--paper-samples", type=int, default=32)
+    parser.add_argument("--eval-ppl", action="store_true")
+    parser.add_argument("--ppl-tokens", type=int, default=4096)
+    parser.add_argument("--ppl-batch-size", type=int, default=1)
     parser.add_argument("--prompt-style", choices=["plain", "chat"], default="plain")
     parser.add_argument("--prompt-template", choices=["simple", "instruction"], default="simple")
     parser.add_argument("--glue-shot-count", type=int, default=0)
@@ -133,6 +136,15 @@ def main() -> None:
     load_seconds = time.perf_counter() - load_start
 
     calib_batches = make_calibration_batches(args, tokenizer)
+    ppl_batches = None
+    if args.eval_ppl:
+        ppl_batches = make_lm_batches(
+            tokenizer,
+            load_wikitext_texts("test"),
+            args.seq_len,
+            args.ppl_tokens,
+            batch_size=args.ppl_batch_size,
+        )
     summary: dict[str, Any] = {
         "model_id": args.model_id,
         "device": str(device),
@@ -158,6 +170,10 @@ def main() -> None:
             glue_shot_count=args.glue_shot_count,
             mmlu_shot_count=args.mmlu_shot_count,
         )
+        save_json(out_dir / "summary.json", summary)
+    if args.eval_ppl and ppl_batches is not None:
+        print("Evaluating FP16 baseline perplexity", flush=True)
+        summary.setdefault("fp16_baseline", {})["wikitext_ppl"] = evaluate_ppl(model, ppl_batches, device)
         save_json(out_dir / "summary.json", summary)
 
     print("Freezing dense model weights", flush=True)
@@ -223,6 +239,10 @@ def main() -> None:
             mmlu_shot_count=args.mmlu_shot_count,
         )
         save_json(out_dir / "summary.json", summary)
+    if args.eval_ppl and ppl_batches is not None:
+        print("Evaluating direct activation-LUT model perplexity", flush=True)
+        summary["act_lut_fit"]["wikitext_ppl"] = evaluate_ppl(model, ppl_batches, device)
+        save_json(out_dir / "summary.json", summary)
 
     if args.skip_final_lut:
         print(json.dumps(summary, indent=2, sort_keys=True), flush=True)
@@ -268,6 +288,10 @@ def main() -> None:
             glue_shot_count=args.glue_shot_count,
             mmlu_shot_count=args.mmlu_shot_count,
         )
+        save_json(out_dir / "summary.json", summary)
+    if args.eval_ppl and ppl_batches is not None:
+        print("Evaluating reconstructed final LUT perplexity", flush=True)
+        summary["reconstructed_final_lut"]["wikitext_ppl"] = evaluate_ppl(model, ppl_batches, device)
         save_json(out_dir / "summary.json", summary)
 
     print(json.dumps(summary, indent=2, sort_keys=True), flush=True)
