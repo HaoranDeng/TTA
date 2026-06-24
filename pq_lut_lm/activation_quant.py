@@ -459,7 +459,7 @@ def convert_ste_act_quant_to_lut(
     if device.type == "cuda":
         torch.cuda.synchronize(device)
     start = time.perf_counter()
-    for name, wrapped in target:
+    for idx, (name, wrapped) in enumerate(target, start=1):
         current = modules[name]
         if not isinstance(current, STEActivationQuantLinear):
             continue
@@ -472,6 +472,8 @@ def convert_ste_act_quant_to_lut(
         )
         _set_submodule(model, name, pq)
         module_stats.append(pq.hardware_stats())
+        if idx == 1 or idx == len(target) or idx % 10 == 0:
+            print(f"converted STE activation quantizer {idx}/{len(target)} to LUT: {name}", flush=True)
         modules = dict(model.named_modules())
     if device.type == "cuda":
         torch.cuda.synchronize(device)
@@ -520,7 +522,7 @@ def convert_activation_lut_to_pq_lut(
     if device.type == "cuda":
         torch.cuda.synchronize(device)
     start = time.perf_counter()
-    for name in target_names:
+    for idx, name in enumerate(target_names, start=1):
         modules = dict(model.named_modules())
         current = modules[name]
         if not isinstance(current, ActivationLUTLinear):
@@ -536,6 +538,8 @@ def convert_activation_lut_to_pq_lut(
         _set_submodule(model, name, pq)
         module_stats.append(pq.hardware_stats())
         del modules, current, reconstructed
+        if idx == 1 or idx == len(target_names) or idx % 10 == 0:
+            print(f"converted fitted activation LUT {idx}/{len(target_names)} to final LUT: {name}", flush=True)
         if device.type == "cuda":
             torch.cuda.empty_cache()
     if device.type == "cuda":
