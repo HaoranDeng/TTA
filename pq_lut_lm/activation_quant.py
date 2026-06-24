@@ -15,7 +15,7 @@ from .modeling import (
     collect_calibration_inputs,
     iter_target_linears,
 )
-from .pq_linear import PQConfig, PQLUTLinear, encode_activation, kmeans_padded
+from .pq_linear import PQConfig, PQLUTLinear, encode_activation, kmeans_padded_batched
 
 
 class STEActivationQuantLinear(nn.Module):
@@ -130,22 +130,19 @@ class ActivationLUTLinear(nn.Module):
         calib = calibration_inputs.to(device=device, dtype=weight.dtype, non_blocking=True)
         out_features, in_features = weight.shape
         m = in_features // config.subdim
-        centers = torch.empty((m, config.ka, config.subdim), device=device, dtype=torch.float32)
+        centers = kmeans_padded_batched(
+            calib,
+            config.ka,
+            config.kmeans_iters,
+            config.seed,
+            config.sample_limit,
+            config.encode_chunk,
+            config.distance,
+            config.subdim,
+        )
         lut = torch.empty((m, config.ka, out_features), device=device, dtype=weight.dtype)
-        for mi in range(m):
-            lo = mi * config.subdim
-            hi = lo + config.subdim
-            ca = kmeans_padded(
-                calib[:, lo:hi],
-                config.ka,
-                config.kmeans_iters,
-                config.seed + 1009 * mi,
-                config.sample_limit,
-                config.encode_chunk,
-                config.distance,
-            )
-            centers[mi] = ca
-            lut[mi] = (ca.to(dtype=weight.dtype) @ weight[:, lo:hi].t()).to(dtype=weight.dtype)
+        weight_view = weight.view(out_features, m, config.subdim).permute(1, 2, 0).contiguous()
+        lut.copy_(torch.bmm(centers.to(dtype=weight.dtype), weight_view).to(dtype=weight.dtype))
         return centers, lut
 
     @classmethod
@@ -334,28 +331,26 @@ def replace_with_ste_act_quant(
     if device.type == "cuda":
         torch.cuda.synchronize(device)
     start = time.perf_counter()
-    for name in target_names:
+    for idx, name in enumerate(target_names, start=1):
         old = modules[name]
         if not isinstance(old, nn.Linear):
             raise TypeError(f"{name} is no longer nn.Linear")
-        m = old.in_features // config.subdim
-        centers = torch.empty((m, config.ka, config.subdim), device=device, dtype=torch.float32)
         calib = calibration_inputs[name].to(device=device, dtype=old.weight.dtype)
-        for mi in range(m):
-            lo = mi * config.subdim
-            hi = lo + config.subdim
-            centers[mi] = kmeans_padded(
-                calib[:, lo:hi],
-                config.ka,
-                config.kmeans_iters,
-                config.seed + 1009 * mi,
-                config.sample_limit,
-                config.encode_chunk,
-                config.distance,
-            )
+        centers = kmeans_padded_batched(
+            calib,
+            config.ka,
+            config.kmeans_iters,
+            config.seed + 1009 * idx,
+            config.sample_limit,
+            config.encode_chunk,
+            config.distance,
+            config.subdim,
+        )
         wrapped = STEActivationQuantLinear(old, centers, config, name)
         _set_submodule(model, name, wrapped)
         module_stats.append(wrapped.hardware_stats())
+        if idx == 1 or idx == len(target_names) or idx % 10 == 0:
+            print(f"initialized STE activation quantizer {idx}/{len(target_names)}: {name}", flush=True)
         modules = dict(model.named_modules())
     if device.type == "cuda":
         torch.cuda.synchronize(device)
@@ -400,7 +395,7 @@ def replace_with_fitted_activation_lut(
     if device.type == "cuda":
         torch.cuda.synchronize(device)
     start = time.perf_counter()
-    for name in target_names:
+    for idx, name in enumerate(target_names, start=1):
         old = modules[name]
         if not isinstance(old, nn.Linear):
             raise TypeError(f"{name} is no longer nn.Linear")
@@ -416,6 +411,8 @@ def replace_with_fitted_activation_lut(
         )
         _set_submodule(model, name, fitted)
         module_stats.append(fitted.hardware_stats())
+        if idx == 1 or idx == len(target_names) or idx % 10 == 0:
+            print(f"fitted activation LUT {idx}/{len(target_names)}: {name}", flush=True)
         modules = dict(model.named_modules())
     if device.type == "cuda":
         torch.cuda.synchronize(device)

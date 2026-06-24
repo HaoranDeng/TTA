@@ -131,6 +131,75 @@ def kmeans_padded(
 
 
 @torch.no_grad()
+def kmeans_padded_batched(
+    x: torch.Tensor,
+    k: int,
+    iters: int,
+    seed: int,
+    sample_limit: int,
+    chunk: int = 8192,
+    distance: str = "l2",
+    subdim: int = 2,
+) -> torch.Tensor:
+    """Run k-means for all activation subspaces in one Linear module.
+
+    Input x is [N, in_features]. The output is [M, K, subdim], where
+    M = in_features / subdim. This avoids hundreds of thousands of tiny
+    Python k-means calls for full-model LUT-LLM runs.
+    """
+    x = x.float().contiguous()
+    if x.shape[1] % subdim != 0:
+        raise ValueError(f"in_features={x.shape[1]} is not divisible by subdim={subdim}")
+    effective_sample_limit = max(sample_limit, k) if sample_limit > 0 else sample_limit
+    if effective_sample_limit > 0 and x.shape[0] > effective_sample_limit:
+        gen = torch.Generator(device=x.device)
+        gen.manual_seed(seed)
+        idx = torch.randperm(x.shape[0], generator=gen, device=x.device)[:effective_sample_limit]
+        x = x[idx].contiguous()
+
+    n = x.shape[0]
+    if n <= 0:
+        raise ValueError("No calibration samples for k-means")
+    m = x.shape[1] // subdim
+    xv = x.view(n, m, subdim)
+    effective_k = min(k, n)
+
+    gen = torch.Generator(device=x.device)
+    gen.manual_seed(seed)
+    init_idx = torch.randint(n, (m, effective_k), generator=gen, device=x.device)
+    m_idx = torch.arange(m, device=x.device).view(m, 1)
+    centers = xv[init_idx, m_idx].contiguous()
+
+    # Bound the [N, M_chunk, K] distance tensor. The CLI encode_chunk is a row
+    # chunk for other paths, so convert it into a conservative subspace chunk.
+    m_chunk = max(1, min(m, max(16, chunk // max(effective_k, 1))))
+    for _ in range(iters):
+        for start in range(0, m, m_chunk):
+            end = min(start + m_chunk, m)
+            xb = xv[:, start:end, :]
+            cb = centers[start:end]
+            if distance == "chebyshev":
+                dist = (xb[:, :, None, :] - cb[None, :, :, :]).abs().amax(dim=3)
+            elif distance == "l2":
+                dist = ((xb[:, :, None, :] - cb[None, :, :, :]) ** 2).sum(dim=3)
+            else:
+                raise ValueError(f"Unsupported distance metric: {distance}")
+            codes = dist.argmin(dim=2)
+            one_hot = torch.nn.functional.one_hot(codes, num_classes=effective_k).to(dtype=xb.dtype)
+            counts = one_hot.sum(dim=0)
+            sums = torch.einsum("nmk,nms->mks", one_hot, xb)
+            nonempty = counts > 0
+            updated = sums / counts.clamp_min(1.0).unsqueeze(2)
+            centers[start:end] = torch.where(nonempty.unsqueeze(2), updated, cb)
+
+    if effective_k == k:
+        return centers
+    pad_count = k - effective_k
+    repeats = centers[:, torch.arange(pad_count, device=centers.device) % effective_k, :]
+    return torch.cat([centers, repeats], dim=1)
+
+
+@torch.no_grad()
 def encode_activation(x: torch.Tensor, act_centers: torch.Tensor, distance: str = "l2") -> torch.Tensor:
     """Encode flattened activations [N, in_features] into PQ codes [N, M]."""
     n, in_features = x.shape
