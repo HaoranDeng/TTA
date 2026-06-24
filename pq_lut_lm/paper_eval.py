@@ -50,12 +50,21 @@ def _take(ds: Any, max_samples: int) -> list[dict[str, Any]]:
     return rows
 
 
-def load_glue_rows(task: str, max_samples: int) -> list[dict[str, Any]]:
-    split = "validation_matched" if task == "mnli" else "validation"
+def load_glue_rows(task: str, max_samples: int, split: str | None = None) -> list[dict[str, Any]]:
+    if split is None:
+        split = "validation_matched" if task == "mnli" else "validation"
     return _take(load_dataset("glue", task, split=split), max_samples)
 
 
-def glue_prompt_and_labels(task: str, row: dict[str, Any]) -> tuple[str, list[str], int]:
+def glue_prompt_and_labels(
+    task: str,
+    row: dict[str, Any],
+    prompt_template: str = "simple",
+) -> tuple[str, list[str], int]:
+    if prompt_template not in {"simple", "instruction"}:
+        raise ValueError(f"Unsupported GLUE prompt template: {prompt_template}")
+    if prompt_template == "instruction":
+        return glue_instruction_prompt_and_labels(task, row)
     if task == "sst2":
         prompt = f"Sentence: {row['sentence']}\nSentiment:"
         return prompt, [" negative", " positive"], int(row["label"])
@@ -97,6 +106,78 @@ def glue_prompt_and_labels(task: str, row: dict[str, Any]) -> tuple[str, list[st
     raise ValueError(f"Unsupported GLUE task: {task}")
 
 
+def glue_instruction_prompt_and_labels(task: str, row: dict[str, Any]) -> tuple[str, list[str], int]:
+    if task == "sst2":
+        prompt = (
+            "Classify the sentiment of the sentence as negative or positive.\n"
+            f"Sentence: {row['sentence']}\n"
+            "Answer:"
+        )
+        return prompt, [" negative", " positive"], int(row["label"])
+    if task == "mrpc":
+        prompt = (
+            "Decide whether the two sentences are semantically equivalent. Answer yes or no.\n"
+            f"Sentence 1: {row['sentence1']}\n"
+            f"Sentence 2: {row['sentence2']}\n"
+            "Answer:"
+        )
+        return prompt, [" no", " yes"], int(row["label"])
+    if task == "qqp":
+        prompt = (
+            "Decide whether the two questions are duplicates. Answer yes or no.\n"
+            f"Question 1: {row['question1']}\n"
+            f"Question 2: {row['question2']}\n"
+            "Answer:"
+        )
+        return prompt, [" no", " yes"], int(row["label"])
+    if task == "mnli":
+        prompt = (
+            "Classify the relationship between the premise and hypothesis as entailment, neutral, or contradiction.\n"
+            f"Premise: {row['premise']}\n"
+            f"Hypothesis: {row['hypothesis']}\n"
+            "Answer:"
+        )
+        return prompt, [" entailment", " neutral", " contradiction"], int(row["label"])
+    if task == "qnli":
+        prompt = (
+            "Decide whether the sentence answers the question. Answer yes or no.\n"
+            f"Question: {row['question']}\n"
+            f"Sentence: {row['sentence']}\n"
+            "Answer:"
+        )
+        return prompt, [" yes", " no"], int(row["label"])
+    if task == "rte":
+        prompt = (
+            "Decide whether the premise entails the hypothesis. Answer entailment or not entailment.\n"
+            f"Premise: {row['sentence1']}\n"
+            f"Hypothesis: {row['sentence2']}\n"
+            "Answer:"
+        )
+        return prompt, [" entailment", " not entailment"], int(row["label"])
+    raise ValueError(f"Unsupported GLUE task: {task}")
+
+
+def make_glue_few_shot_prefix(task: str, shot_count: int, prompt_template: str = "simple") -> str:
+    if shot_count <= 0:
+        return ""
+    rows = load_glue_rows(task, 0, split="train")
+    buckets: dict[int, list[dict[str, Any]]] = collections.defaultdict(list)
+    for row in rows:
+        label = int(row["label"])
+        buckets[label].append(row)
+    examples: list[dict[str, Any]] = []
+    label_ids = sorted(buckets)
+    while len(examples) < shot_count and any(buckets.values()):
+        for label in label_ids:
+            if buckets[label] and len(examples) < shot_count:
+                examples.append(buckets[label].pop(0))
+    rendered = []
+    for row in examples:
+        prompt, labels, gold = glue_prompt_and_labels(task, row, prompt_template=prompt_template)
+        rendered.append(prompt + labels[gold])
+    return "\n\n".join(rendered) + "\n\n"
+
+
 def make_glue_supervised_examples(task: str, max_samples: int) -> list[tuple[str, str]]:
     examples = []
     for row in load_glue_rows(task, max_samples):
@@ -113,16 +194,20 @@ def evaluate_glue_task(
     max_samples: int,
     device: torch.device,
     prompt_style: str = "plain",
+    prompt_template: str = "simple",
+    shot_count: int = 0,
 ) -> dict[str, Any]:
     rows = load_glue_rows(task, max_samples)
     correct = 0
     predictions = []
+    prefix = make_glue_few_shot_prefix(task, shot_count, prompt_template=prompt_template)
     if device.type == "cuda":
         torch.cuda.synchronize(device)
     start = time.perf_counter()
     model.eval()
     for row in rows:
-        prompt, labels, gold = glue_prompt_and_labels(task, row)
+        prompt, labels, gold = glue_prompt_and_labels(task, row, prompt_template=prompt_template)
+        prompt = prefix + prompt
         prompt = format_prompt_for_style(tokenizer, prompt, prompt_style)
         labels = [format_completion_for_style(label, prompt_style) for label in labels]
         scores = score_completions(model, tokenizer, prompt, labels, device)
@@ -145,10 +230,16 @@ def load_mmlu_pro_rows(max_samples: int, split: str = "test") -> list[dict[str, 
     return list(islice(ds, max_samples if max_samples > 0 else None))
 
 
-def format_mmlu_pro_prompt(row: dict[str, Any]) -> tuple[str, list[str]]:
+def format_mmlu_pro_prompt(row: dict[str, Any], prompt_template: str = "simple") -> tuple[str, list[str]]:
+    if prompt_template not in {"simple", "instruction"}:
+        raise ValueError(f"Unsupported MMLU-Pro prompt template: {prompt_template}")
     letters = [chr(ord("A") + i) for i in range(10)]
     options = row["options"]
-    prompt = f"Question: {row['question']}\n"
+    if prompt_template == "instruction":
+        prompt = "Choose the single best answer. Respond with only the option letter.\n"
+    else:
+        prompt = ""
+    prompt += f"Question: {row['question']}\n"
     for i, option in enumerate(options):
         prompt += f"{letters[i]}. {option}\n"
     prompt += "Answer:"
@@ -164,6 +255,16 @@ def make_mmlu_pro_supervised_examples(max_samples: int) -> list[tuple[str, str]]
     return examples
 
 
+def make_mmlu_pro_few_shot_prefix(shot_count: int, prompt_template: str = "simple") -> str:
+    if shot_count <= 0:
+        return ""
+    examples = []
+    for row in load_mmlu_pro_rows(shot_count, split="validation"):
+        prompt, labels = format_mmlu_pro_prompt(row, prompt_template=prompt_template)
+        examples.append(prompt + labels[int(row["answer_index"])])
+    return "\n\n".join(examples) + "\n\n"
+
+
 @torch.no_grad()
 def evaluate_mmlu_pro(
     model: torch.nn.Module,
@@ -171,17 +272,21 @@ def evaluate_mmlu_pro(
     max_samples: int,
     device: torch.device,
     prompt_style: str = "plain",
+    prompt_template: str = "simple",
+    shot_count: int = 0,
 ) -> dict[str, Any]:
     rows = load_mmlu_pro_rows(max_samples)
     correct = 0
     predictions = []
     letters = [chr(ord("A") + i) for i in range(10)]
+    prefix = make_mmlu_pro_few_shot_prefix(shot_count, prompt_template=prompt_template)
     if device.type == "cuda":
         torch.cuda.synchronize(device)
     start = time.perf_counter()
     model.eval()
     for row in rows:
-        prompt, labels = format_mmlu_pro_prompt(row)
+        prompt, labels = format_mmlu_pro_prompt(row, prompt_template=prompt_template)
+        prompt = prefix + prompt
         prompt = format_prompt_for_style(tokenizer, prompt, prompt_style)
         labels = [format_completion_for_style(label, prompt_style) for label in labels]
         scores = score_completions(model, tokenizer, prompt, labels, device)
@@ -364,14 +469,34 @@ def evaluate_paper_tasks(
     max_samples_per_task: int,
     include_squad: bool = True,
     prompt_style: str = "plain",
+    prompt_template: str = "simple",
+    glue_shot_count: int = 0,
+    mmlu_shot_count: int = 0,
 ) -> dict[str, Any]:
     results: dict[str, Any] = {}
     for task in GLUE_TASKS:
-        metric = evaluate_glue_task(model, tokenizer, task, max_samples_per_task, device, prompt_style=prompt_style)
+        metric = evaluate_glue_task(
+            model,
+            tokenizer,
+            task,
+            max_samples_per_task,
+            device,
+            prompt_style=prompt_style,
+            prompt_template=prompt_template,
+            shot_count=glue_shot_count,
+        )
         results[task] = {k: v for k, v in metric.items() if k != "predictions"}
     if include_squad:
         metric = evaluate_squad_v2(model, tokenizer, max_samples_per_task, device, prompt_style=prompt_style)
         results["squad_v2"] = {k: v for k, v in metric.items() if k != "predictions"}
-    metric = evaluate_mmlu_pro(model, tokenizer, max_samples_per_task, device, prompt_style=prompt_style)
+    metric = evaluate_mmlu_pro(
+        model,
+        tokenizer,
+        max_samples_per_task,
+        device,
+        prompt_style=prompt_style,
+        prompt_template=prompt_template,
+        shot_count=mmlu_shot_count,
+    )
     results["mmlu_pro"] = {k: v for k, v in metric.items() if k != "predictions"}
     return results
