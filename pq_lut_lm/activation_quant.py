@@ -280,14 +280,10 @@ def reconstruct_linear_from_activation_lut(
         device=device,
         dtype=dtype,
     )
-    weight = torch.empty((module.out_features, module.in_features), device=device, dtype=dtype)
-    for mi in range(module.in_features // module.config.subdim):
-        lo = mi * module.config.subdim
-        hi = lo + module.config.subdim
-        centers = module.act_centers[mi].float()
-        table = module.expanded_lut[mi].float()
-        sub_weight = torch.linalg.pinv(centers) @ table
-        weight[:, lo:hi] = sub_weight.t().to(dtype=dtype)
+    centers = module.act_centers.float()
+    table = module.expanded_lut.float()
+    sub_weight = torch.bmm(torch.linalg.pinv(centers), table)
+    weight = sub_weight.permute(2, 0, 1).reshape(module.out_features, module.in_features).to(dtype=dtype)
     linear.weight.copy_(weight)
     if module.bias is not None:
         linear.bias.copy_(module.bias.to(dtype=dtype))
