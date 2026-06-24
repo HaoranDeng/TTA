@@ -239,6 +239,8 @@ These runs continue from the corrected shuffled-calibration setup. All rows quan
 | `lutllm_base_instruction_all196_shufcalib_denseqat300_centers3e4_dense1e5_actonly_ppl32` | centers + dense linear QAT, 300 steps | 32 | 472.2 | 40.6 | 75.0 | 53.1 | 68.8 | 65.6 | 78.1 | 3.1 |
 | `lutllm_base_instruction_all196_shufcalib_steqat500_int8_final32_ppl` | Act Quant before final LUT | 32 | 464.3 | 50.0 | 68.8 | 65.6 | 62.5 | 65.6 | 81.2 | 15.6 |
 | same | compact INT8 final LUT with local k-means weight VQ | 32 | 39,716.5 | 31.2 | 40.6 | 28.1 | 59.4 | 56.2 | 37.5 | 3.1 |
+| `lutllm_base_instruction_all196_shufcalib_steqat500_int8_final16_affine_ppl` | compact INT8 final LUT + per-output affine correction | 16 | 10,768.6 | 31.2 | 37.5 | 62.5 | 62.5 | 62.5 | 37.5 | 6.2 |
+| `lutllm_base_instruction_all196_shufcalib_steqat500_int8_final16_reassign1_ppl` | compact INT8 final LUT + output-aware weight-code reassignment, 1 pass | 16 | 98,591.5 | 25.0 | 37.5 | 62.5 | 62.5 | 62.5 | 50.0 | 12.5 |
 | `lutllm_base_instruction_all196_shufcalib_actlutfit50_actonly16_ppl` | direct expanded Act-LUT fit, 50 local steps | 16 | 608.5 | 25.0 | 81.2 | 68.8 | 62.5 | 68.8 | 50.0 | 0.0 |
 
 Findings:
@@ -247,9 +249,11 @@ Findings:
 - Longer centers-only QAT is not monotonic: `5000` steps at `3e-4` degraded PPL to `749`.
 - Naively unfreezing dense linear weights during QAT did not help; it improved a few small-sample GLUE cells but damaged PPL and MMLU-Pro.
 - The compact final LUT path is currently dominated by local k-means weight VQ error: PPL jumps to about `39,716`.
+- A per-output affine correction reduces the diagnostic final-LUT PPL to about `10,769`, but GLUE/MMLU-Pro accuracy remains near random.
+- The first implemented output-aware weight-code reassignment pass (`--weight-code-reassign-iters 1`) did not help: with 128 calibration vectors per layer it reached PPL about `98,591`, although MMLU-Pro moved from `6.2` to `12.5` on a very small 16-row diagnostic.
 - Direct local expanded Act-LUT fitting is also insufficient, so simply training lookup-table values layerwise against dense linear outputs does not reproduce the paper's end-to-end QAT.
 
-Next implementation target: replace the current local k-means weight VQ with a GPTQ/GPTVQ-style reconstruction-aware weight-code assignment using calibration activations. That is the most plausible missing step between our final LUT and the paper's `+ Weight Quant.` row.
+Next implementation target: replace the current one-pass code reassignment with a closer GPTQ/GPTVQ-style weight quantizer that updates codes and/or centers under a second-order or blockwise reconstruction objective. The one-pass diagnostic shows that simple coordinate reassignment is not enough.
 
 ### Historical 7-Linear Debug Runs
 
@@ -316,7 +320,7 @@ Baseline:
 
 ```bash
 python3 run_paper_eval.py \
-  --model-id Qwen/Qwen3-1.7B \
+  --model-id Qwen/Qwen3-1.7B-Base \
   --output-dir results/paper_baseline_qwen3_1p7b_128 \
   --paper-samples 128
 ```
@@ -325,7 +329,7 @@ Simplified QAT:
 
 ```bash
 python3 run_lutllm_qat.py \
-  --model-id Qwen/Qwen3-1.7B \
+  --model-id Qwen/Qwen3-1.7B-Base \
   --output-dir results/paper_lutllm_qwen3_1p7b_all_qat20 \
   --paper-samples 16 \
   --skip-squad \
@@ -346,7 +350,7 @@ Stronger paper-supervised QAT mode:
 
 ```bash
 python3 run_lutllm_qat.py \
-  --model-id Qwen/Qwen3-1.7B \
+  --model-id Qwen/Qwen3-1.7B-Base \
   --output-dir results/paper_lutllm_qwen3_1p7b_all_paperqat100_affine \
   --train-source paper \
   --task-train-samples 32 \
@@ -365,13 +369,13 @@ python3 run_lutllm_qat.py \
   --eval-final-lut
 ```
 
-The `--train-source paper` mode trains activation codebooks on supervised GLUE/SQuAD/MMLU-Pro-style prompt+answer examples instead of WikiText continuation loss. `--output-correction affine` fits a post-hoc per-output affine correction during final LUT conversion; this is not GPTVQ, but it is a useful lightweight approximation for reducing final layer-output error.
+The `--train-source paper` mode trains activation codebooks on supervised GLUE/SQuAD/MMLU-Pro-style prompt+answer examples instead of WikiText continuation loss. `--output-correction affine` fits a post-hoc per-output affine correction during final LUT conversion; this is not GPTVQ, but it is a useful lightweight approximation for reducing final layer-output error. `--weight-code-reassign-iters 1` enables the experimental output-aware final weight-code reassignment diagnostic.
 
 Direct activation-LUT fitting with reconstructed final LUT:
 
 ```bash
 python3 run_act_lut_fit.py \
-  --model-id Qwen/Qwen3-1.7B \
+  --model-id Qwen/Qwen3-1.7B-Base \
   --output-dir results/paper_lutllm_qwen3_1p7b_all_actlutfit5_int4_expanded_final16_fast \
   --calib-source paper \
   --task-calib-samples 64 \

@@ -81,9 +81,11 @@ Additional all-196 attempts:
 | `lutllm_base_instruction_all196_shufcalib_denseqat300_centers3e4_dense1e5_actonly_ppl32` | centers + dense linear QAT, 300 steps | 32 | 472.2 | 40.6 | 75.0 | 53.1 | 68.8 | 65.6 | 78.1 | 3.1 |
 | `lutllm_base_instruction_all196_shufcalib_steqat500_int8_final32_ppl` | Act Quant before final LUT | 32 | 464.3 | 50.0 | 68.8 | 65.6 | 62.5 | 65.6 | 81.2 | 15.6 |
 | same | compact INT8 final LUT with local k-means weight VQ | 32 | 39,716.5 | 31.2 | 40.6 | 28.1 | 59.4 | 56.2 | 37.5 | 3.1 |
+| `lutllm_base_instruction_all196_shufcalib_steqat500_int8_final16_affine_ppl` | compact INT8 final LUT + per-output affine correction | 16 | 10,768.6 | 31.2 | 37.5 | 62.5 | 62.5 | 62.5 | 37.5 | 6.2 |
+| `lutllm_base_instruction_all196_shufcalib_steqat500_int8_final16_reassign1_ppl` | compact INT8 final LUT + output-aware weight-code reassignment, 1 pass | 16 | 98,591.5 | 25.0 | 37.5 | 62.5 | 62.5 | 62.5 | 50.0 | 12.5 |
 | `lutllm_base_instruction_all196_shufcalib_actlutfit50_actonly16_ppl` | direct expanded Act-LUT fit, 50 local steps | 16 | 608.5 | 25.0 | 81.2 | 68.8 | 62.5 | 68.8 | 50.0 | 0.0 |
 
-Interpretation: WikiText loss can reduce PPL versus task-supervised centers-only QAT, but it is still far from FP16 and damages downstream accuracy. Naively training dense linear weights alongside activation centers does not recover accuracy. The compact final LUT path is dominated by the current local k-means weight VQ error; a GPTVQ-style reconstruction-aware weight quantizer is the next missing piece to approximate.
+Interpretation: WikiText loss can reduce PPL versus task-supervised centers-only QAT, but it is still far from FP16 and damages downstream accuracy. Naively training dense linear weights alongside activation centers does not recover accuracy. A per-output affine correction reduces final-LUT PPL relative to the local k-means final run, but accuracy remains near random. The first output-aware weight-code reassignment attempt (`--weight-code-reassign-iters 1`) also does not recover PPL or accuracy. The compact final LUT path is still dominated by missing GPTVQ-style reconstruction-aware weight quantization, not just by scale/bias error.
 
 The all-196 final LUT run uses compact INT8 LUT storage `2,688.0 MiB`, packed weight codes `336.0 MiB`, and `704,643,072` table lookups per token. Its expanded FP16 activation-LUT intermediate would be `86,016.0 MiB`, which is why direct Act-LUT evaluation is very slow in the PyTorch prototype. Earlier 7-linear runs are now treated only as debugging/profiling runs, not formal reproduction results.
 
@@ -218,6 +220,7 @@ Two extra switches are useful for the scai7 full-layer runs:
 
 - `--lut-storage compact` stores the base `M * groups * Ka * Kw` LUT instead of the expanded `M * Ka * out_features` LUT. This is slower in PyTorch but avoids huge expanded LUT tensors for 7B experiments.
 - `--output-correction {bias,affine}` fits a simple per-output post-hoc correction on calibration activations. This is not part of the LUT-LLM paper, but it is a useful PTQ diagnostic because it separates scale/bias error from centroid/codebook error.
+- `--weight-code-reassign-iters N` runs an experimental output-reconstruction-aware coordinate reassignment of final weight codes after local k-means weight VQ. This is a diagnostic toward GPTVQ, not a full GPTVQ implementation.
 
 ## Output Files
 
