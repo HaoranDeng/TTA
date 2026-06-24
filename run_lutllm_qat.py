@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import random
 import time
 from pathlib import Path
 from typing import Any
@@ -88,6 +89,12 @@ def strip_labels(batches: list[dict[str, torch.Tensor]]) -> list[dict[str, torch
     return [{k: v for k, v in batch.items() if k != "labels"} for batch in batches]
 
 
+def shuffled_batches(batches: list[dict[str, torch.Tensor]], seed: int) -> list[dict[str, torch.Tensor]]:
+    out = list(batches)
+    random.Random(seed).shuffle(out)
+    return out
+
+
 def main() -> None:
     args = parse_args()
     torch.manual_seed(args.seed)
@@ -127,6 +134,7 @@ def main() -> None:
             prompt_style=args.prompt_style,
             prompt_template=args.prompt_template,
         )
+        train_batches = shuffled_batches(train_batches, args.seed)
         calib_batches = strip_labels(train_batches[: args.calib_batches])
     else:
         train_batches = make_lm_batches(tokenizer, texts, args.seq_len, args.train_tokens, batch_size=1)

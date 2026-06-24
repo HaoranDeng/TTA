@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import random
 import time
 from pathlib import Path
 from typing import Any
@@ -89,6 +90,12 @@ def select_batches(batches: list[dict[str, torch.Tensor]], count: int) -> list[d
     return batches[:count]
 
 
+def shuffled_batches(batches: list[dict[str, torch.Tensor]], seed: int) -> list[dict[str, torch.Tensor]]:
+    out = list(batches)
+    random.Random(seed).shuffle(out)
+    return out
+
+
 def make_calibration_batches(args: argparse.Namespace, tokenizer: Any) -> list[dict[str, torch.Tensor]]:
     if args.calib_source == "paper":
         batches = make_paper_supervised_batches(
@@ -100,6 +107,7 @@ def make_calibration_batches(args: argparse.Namespace, tokenizer: Any) -> list[d
             prompt_style=args.prompt_style,
             prompt_template=args.prompt_template,
         )
+        batches = shuffled_batches(batches, args.seed)
         return strip_labels(select_batches(batches, args.calib_batches))
     texts = load_wikitext_texts("train")
     batches = make_lm_batches(tokenizer, texts, args.seq_len, args.calib_tokens, batch_size=1)
