@@ -32,7 +32,7 @@ Most recent scai7 reproduction finding:
 
 - The public paper artifact does not expose the exact benchmark harness or the customized checkpoint. The paper text says the FPGA prototype uses a customized Qwen 3 1.7B model and describes continuing training on FineWeb and WikiQA.
 - The closest public-checkpoint baseline found so far is `Qwen/Qwen3-1.7B-Base` with the new `--prompt-template instruction` evaluator. It matches the paper's MMLU-Pro baseline closely, but SQuAD v2 remains far below the paper.
-- New quantization runs therefore use `Qwen/Qwen3-1.7B-Base`, instruction prompts, `Ka=64`, `Kw=16`, `subdim=2`, INT8 compact final LUTs, and GLUE train split for supervised calibration/training batches.
+- New formal quantization runs therefore use all 196 transformer-block linear layers, `Qwen/Qwen3-1.7B-Base`, instruction prompts, `Ka=64`, `Kw=16`, `subdim=2`, INT8 compact final LUTs, and GLUE train split for supervised calibration/training batches.
 
 Updated public-checkpoint baselines:
 
@@ -43,18 +43,16 @@ Updated public-checkpoint baselines:
 | `paper_baseline_qwen3_1p7b_base_128` | `Qwen/Qwen3-1.7B-Base` | 41.4 | 74.2 | 74.2 | 56.2 | 52.3 | 57.0 | 36.0 | 28.9 |
 | `paper_baseline_qwen3_1p7b_chat_128` | `Qwen/Qwen3-1.7B`, chat template | 29.7 | 68.0 | 56.2 | 51.6 | 52.3 | 81.2 | 33.9 | 10.9 |
 
-Current best 7-linear LUT-LLM reproduction attempts on the corrected Base+instruction protocol:
+Formal all-196-linear LUT-LLM reproduction attempts on the corrected Base+instruction protocol:
 
-| Run | Stage | Samples | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | SQuADv2 F1 | MMLU-Pro |
-|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| `lutllm_base_instruction_7linear_traincalib_actlutfit50_int8_64` | FP16 baseline | 64 | 82.8 | 67.2 | 81.2 | 84.4 | 78.1 | 87.5 | - | 39.1 |
-| same | direct Act LUT | 64 | 89.1 | 62.5 | 81.2 | 75.0 | 79.7 | 84.4 | - | 32.8 |
-| same | reconstructed final LUT | 64 | 67.2 | 73.4 | 68.8 | 54.7 | 54.7 | 62.5 | - | 21.9 |
-| `lutllm_base_instruction_7linear_traincalib_steqat300_int8_64` | simplified STE Act Quant | 64 | 70.3 | 62.5 | 79.7 | 79.7 | 85.9 | 90.6 | - | 28.1 |
-| same | final LUT | 64 | 45.3 | 57.8 | 78.1 | 68.8 | 70.3 | 85.9 | - | 21.9 |
-| `lutllm_base_instruction_7linear_traincalib_actlutfit50_int8_128_actonly` | direct Act LUT | 128 | 83.6 | 64.1 | 82.8 | 78.1 | 82.8 | 82.0 | 37.7 | 26.6 |
+| Run | Stage | Samples | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `lutllm_base_instruction_all196_batched_traincalib_steqat1000_int8_64_actonly` | FP16 baseline | 64 | 82.8 | 67.2 | 81.2 | 84.4 | 78.1 | 87.5 | 39.1 |
+| same | simplified STE Act Quant | 64 | 37.5 | 68.8 | 51.6 | 46.9 | 51.6 | 60.9 | 9.4 |
+| `lutllm_base_instruction_all196_batched_traincalib_actlutfit10_int8_final16_v4` | FP16 baseline | 16 | 87.5 | 56.2 | 75.0 | 75.0 | 87.5 | 81.2 | 62.5 |
+| same | reconstructed final LUT | 16 | 31.2 | 25.0 | 68.8 | 50.0 | 62.5 | 50.0 | 6.2 |
 
-For the 7-linear final LUT runs, compact INT8 LUT storage is `96.0 MiB`, packed weight codes are `12.0 MiB`, and the model performs `25,165,824` table lookups per token over the quantized linears. Direct activation-LUT mode before weight VQ has a larger FP16 expanded table footprint, `3,072.0 MiB`, with the same lookup count. Full 196-linear hardware scale remains `2,688.0 MiB` compact INT8 LUT, `336.0 MiB` packed weight codes, and `704,643,072` lookups per token.
+The all-196 final LUT run uses compact INT8 LUT storage `2,688.0 MiB`, packed weight codes `336.0 MiB`, and `704,643,072` table lookups per token. Its expanded FP16 activation-LUT intermediate would be `86,016.0 MiB`, which is why direct Act-LUT evaluation is very slow in the PyTorch prototype. Earlier 7-linear runs are now treated only as debugging/profiling runs, not formal reproduction results.
 
 Simplified full-layer QAT smoke on scai7:
 

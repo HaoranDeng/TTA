@@ -169,9 +169,37 @@ Config:
 
 The 1000-step full-layer activation-only run reduced supervised training loss from `7.541` to `4.772`, but it still did not approach the paper's `+ Act. Quant.` accuracy. This strengthens the conclusion that reproducing Table III requires missing pieces from the paper implementation: exact evaluation/task-adaptation setup, full QAT recipe, adjustable-gradient STE details, and GPTVQ/fused-kernel behavior.
 
-### Corrected Base+Instruction 7-Linear Runs
+### Corrected Base+Instruction All-196-Linear Runs
 
-After the prompt grid above, the most useful public-checkpoint reproduction path is `Qwen/Qwen3-1.7B-Base` with instruction prompts. These runs quantize only the first 7 target linears so we can iterate quickly while preserving the paper-shaped codebooks: `subdim=2`, `Ka=64`, `Kw=16`, Chebyshev activation assignment, `weight_group_size=256`, and INT8 compact final LUTs. Supervised calibration/training uses GLUE train split after commit `7c78c60`.
+After the prompt grid above, the formal public-checkpoint reproduction path is `Qwen/Qwen3-1.7B-Base` with instruction prompts, quantizing all 196 transformer-block linear layers matching `q/k/v/o/gate/up/down_proj`. These runs preserve the paper-shaped codebooks: `subdim=2`, `Ka=64`, `Kw=16`, Chebyshev activation assignment, `weight_group_size=256`, and INT8 compact final LUTs. Supervised calibration/training uses GLUE train split after commit `7c78c60`.
+
+64 examples/task, SQuAD skipped, all 196 target linears:
+
+| Run | Stage | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| `lutllm_base_instruction_all196_batched_traincalib_steqat1000_int8_64_actonly` | FP16 baseline | 82.8 | 67.2 | 81.2 | 84.4 | 78.1 | 87.5 | 39.1 |
+| same | simplified STE Act Quant | 37.5 | 68.8 | 51.6 | 46.9 | 51.6 | 60.9 | 9.4 |
+
+16 examples/task, SQuAD skipped, all 196 target linears:
+
+| Run | Stage | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| `lutllm_base_instruction_all196_batched_traincalib_actlutfit10_int8_final16_v4` | FP16 baseline | 87.5 | 56.2 | 75.0 | 75.0 | 87.5 | 81.2 | 62.5 |
+| same | reconstructed final LUT | 31.2 | 25.0 | 68.8 | 50.0 | 62.5 | 50.0 | 6.2 |
+
+Hardware aggregate for the all-196 final LUT:
+
+| Quantized Linears | Compact INT8 LUT | Weight Codes Packed | Lookups / Token | Act Code Bits / Token | Expanded Act-LUT FP16 Intermediate |
+|---:|---:|---:|---:|---:|---:|
+| 196 | 2,688.0 MiB | 336.0 MiB | 704,643,072 | 1,548,288 | 86,016.0 MiB |
+
+Interpretation: once all 196 linears are quantized, the current simplified STE/QAT recipe and inferred final-LUT reconstruction are far below the paper. This is now a more meaningful failure mode than the earlier partial-layer runs: the missing pieces are likely the paper's customized checkpoint/task adaptation, exact STE gradient recipe, fused training implementation, and GPTVQ details.
+
+Implementation note: full all-196 runs exposed Python prototype bottlenecks, so commits `ead46f9`, `28fe1be`, `0434a8b`, and `2c813e1` add batched activation k-means, batched LUT-to-weight reconstruction, calibration-input reuse during conversion, and batched final weight VQ. These are speed fixes for the reproduction scaffold; they do not change the intended all-layer quantization scope.
+
+### Historical 7-Linear Debug Runs
+
+The following runs quantize only the first 7 target linears. They are retained for debugging/profiling history only and should not be interpreted as formal LUT-LLM reproduction results.
 
 64 examples/task, SQuAD skipped:
 
