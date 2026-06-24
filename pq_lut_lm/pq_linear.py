@@ -23,6 +23,7 @@ class PQConfig:
     distance: str = "l2"
     weight_group_size: int = 0
     lut_quant_bits: int = 0
+    weight_code_reassign_iters: int = 0
     output_correction: str = "none"
     seed: int = 123
 
@@ -288,6 +289,47 @@ def encode_activation(x: torch.Tensor, act_centers: torch.Tensor, distance: str 
     return dist.argmin(dim=2)
 
 
+@torch.no_grad()
+def reassign_weight_codes_output_aware(
+    calib: torch.Tensor,
+    weight_group: torch.Tensor,
+    act_codes: torch.Tensor,
+    dequant_lut: torch.Tensor,
+    init_codes: torch.Tensor,
+    iters: int,
+) -> torch.Tensor:
+    """Coordinate-descent weight-code assignment using layer-output MSE."""
+    if iters <= 0:
+        return init_codes
+    calib = calib.float().contiguous()
+    weight_group = weight_group.float().contiguous()
+    dequant_lut = dequant_lut.float().contiguous()
+    codes = init_codes.clone().long()
+    target = calib @ weight_group.t()
+    pred = torch.zeros_like(target)
+    n, out_features = target.shape
+    m = codes.shape[0]
+
+    for mi in range(m):
+        contrib = dequant_lut[mi].index_select(0, act_codes[:, mi]).float()
+        pred.add_(contrib.index_select(1, codes[mi]))
+
+    for _ in range(iters):
+        for mi in range(m):
+            contrib = dequant_lut[mi].index_select(0, act_codes[:, mi]).float()
+            old = contrib.index_select(1, codes[mi])
+            pred.sub_(old)
+            residual = target - pred
+            scores = -2.0 * contrib.t().matmul(residual)
+            scores.add_((contrib * contrib).sum(dim=0).view(-1, 1))
+            new_codes = scores.argmin(dim=0)
+            pred.add_(contrib.index_select(1, new_codes))
+            codes[mi].copy_(new_codes)
+    if pred.shape != (n, out_features):
+        raise RuntimeError("Unexpected reconstruction shape while reassigning weight codes")
+    return codes
+
+
 def _num_weight_groups(out_features: int, weight_group_size: int) -> int:
     if weight_group_size <= 0:
         return 1
@@ -433,6 +475,10 @@ class PQLUTLinear(nn.Module):
         else:
             act_centers.copy_(act_centers_override.to(device=device, dtype=torch.float32))
 
+        act_codes_for_reassign = None
+        if config.weight_code_reassign_iters > 0:
+            act_codes_for_reassign = encode_activation(calib.float(), act_centers, distance=config.distance)
+
         weight_by_subspace = weight.view(out_features, m, config.subdim).permute(1, 0, 2).contiguous()
         for gi in range(group_count):
             g_lo = gi * config.weight_group_size if config.weight_group_size > 0 else 0
@@ -449,6 +495,15 @@ class PQLUTLinear(nn.Module):
             wc = assign_to_centers_batched(ww, cw, distance=config.distance)
             lut = torch.einsum("mks,mws->mkw", act_centers, cw)
             stored_lut, dequant_lut, scale, zeropoint = _quantize_lut_batched(lut, config.lut_quant_bits)
+            if act_codes_for_reassign is not None:
+                wc = reassign_weight_codes_output_aware(
+                    calib,
+                    weight[g_lo:g_hi],
+                    act_codes_for_reassign,
+                    dequant_lut,
+                    wc,
+                    config.weight_code_reassign_iters,
+                )
             weight_centers[:, gi] = cw
             weight_codes[:, g_lo:g_hi] = wc
             if config.lut_storage == "expanded":
@@ -566,6 +621,7 @@ class PQLUTLinear(nn.Module):
             "M": m,
             "weight_groups": group_count,
             "weight_group_size": self.config.weight_group_size,
+            "weight_code_reassign_iters": self.config.weight_code_reassign_iters,
             "Ka": self.config.ka,
             "Kw": self.config.kw,
             "distance": self.config.distance,

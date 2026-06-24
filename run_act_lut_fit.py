@@ -60,6 +60,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--distance", choices=["l2", "chebyshev"], default="chebyshev")
     parser.add_argument("--weight-group-size", type=int, default=256)
     parser.add_argument("--lut-quant-bits", type=int, default=4)
+    parser.add_argument("--weight-code-reassign-iters", type=int, default=0)
     parser.add_argument("--lut-storage", choices=["expanded", "compact"], default="compact")
     parser.add_argument("--output-correction", choices=["none", "bias", "affine"], default="none")
     parser.add_argument("--eval-baseline", action="store_true")
@@ -201,6 +202,7 @@ def main() -> None:
         distance=args.distance,
         weight_group_size=args.weight_group_size,
         lut_quant_bits=args.lut_quant_bits,
+        weight_code_reassign_iters=args.weight_code_reassign_iters,
         output_correction=args.output_correction,
         seed=args.seed,
     )
