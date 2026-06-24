@@ -484,6 +484,7 @@ def evaluate_paper_tasks(
 ) -> dict[str, Any]:
     results: dict[str, Any] = {}
     for task in GLUE_TASKS:
+        print(f"Evaluating {task}", flush=True)
         metric = evaluate_glue_task(
             model,
             tokenizer,
@@ -496,8 +497,10 @@ def evaluate_paper_tasks(
         )
         results[task] = {k: v for k, v in metric.items() if k != "predictions"}
     if include_squad:
+        print("Evaluating squad_v2", flush=True)
         metric = evaluate_squad_v2(model, tokenizer, max_samples_per_task, device, prompt_style=prompt_style)
         results["squad_v2"] = {k: v for k, v in metric.items() if k != "predictions"}
+    print("Evaluating mmlu_pro", flush=True)
     metric = evaluate_mmlu_pro(
         model,
         tokenizer,

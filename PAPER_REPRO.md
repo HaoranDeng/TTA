@@ -227,6 +227,30 @@ Hardware scale for the shuffled-calibration runs:
 
 Interpretation: shuffling calibration removes the task-order artifact, and increasing the activation codebook from `Ka=64` to `Ka=256` improves PPL and several GLUE metrics slightly. It still does not approach the paper's `+ Act. Quant.` row. The current centers-only STE QAT can improve some classification metrics, but it worsens WikiText PPL and remains far from paper accuracy. This points back to the missing paper pieces: trainable lookup-table values or fused lookup/reduce QAT, adjustable-gradient STE, GPTVQ, and possibly the customized checkpoint/task adaptation.
 
+### Additional All-196 Reproduction Attempts
+
+These runs continue from the corrected shuffled-calibration setup. All rows quantize all 196 transformer-block linears unless explicitly noted.
+
+| Run | Stage | Samples | WikiText PPL | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `lutllm_base_instruction_all196_wikitext_steqat1000_int8_64_actonly_ppl64` | WikiText STE Act Quant, 1000 steps | 64 | 104.5 | 37.5 | 34.4 | 50.0 | 64.1 | 51.6 | 56.2 | 12.5 |
+| `lutllm_base_instruction_all196_wikitext_steqat3000_lr1e4_int8_64_actonly_ppl64` | WikiText STE Act Quant, 3000 steps, lr=1e-4 | 64 | 101.3 | 40.6 | 34.4 | 46.9 | 62.5 | 50.0 | 50.0 | 10.9 |
+| `lutllm_base_instruction_all196_wikitext_steqat5000_int8_64_actonly_ppl64` | WikiText STE Act Quant, 5000 steps, lr=3e-4 | 64 | 749.3 | 34.4 | 32.8 | 46.9 | 65.6 | 50.0 | 51.6 | 9.4 |
+| `lutllm_base_instruction_all196_shufcalib_denseqat300_centers3e4_dense1e5_actonly_ppl32` | centers + dense linear QAT, 300 steps | 32 | 472.2 | 40.6 | 75.0 | 53.1 | 68.8 | 65.6 | 78.1 | 3.1 |
+| `lutllm_base_instruction_all196_shufcalib_steqat500_int8_final32_ppl` | Act Quant before final LUT | 32 | 464.3 | 50.0 | 68.8 | 65.6 | 62.5 | 65.6 | 81.2 | 15.6 |
+| same | compact INT8 final LUT with local k-means weight VQ | 32 | 39,716.5 | 31.2 | 40.6 | 28.1 | 59.4 | 56.2 | 37.5 | 3.1 |
+| `lutllm_base_instruction_all196_shufcalib_actlutfit50_actonly16_ppl` | direct expanded Act-LUT fit, 50 local steps | 16 | 608.5 | 25.0 | 81.2 | 68.8 | 62.5 | 68.8 | 50.0 | 0.0 |
+
+Findings:
+
+- WikiText LM-loss QAT improves PPL relative to task-supervised centers-only QAT, but the best PPL is still about `101`, far from the FP16 `16.4`, and GLUE/MMLU-Pro collapse remains.
+- Longer centers-only QAT is not monotonic: `5000` steps at `3e-4` degraded PPL to `749`.
+- Naively unfreezing dense linear weights during QAT did not help; it improved a few small-sample GLUE cells but damaged PPL and MMLU-Pro.
+- The compact final LUT path is currently dominated by local k-means weight VQ error: PPL jumps to about `39,716`.
+- Direct local expanded Act-LUT fitting is also insufficient, so simply training lookup-table values layerwise against dense linear outputs does not reproduce the paper's end-to-end QAT.
+
+Next implementation target: replace the current local k-means weight VQ with a GPTQ/GPTVQ-style reconstruction-aware weight-code assignment using calibration activations. That is the most plausible missing step between our final LUT and the paper's `+ Weight Quant.` row.
+
 ### Historical 7-Linear Debug Runs
 
 The following runs quantize only the first 7 target linears. They are retained for debugging/profiling history only and should not be interpreted as formal LUT-LLM reproduction results.
