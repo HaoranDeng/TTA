@@ -52,6 +52,25 @@ Formal all-196-linear LUT-LLM reproduction attempts on the corrected Base+instru
 | `lutllm_base_instruction_all196_batched_traincalib_actlutfit10_int8_final16_v4` | FP16 baseline | 16 | 87.5 | 56.2 | 75.0 | 75.0 | 87.5 | 81.2 | 62.5 |
 | same | reconstructed final LUT | 16 | 31.2 | 25.0 | 68.8 | 50.0 | 62.5 | 50.0 | 6.2 |
 
+After commit `3708f19`, paper-supervised calibration/training batches are shuffled before selecting calibration batches. This avoids the earlier artifact where the first calibration batches came mostly from MNLI. New all-layer act-quant runs with WikiText PPL:
+
+| Run | Scope | Stage | Samples | WikiText PPL | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `lutllm_base_instruction_all196_shufcalib_ka64_calib1024_k5_init_actonly_ppl64` | 196 block linears | FP16 baseline | 64 | 16.4 | 82.8 | 67.2 | 81.2 | 84.4 | 78.1 | 87.5 | 39.1 |
+| same | 196 block linears | Act Quant, `Ka=64`, no QAT | 64 | 332.6 | 39.1 | 71.9 | 67.2 | 65.6 | 54.7 | 62.5 | 1.6 |
+| `lutllm_base_instruction_all196_shufcalib_ka256_calib512_k3_init_actonly_ppl64` | 196 block linears | Act Quant, `Ka=256`, no QAT | 64 | 250.9 | 50.0 | 73.4 | 67.2 | 65.6 | 59.4 | 65.6 | 3.1 |
+| `lutllm_base_instruction_all196_shufcalib_steqat1000_int8_64_actonly_ppl64` | 196 block linears | simplified STE Act Quant, 1000 steps | 64 | 413.4 | 51.6 | 68.8 | 62.5 | 75.0 | 60.9 | 70.3 | 9.4 |
+| `lutllm_base_instruction_all197_includelmhead_shufcalib_ka64_calib512_k3_actonly_ppl16` | 197 linears incl. `lm_head` | FP16 baseline | 16 | 15.6 | 87.5 | 56.2 | 75.0 | 75.0 | 87.5 | 81.2 | 62.5 |
+| same | 197 linears incl. `lm_head` | Act Quant, `Ka=64`, no QAT | 16 | 403.4 | 18.8 | 50.0 | 50.0 | 62.5 | 56.2 | 62.5 | 6.2 |
+
+Shuffled-calibration hardware scale:
+
+| Run | Quantized Linears | Activation Centers | Expanded Act-LUT FP16 | Lookups / Token | Act Code Bits / Token | Centroid Distance Vectors / Token |
+|---|---:|---:|---:|---:|---:|---:|
+| all196 `Ka=64` | 196 | 33,030,144 | 86,016.0 MiB | 704,643,072 | 1,548,288 | 16,515,072 |
+| all196 `Ka=256` | 196 | 132,120,576 | 344,064.0 MiB | 704,643,072 | 2,064,384 | 66,060,288 |
+| all197 `Ka=64`, incl. `lm_head` | 197 | 33,161,216 | 105,008.0 MiB | 860,225,536 | 1,554,432 | 16,580,608 |
+
 The all-196 final LUT run uses compact INT8 LUT storage `2,688.0 MiB`, packed weight codes `336.0 MiB`, and `704,643,072` table lookups per token. Its expanded FP16 activation-LUT intermediate would be `86,016.0 MiB`, which is why direct Act-LUT evaluation is very slow in the PyTorch prototype. Earlier 7-linear runs are now treated only as debugging/profiling runs, not formal reproduction results.
 
 Simplified full-layer QAT smoke on scai7:

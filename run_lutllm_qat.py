@@ -13,6 +13,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from pq_lut_lm.activation_quant import (
+    STEActivationQuantLinear,
     convert_ste_act_quant_to_lut,
     replace_with_ste_act_quant,
     trainable_act_center_parameters,
@@ -40,6 +41,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--calib-vectors-per-layer", type=int, default=256)
     parser.add_argument("--train-steps", type=int, default=20)
     parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--train-dense-linears", action="store_true")
+    parser.add_argument("--dense-lr", type=float, default=1e-5)
     parser.add_argument("--paper-samples", type=int, default=16)
     parser.add_argument("--eval-ppl", action="store_true")
     parser.add_argument("--ppl-tokens", type=int, default=4096)
@@ -93,6 +96,16 @@ def shuffled_batches(batches: list[dict[str, torch.Tensor]], seed: int) -> list[
     out = list(batches)
     random.Random(seed).shuffle(out)
     return out
+
+
+def dense_linear_parameters_under_ste(model: torch.nn.Module) -> list[torch.nn.Parameter]:
+    params: list[torch.nn.Parameter] = []
+    for module in model.modules():
+        if isinstance(module, STEActivationQuantLinear):
+            for param in module.linear.parameters():
+                param.requires_grad_(True)
+                params.append(param)
+    return params
 
 
 def main() -> None:
@@ -217,9 +230,18 @@ def main() -> None:
         "initialization_seconds": act_report.initialization_seconds,
     })
 
-    params = trainable_act_center_parameters(model)
-    print(f"Training {sum(p.numel() for p in params):,} activation-center parameters", flush=True)
-    opt = torch.optim.AdamW(params, lr=args.lr)
+    center_params = trainable_act_center_parameters(model)
+    dense_params = dense_linear_parameters_under_ste(model) if args.train_dense_linears else []
+    center_param_count = sum(p.numel() for p in center_params)
+    dense_param_count = sum(p.numel() for p in dense_params)
+    message = f"Training {center_param_count:,} activation-center parameters"
+    if dense_params:
+        message += f" and {dense_param_count:,} dense linear parameters"
+    print(message, flush=True)
+    param_groups: list[dict[str, Any]] = [{"params": center_params, "lr": args.lr}]
+    if dense_params:
+        param_groups.append({"params": dense_params, "lr": args.dense_lr})
+    opt = torch.optim.AdamW(param_groups)
     train_losses = []
     if device.type == "cuda":
         torch.cuda.synchronize(device)
@@ -244,6 +266,9 @@ def main() -> None:
         "steps": args.train_steps,
         "seconds": time.perf_counter() - train_start,
         "losses": train_losses,
+        "train_dense_linears": args.train_dense_linears,
+        "center_param_count": center_param_count,
+        "dense_linear_param_count": dense_param_count,
     }
     model.eval()
     save_json(out_dir / "summary.json", summary)

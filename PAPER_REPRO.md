@@ -197,6 +197,36 @@ Interpretation: once all 196 linears are quantized, the current simplified STE/Q
 
 Implementation note: full all-196 runs exposed Python prototype bottlenecks, so commits `ead46f9`, `28fe1be`, `0434a8b`, and `2c813e1` add batched activation k-means, batched LUT-to-weight reconstruction, calibration-input reuse during conversion, and batched final weight VQ. These are speed fixes for the reproduction scaffold; they do not change the intended all-layer quantization scope.
 
+### Shuffled Calibration and PPL Runs
+
+Commit `3708f19` shuffles paper-supervised training/calibration batches before taking the calibration prefix. This fixes a reproduction artifact in earlier `traincalib` runs: because examples were concatenated task-by-task, the first calibration batches were mostly MNLI. The following runs supersede the earlier unshuffled all-196 act-only rows for calibration-order analysis.
+
+64 examples/task, SQuAD skipped, `Qwen/Qwen3-1.7B-Base`, instruction prompt, all 196 block linears unless noted:
+
+| Run | Stage | WikiText PPL | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `lutllm_base_instruction_all196_shufcalib_ka64_calib1024_k5_init_actonly_ppl64` | FP16 baseline | 16.4 | 82.8 | 67.2 | 81.2 | 84.4 | 78.1 | 87.5 | 39.1 |
+| same | Act Quant, `Ka=64`, no QAT | 332.6 | 39.1 | 71.9 | 67.2 | 65.6 | 54.7 | 62.5 | 1.6 |
+| `lutllm_base_instruction_all196_shufcalib_ka256_calib512_k3_init_actonly_ppl64` | Act Quant, `Ka=256`, no QAT | 250.9 | 50.0 | 73.4 | 67.2 | 65.6 | 59.4 | 65.6 | 3.1 |
+| `lutllm_base_instruction_all196_shufcalib_steqat1000_int8_64_actonly_ppl64` | simplified STE Act Quant, 1000 steps | 413.4 | 51.6 | 68.8 | 62.5 | 75.0 | 60.9 | 70.3 | 9.4 |
+
+16 examples/task, diagnostic run including `lm_head` so every `nn.Linear` is quantized:
+
+| Run | Scope | Stage | WikiText PPL | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `lutllm_base_instruction_all197_includelmhead_shufcalib_ka64_calib512_k3_actonly_ppl16` | 197 linears incl. `lm_head` | FP16 baseline | 15.6 | 87.5 | 56.2 | 75.0 | 75.0 | 87.5 | 81.2 | 62.5 |
+| same | 197 linears incl. `lm_head` | Act Quant, `Ka=64`, no QAT | 403.4 | 18.8 | 50.0 | 50.0 | 62.5 | 56.2 | 62.5 | 6.2 |
+
+Hardware scale for the shuffled-calibration runs:
+
+| Run | Quantized Linears | Activation Centers | Expanded Act-LUT FP16 | Lookups / Token | Act Code Bits / Token | Centroid Distance Vectors / Token |
+|---|---:|---:|---:|---:|---:|---:|
+| all196 `Ka=64` | 196 | 33,030,144 | 86,016.0 MiB | 704,643,072 | 1,548,288 | 16,515,072 |
+| all196 `Ka=256` | 196 | 132,120,576 | 344,064.0 MiB | 704,643,072 | 2,064,384 | 66,060,288 |
+| all197 `Ka=64`, incl. `lm_head` | 197 | 33,161,216 | 105,008.0 MiB | 860,225,536 | 1,554,432 | 16,580,608 |
+
+Interpretation: shuffling calibration removes the task-order artifact, and increasing the activation codebook from `Ka=64` to `Ka=256` improves PPL and several GLUE metrics slightly. It still does not approach the paper's `+ Act. Quant.` row. The current centers-only STE QAT can improve some classification metrics, but it worsens WikiText PPL and remains far from paper accuracy. This points back to the missing paper pieces: trainable lookup-table values or fused lookup/reduce QAT, adjustable-gradient STE, GPTVQ, and possibly the customized checkpoint/task adaptation.
+
 ### Historical 7-Linear Debug Runs
 
 The following runs quantize only the first 7 target linears. They are retained for debugging/profiling history only and should not be interpreted as formal LUT-LLM reproduction results.
