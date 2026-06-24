@@ -182,9 +182,10 @@ def make_glue_supervised_examples(
     task: str,
     max_samples: int,
     prompt_template: str = "simple",
+    split: str = "train",
 ) -> list[tuple[str, str]]:
     examples = []
-    for row in load_glue_rows(task, max_samples):
+    for row in load_glue_rows(task, max_samples, split=split):
         prompt, labels, gold = glue_prompt_and_labels(task, row, prompt_template=prompt_template)
         examples.append((prompt, labels[gold]))
     return examples
