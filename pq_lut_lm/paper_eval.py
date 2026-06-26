@@ -502,6 +502,7 @@ def make_paper_supervised_batches(
     batch_size: int,
     max_length: int,
     include_squad: bool = True,
+    include_mmlu: bool = True,
     prompt_style: str = "plain",
     prompt_template: str = "simple",
 ) -> list[dict[str, torch.Tensor]]:
@@ -509,7 +510,8 @@ def make_paper_supervised_batches(
     per_task = max(1, max_samples_per_task)
     for task in GLUE_TASKS:
         examples.extend(make_glue_supervised_examples(task, per_task, prompt_template=prompt_template))
-    examples.extend(make_mmlu_pro_supervised_examples(per_task, prompt_template=prompt_template))
+    if include_mmlu:
+        examples.extend(make_mmlu_pro_supervised_examples(per_task, prompt_template=prompt_template))
     if include_squad:
         examples.extend(make_squad_supervised_examples(per_task, prompt_template=prompt_template))
 
@@ -527,7 +529,8 @@ def make_paper_supervised_batches(
             prompt_len = prompt_ids.numel()
         labels = full_ids.clone()
         labels[:prompt_len] = -100
-        encoded.append((full_ids, labels))
+        if (labels != -100).any():
+            encoded.append((full_ids, labels))
 
     batches = []
     rows: list[tuple[torch.Tensor, torch.Tensor]] = []

@@ -33,6 +33,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--prompt-style", choices=["plain", "chat"], default="plain")
     parser.add_argument("--prompt-template", choices=["simple", "instruction", "lm_eval"], default="lm_eval")
     parser.add_argument("--skip-squad", action="store_true")
+    parser.add_argument("--skip-mmlu", action="store_true")
     parser.add_argument("--seed", type=int, default=123)
     parser.add_argument("--save-every", type=int, default=0)
     return parser.parse_args()
@@ -87,6 +88,7 @@ def main() -> None:
         batch_size=args.batch_size,
         max_length=args.max_length,
         include_squad=not args.skip_squad,
+        include_mmlu=not args.skip_mmlu,
         prompt_style=args.prompt_style,
         prompt_template=args.prompt_template,
     )
@@ -99,17 +101,29 @@ def main() -> None:
 
     step = 0
     update = 0
+    micro_since_update = 0
+    skipped = 0
     while update < args.steps:
         order = list(range(len(batches)))
         random.shuffle(order)
         for idx in order:
             batch = {k: v.to(device) for k, v in batches[idx].items()}
             out = model(**batch)
+            if not torch.isfinite(out.loss):
+                skipped += 1
+                if skipped <= 10 or skipped % 100 == 0:
+                    print(f"Skipping non-finite loss batch: skipped={skipped}", flush=True)
+                optimizer.zero_grad(set_to_none=True)
+                micro_since_update = 0
+                continue
+            raw_loss = float(out.loss.detach().item())
             loss = out.loss / args.grad_accum_steps
             loss.backward()
             step += 1
-            if step % args.grad_accum_steps == 0:
+            micro_since_update += 1
+            if micro_since_update == args.grad_accum_steps:
                 update += 1
+                micro_since_update = 0
                 if args.warmup_steps > 0 and update <= args.warmup_steps:
                     scale = update / args.warmup_steps
                     for group in optimizer.param_groups:
@@ -121,11 +135,11 @@ def main() -> None:
                 optimizer.step()
                 optimizer.zero_grad(set_to_none=True)
 
-                raw_loss = float(out.loss.detach().item() * args.grad_accum_steps)
                 record = {
                     "update": update,
                     "loss": raw_loss,
                     "lr": float(optimizer.param_groups[0]["lr"]),
+                    "skipped": skipped,
                     "seconds": time.perf_counter() - start,
                 }
                 losses.append(record)
