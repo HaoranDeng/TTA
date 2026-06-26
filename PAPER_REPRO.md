@@ -71,6 +71,7 @@ Latest all-196 diagnostic gap:
 | FP16 baseline | 82.88 | 88.80 | -5.92 | 29.69 | 33.10 | -3.41 | 16.45 |
 | Act Quant, `Ka=64`, no QAT | 61.07 | 87.20 | -26.13 | 6.25 | 31.80 | -25.55 | 332.60 |
 | centers-only STE Act Quant, 1000 steps | 70.96 | 87.20 | -16.24 | 7.81 | 31.80 | -23.99 | 335.62 |
+| `subdim=4, Ka=64` centers-only STE Act Quant, 1000 steps | 46.09 | 87.20 | -41.11 | 7.81 | 31.80 | -23.99 | 19,947.91 |
 
 Prompt grid, 64 examples/task, SQuAD skipped:
 
@@ -213,6 +214,15 @@ This is the closest current public-checkpoint reproduction protocol before QAT. 
 | same | centers-only STE Act Quant, 1000 steps | 335.62 | 68.0 | 75.0 | 62.5 | 64.1 | 72.7 | 83.6 | 7.8 |
 
 This QAT run trained `33,030,144` activation-center parameters for 1000 supervised steps and quantized all 196 transformer-block linears. It improves GLUE over no-QAT activation quantization, but it still does not reproduce the paper: GLUE is `70.96` versus paper `+ Act. Quant.` `87.20` (`-16.24`), and MMLU-Pro is `7.81` versus `31.80` (`-23.99`). The same-run quantization drop is `-12.11` GLUE points and `-25.78` MMLU-Pro points, while the paper's drop from FP16 to `+ Act. Quant.` is about `-1.63` GLUE and `-1.30` MMLU-Pro.
+
+64 examples/task, 8-shot GLUE instruction prompt, 0-shot MMLU-Pro, SQuAD skipped, all 196 target linears, testing the official artifact's `vec_len=4`-style branch:
+
+| Run | Stage | WikiText PPL | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `lutllm_base_instruction_g8_all196_subdim4_ka64_steqat1000_actonly_ppl64` | FP16 baseline | 16.45 | 84.4 | 73.4 | 81.2 | 87.5 | 76.6 | 96.9 | 39.1 |
+| same | `subdim=4, Ka=64` centers-only STE Act Quant, 1000 steps | 19,947.91 | 29.7 | 40.6 | 29.7 | 67.2 | 50.0 | 59.4 | 7.8 |
+
+This branch halves lookup count and expanded Act-LUT size (`352,321,536` lookups/token and `43,008.0` MiB expanded FP16 Act-LUT), but accuracy collapses harder than `subdim=2`. It therefore does not explain the paper's Table III accuracy under the current reproduction scaffold.
 
 64 examples/task, SQuAD skipped, all 196 target linears:
 
