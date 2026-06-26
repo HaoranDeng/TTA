@@ -72,6 +72,7 @@ Latest all-196 diagnostic gap:
 | Act Quant, `Ka=64`, no QAT | 61.07 | 87.20 | -26.13 | 6.25 | 31.80 | -25.55 | 332.60 |
 | centers-only STE Act Quant, 1000 steps | 70.96 | 87.20 | -16.24 | 7.81 | 31.80 | -23.99 | 335.62 |
 | `subdim=4, Ka=64` centers-only STE Act Quant, 1000 steps | 46.09 | 87.20 | -41.11 | 7.81 | 31.80 | -23.99 | 19,947.91 |
+| `subdim=2, Ka=128` centers-only STE Act Quant, 1000 steps | 68.75 | 87.20 | -18.45 | 7.81 | 31.80 | -23.99 | 217.62 |
 
 Prompt grid, 64 examples/task, SQuAD skipped:
 
@@ -223,6 +224,15 @@ This QAT run trained `33,030,144` activation-center parameters for 1000 supervis
 | same | `subdim=4, Ka=64` centers-only STE Act Quant, 1000 steps | 19,947.91 | 29.7 | 40.6 | 29.7 | 67.2 | 50.0 | 59.4 | 7.8 |
 
 This branch halves lookup count and expanded Act-LUT size (`352,321,536` lookups/token and `43,008.0` MiB expanded FP16 Act-LUT), but accuracy collapses harder than `subdim=2`. It therefore does not explain the paper's Table III accuracy under the current reproduction scaffold.
+
+64 examples/task, 8-shot GLUE instruction prompt, 0-shot MMLU-Pro, SQuAD skipped, all 196 target linears, testing a larger activation codebook:
+
+| Run | Stage | WikiText PPL | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `lutllm_base_instruction_g8_all196_ka128_steqat1000_actonly_ppl64` | FP16 baseline | 16.45 | 84.4 | 73.4 | 81.2 | 87.5 | 76.6 | 96.9 | 39.1 |
+| same | `subdim=2, Ka=128` centers-only STE Act Quant, 1000 steps | 217.62 | 43.8 | 76.6 | 62.5 | 71.9 | 64.1 | 93.8 | 7.8 |
+
+Increasing `Ka` from 64 to 128 improves WikiText PPL relative to the 128-sample `Ka=64` QAT run (`217.62` vs `335.62`) but does not improve the paper-targeted accuracy gap. GLUE is `68.75`, still `-18.45` below the paper `+ Act. Quant.` row, and MMLU-Pro remains `7.81`, `-23.99` below the paper. The hardware cost doubles activation centers to `66,060,288`, doubles centroid-distance vectors to `33,030,144` per token, and increases expanded Act-LUT FP16 size to `172,032.0` MiB while lookup count stays `704,643,072` per token.
 
 64 examples/task, SQuAD skipped, all 196 target linears:
 

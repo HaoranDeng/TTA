@@ -68,6 +68,8 @@ Formal all-196-linear LUT-LLM reproduction attempts on the corrected Base+instru
 | same | centers-only STE Act Quant, 1000 steps | 128 | 68.0 | 75.0 | 62.5 | 64.1 | 72.7 | 83.6 | 7.8 |
 | `lutllm_base_instruction_g8_all196_subdim4_ka64_steqat1000_actonly_ppl64` | FP16 baseline | 64 | 84.4 | 73.4 | 81.2 | 87.5 | 76.6 | 96.9 | 39.1 |
 | same | `subdim=4, Ka=64` centers-only STE Act Quant, 1000 steps | 64 | 29.7 | 40.6 | 29.7 | 67.2 | 50.0 | 59.4 | 7.8 |
+| `lutllm_base_instruction_g8_all196_ka128_steqat1000_actonly_ppl64` | FP16 baseline | 64 | 84.4 | 73.4 | 81.2 | 87.5 | 76.6 | 96.9 | 39.1 |
+| same | `subdim=2, Ka=128` centers-only STE Act Quant, 1000 steps | 64 | 43.8 | 76.6 | 62.5 | 71.9 | 64.1 | 93.8 | 7.8 |
 | `lutllm_base_instruction_all196_batched_traincalib_steqat1000_int8_64_actonly` | FP16 baseline | 64 | 82.8 | 67.2 | 81.2 | 84.4 | 78.1 | 87.5 | 39.1 |
 | same | simplified STE Act Quant | 64 | 37.5 | 68.8 | 51.6 | 46.9 | 51.6 | 60.9 | 9.4 |
 | `lutllm_base_instruction_all196_batched_traincalib_actlutfit10_int8_final16_v4` | FP16 baseline | 16 | 87.5 | 56.2 | 75.0 | 75.0 | 87.5 | 81.2 | 62.5 |
@@ -81,6 +83,7 @@ Current gap to the paper on the latest all-196 diagnostic:
 | Act Quant, `Ka=64`, no QAT | 61.07 | 87.20 | -26.13 | 6.25 | 31.80 | -25.55 | 332.60 |
 | centers-only STE Act Quant, 1000 steps | 70.96 | 87.20 | -16.24 | 7.81 | 31.80 | -23.99 | 335.62 |
 | `subdim=4, Ka=64` centers-only STE Act Quant, 1000 steps | 46.09 | 87.20 | -41.11 | 7.81 | 31.80 | -23.99 | 19,947.91 |
+| `subdim=2, Ka=128` centers-only STE Act Quant, 1000 steps | 68.75 | 87.20 | -18.45 | 7.81 | 31.80 | -23.99 | 217.62 |
 
 After commit `3708f19`, paper-supervised calibration/training batches are shuffled before selecting calibration batches. This avoids the earlier artifact where the first calibration batches came mostly from MNLI. New all-layer act-quant runs with WikiText PPL:
 
@@ -98,6 +101,7 @@ Shuffled-calibration hardware scale:
 | Run | Quantized Linears | Activation Centers | Expanded Act-LUT FP16 | Lookups / Token | Act Code Bits / Token | Centroid Distance Vectors / Token |
 |---|---:|---:|---:|---:|---:|---:|
 | all196 `Ka=64` | 196 | 33,030,144 | 86,016.0 MiB | 704,643,072 | 1,548,288 | 16,515,072 |
+| all196 `Ka=128` | 196 | 66,060,288 | 172,032.0 MiB | 704,643,072 | 1,806,336 | 33,030,144 |
 | all196 `Ka=256` | 196 | 132,120,576 | 344,064.0 MiB | 704,643,072 | 2,064,384 | 66,060,288 |
 | all196 `subdim=4, Ka=64` | 196 | 33,030,144 | 43,008.0 MiB | 352,321,536 | 774,144 | 8,257,536 |
 | all197 `Ka=64`, incl. `lm_head` | 197 | 33,161,216 | 105,008.0 MiB | 860,225,536 | 1,554,432 | 16,580,608 |
