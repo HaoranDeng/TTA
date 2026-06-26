@@ -54,6 +54,7 @@ Current baseline-alignment status:
 | Run | Protocol | Samples | GLUE Avg | Gap vs Paper FP16 GLUE | MMLU-Pro | Gap vs Paper FP16 MMLU |
 |---|---|---:|---:|---:|---:|---:|
 | Paper FP16 | customized Qwen 3 1.7B | full paper eval | 88.80 | 0.00 | 33.10 | 0.00 |
+| `lutllm_base_instruction_g8_all196_shufcalib_ka64_calib1024_k5_init_actonly_ppl256` FP16 | internal instruction 8-shot GLUE, 0-shot MMLU | 256/task | 82.88 | -5.92 | 29.69 | -3.41 |
 | `baseline_prompt_grid_qwen3_1p7b_base_512_more_shots/instruction_g8_m0_plain` | internal instruction 8-shot GLUE, 0-shot MMLU | 512/task | 82.35 | -6.45 | 28.52 | -4.58 |
 | `baseline_prompt_grid_qwen3_1p7b_base_512_more_shots/instruction_g16_m8_plain` | internal instruction 16-shot GLUE, 8-shot MMLU | 512/task | 81.52 | -7.28 | 30.27 | -2.83 |
 | `lmeval_qwen3_1p7b_base_glue6_limit1024` | standard EleutherAI `lm_eval` GLUE prompts | 1024/task limit | 71.63 | -17.17 | - | - |
@@ -61,6 +62,13 @@ Current baseline-alignment status:
 | `lmeval_taskadapt_glue1024_500_glue6_limit1024` | simple GLUE-only task adaptation, then standard `lm_eval` | 1024/task limit | 67.97 | -20.83 | - | - |
 
 Interpretation: standard public `lm_eval` prompts do not explain the paper's FP16 row; they make GLUE substantially worse. Simple GLUE-only continued training for 500 updates also failed to move toward the paper. The remaining FP16 mismatch is therefore likely due to the paper's customized checkpoint and/or an undisclosed task/evaluation protocol. All quantized all-196-linear results below remain useful diagnostics, but they are not a faithful reproduction until this FP16 row is matched.
+
+Latest all-196 diagnostic gap:
+
+| Stage | GLUE Avg | Paper Target | Gap | MMLU-Pro | Paper Target | Gap | WikiText PPL |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| FP16 baseline | 82.88 | 88.80 | -5.92 | 29.69 | 33.10 | -3.41 | 16.45 |
+| Act Quant, `Ka=64`, no QAT | 61.07 | 87.20 | -26.13 | 6.25 | 31.80 | -25.55 | 332.60 |
 
 Prompt grid, 64 examples/task, SQuAD skipped:
 
@@ -185,6 +193,15 @@ The 1000-step full-layer activation-only run reduced supervised training loss fr
 ### Corrected Base+Instruction All-196-Linear Runs
 
 After the prompt grid above, the formal public-checkpoint reproduction path is `Qwen/Qwen3-1.7B-Base` with instruction prompts, quantizing all 196 transformer-block linear layers matching `q/k/v/o/gate/up/down_proj`. These runs preserve the paper-shaped codebooks: `subdim=2`, `Ka=64`, `Kw=16`, Chebyshev activation assignment, `weight_group_size=256`, and INT8 compact final LUTs. Supervised calibration/training uses GLUE train split after commit `7c78c60`.
+
+256 examples/task, 8-shot GLUE instruction prompt, 0-shot MMLU-Pro, SQuAD skipped, all 196 target linears:
+
+| Run | Stage | WikiText PPL | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `lutllm_base_instruction_g8_all196_shufcalib_ka64_calib1024_k5_init_actonly_ppl256` | FP16 baseline | 16.45 | 81.6 | 74.2 | 82.8 | 84.4 | 79.7 | 94.5 | 29.7 |
+| same | Act Quant, `Ka=64`, no QAT | 332.60 | 50.4 | 70.3 | 60.5 | 68.4 | 62.9 | 53.9 | 6.2 |
+
+This is the closest current public-checkpoint reproduction protocol before QAT. It still fails the paper reproduction target: same-run FP16 is `-5.92` GLUE points below paper FP16, and no-QAT activation quantization is `-26.13` GLUE points below the paper `+ Act. Quant.` row. The quantization drop is `-21.81` GLUE points here, while the paper reports roughly `-1.63` from FP16 to `+ Act. Quant.`.
 
 64 examples/task, SQuAD skipped, all 196 target linears:
 

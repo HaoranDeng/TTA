@@ -1,0 +1,115 @@
+{
+  "act_qat_training": {
+    "center_param_count": 33030144,
+    "dense_linear_param_count": 0,
+    "losses": [],
+    "seconds": 0.0012254449538886547,
+    "steps": 0,
+    "train_dense_linears": false
+  },
+  "act_quant": {
+    "mmlu_pro": {
+      "accuracy": 0.0625,
+      "correct": 16,
+      "seconds": 242.21618423983455,
+      "total": 256
+    },
+    "mnli": {
+      "accuracy": 0.50390625,
+      "correct": 129,
+      "seconds": 236.860306317918,
+      "total": 256
+    },
+    "mrpc": {
+      "accuracy": 0.703125,
+      "correct": 180,
+      "seconds": 203.63152440893464,
+      "total": 256
+    },
+    "qnli": {
+      "accuracy": 0.60546875,
+      "correct": 155,
+      "seconds": 176.73827927117236,
+      "total": 256
+    },
+    "qqp": {
+      "accuracy": 0.68359375,
+      "correct": 175,
+      "seconds": 130.4351184340194,
+      "total": 256
+    },
+    "rte": {
+      "accuracy": 0.62890625,
+      "correct": 161,
+      "seconds": 218.4782777139917,
+      "total": 256
+    },
+    "sst2": {
+      "accuracy": 0.5390625,
+      "correct": 138,
+      "seconds": 77.70072624599561,
+      "total": 256
+    },
+    "wikitext_ppl": {
+      "nll": 5.806931346654892,
+      "ppl": 332.59693340756826,
+      "seconds": 2.2458726880140603,
+      "tokens": 4080
+    }
+  },
+  "device": "cuda",
+  "dtype": "torch.bfloat16",
+  "fp16_baseline": {
+    "mmlu_pro": {
+      "accuracy": 0.296875,
+      "correct": 76,
+      "seconds": 6.775216366862878,
+      "total": 256
+    },
+    "mnli": {
+      "accuracy": 0.81640625,
+      "correct": 209,
+      "seconds": 7.89981634914875,
+      "total": 256
+    },
+    "mrpc": {
+      "accuracy": 0.7421875,
+      "correct": 190,
+      "seconds": 6.118495800998062,
+      "total": 256
+    },
+    "qnli": {
+      "accuracy": 0.828125,
+      "correct": 212,
+      "seconds": 5.61243943287991,
+      "total": 256
+    },
+    "qqp": {
+      "accuracy": 0.84375,
+      "correct": 216,
+      "seconds": 4.595170711167157,
+      "total": 256
+    },
+    "rte": {
+      "accuracy": 0.796875,
+      "correct": 204,
+      "seconds": 7.571579813025892,
+      "total": 256
+    },
+    "sst2": {
+      "accuracy": 0.9453125,
+      "correct": 242,
+      "seconds": 3.3730418821796775,
+      "total": 256
+    },
+    "wikitext_ppl": {
+      "nll": 2.8002375066280365,
+      "ppl": 16.448552947553942,
+      "seconds": 0.19080604705959558,
+      "tokens": 4080
+    }
+  },
+  "load_seconds": 5.933173435041681,
+  "model_id": "Qwen/Qwen3-1.7B-Base",
+  "paper_samples": 256
+}
