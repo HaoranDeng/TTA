@@ -41,12 +41,32 @@ class STEActivationQuantLinear(nn.Module):
     def quantize_activation(self, x: torch.Tensor) -> torch.Tensor:
         shape = x.shape
         flat = x.reshape(-1, self.in_features)
-        codes = encode_activation(flat, self.act_centers, distance=self.config.distance)
-        xv = flat.view(flat.shape[0], -1, self.config.subdim)
-        qv = self.act_centers[torch.arange(self.act_centers.shape[0], device=flat.device)[None, :], codes]
+        xv = flat.view(flat.shape[0], -1, self.config.subdim).float()
+        centers = self.act_centers.float()
+        if self.config.distance == "chebyshev":
+            dist = (xv[:, :, None, :] - centers[None, :, :, :]).abs().amax(dim=3)
+        elif self.config.distance == "l2":
+            x_norm = (xv * xv).sum(dim=2, keepdim=True)
+            c_norm = (centers * centers).sum(dim=2).unsqueeze(0)
+            dot = torch.einsum("nms,mks->nmk", xv, centers)
+            dist = x_norm + c_norm - 2.0 * dot
+        else:
+            raise ValueError(f"Unsupported distance metric: {self.config.distance}")
+        codes = dist.argmin(dim=2)
+        qv = centers[torch.arange(centers.shape[0], device=flat.device)[None, :], codes]
+        if self.training and self.config.act_train_mode != "hard":
+            temp = max(float(self.config.act_softmax_temperature), 1e-6)
+            probs = torch.softmax(-dist / temp, dim=2)
+            soft_qv = torch.einsum("nmk,mks->nms", probs, centers)
+            if self.config.act_train_mode == "soft":
+                qv = soft_qv
+            elif self.config.act_train_mode == "soft_hard":
+                qv = qv + (soft_qv - soft_qv.detach())
+            else:
+                raise ValueError(f"Unsupported activation train mode: {self.config.act_train_mode}")
         q = qv.reshape_as(flat)
         # Forward value is quantized; gradients flow to both centers and upstream activations.
-        ste = q + (flat - flat.detach())
+        ste = q + float(self.config.act_ste_input_scale) * (flat - flat.detach())
         return ste.reshape(shape)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -69,6 +89,9 @@ class STEActivationQuantLinear(nn.Module):
             "lut_quant_bits": 0,
             "lut_storage": "dense-weight",
             "output_correction": "none",
+            "act_train_mode": self.config.act_train_mode,
+            "act_softmax_temperature": self.config.act_softmax_temperature,
+            "act_ste_input_scale": self.config.act_ste_input_scale,
             "act_center_values": m * self.config.ka * self.config.subdim,
             "weight_center_values": 0,
             "base_lut_entries": m * self.config.ka * self.out_features,

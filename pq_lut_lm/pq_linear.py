@@ -24,6 +24,11 @@ class PQConfig:
     weight_group_size: int = 0
     lut_quant_bits: int = 0
     weight_code_reassign_iters: int = 0
+    weight_center_refine_iters: int = 0
+    weight_center_refine_reg: float = 1e-4
+    act_train_mode: str = "hard"
+    act_softmax_temperature: float = 1.0
+    act_ste_input_scale: float = 1.0
     output_correction: str = "none"
     seed: int = 123
 
@@ -330,6 +335,58 @@ def reassign_weight_codes_output_aware(
     return codes
 
 
+@torch.no_grad()
+def refine_weight_centers_output_aware(
+    calib: torch.Tensor,
+    weight_group: torch.Tensor,
+    act_centers: torch.Tensor,
+    act_codes: torch.Tensor,
+    init_centers: torch.Tensor,
+    init_codes: torch.Tensor,
+    iters: int,
+    reg: float,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Update weight centroids for fixed codes using calibration-output reconstruction."""
+    if iters <= 0:
+        return init_centers, init_codes
+    calib = calib.float().contiguous()
+    weight_group = weight_group.float().contiguous()
+    act_centers = act_centers.float().contiguous()
+    centers = init_centers.clone().float()
+    codes = init_codes.clone().long()
+    target = calib @ weight_group.t()
+    m, kw, subdim = centers.shape
+    n, out_features = target.shape
+    eye = torch.eye(subdim, device=calib.device, dtype=torch.float32)
+
+    for _ in range(iters):
+        lut = torch.einsum("mks,mws->mkw", act_centers, centers)
+        pred = torch.zeros_like(target)
+        for mi in range(m):
+            contrib = lut[mi].index_select(0, act_codes[:, mi]).float()
+            pred.add_(contrib.index_select(1, codes[mi]))
+
+        for mi in range(m):
+            contrib = lut[mi].index_select(0, act_codes[:, mi]).float()
+            pred.sub_(contrib.index_select(1, codes[mi]))
+            residual = target - pred
+            x = act_centers[mi].index_select(0, act_codes[:, mi]).float()
+            xtx = x.t().matmul(x)
+            residual_by_code = torch.zeros((n, kw), device=calib.device, dtype=torch.float32)
+            residual_by_code.index_add_(1, codes[mi], residual)
+            rhs = residual_by_code.t().matmul(x)
+            counts = torch.bincount(codes[mi], minlength=kw).float()
+            nonempty = counts > 0
+            lhs = counts[:, None, None] * xtx[None, :, :] + float(reg) * eye[None, :, :]
+            updated = torch.linalg.solve(lhs[nonempty], rhs[nonempty].unsqueeze(2)).squeeze(2)
+            centers[mi, nonempty] = updated
+            new_lut = act_centers[mi].matmul(centers[mi].t())
+            pred.add_(new_lut.index_select(0, act_codes[:, mi]).index_select(1, codes[mi]))
+    if pred.shape != (n, out_features):
+        raise RuntimeError("Unexpected reconstruction shape while refining weight centers")
+    return centers, codes
+
+
 def _num_weight_groups(out_features: int, weight_group_size: int) -> int:
     if weight_group_size <= 0:
         return 1
@@ -493,6 +550,17 @@ class PQLUTLinear(nn.Module):
                 config.distance,
             )
             wc = assign_to_centers_batched(ww, cw, distance=config.distance)
+            if act_codes_for_reassign is not None and config.weight_center_refine_iters > 0:
+                cw, wc = refine_weight_centers_output_aware(
+                    calib,
+                    weight[g_lo:g_hi],
+                    act_centers,
+                    act_codes_for_reassign,
+                    cw,
+                    wc,
+                    config.weight_center_refine_iters,
+                    config.weight_center_refine_reg,
+                )
             lut = torch.einsum("mks,mws->mkw", act_centers, cw)
             stored_lut, dequant_lut, scale, zeropoint = _quantize_lut_batched(lut, config.lut_quant_bits)
             if act_codes_for_reassign is not None:
@@ -622,6 +690,8 @@ class PQLUTLinear(nn.Module):
             "weight_groups": group_count,
             "weight_group_size": self.config.weight_group_size,
             "weight_code_reassign_iters": self.config.weight_code_reassign_iters,
+            "weight_center_refine_iters": self.config.weight_center_refine_iters,
+            "weight_center_refine_reg": self.config.weight_center_refine_reg,
             "Ka": self.config.ka,
             "Kw": self.config.kw,
             "distance": self.config.distance,

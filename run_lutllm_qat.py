@@ -65,6 +65,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--weight-group-size", type=int, default=256)
     parser.add_argument("--lut-quant-bits", type=int, default=8)
     parser.add_argument("--weight-code-reassign-iters", type=int, default=0)
+    parser.add_argument("--weight-center-refine-iters", type=int, default=0)
+    parser.add_argument("--weight-center-refine-reg", type=float, default=1e-4)
+    parser.add_argument("--act-train-mode", choices=["hard", "soft", "soft_hard"], default="hard")
+    parser.add_argument("--act-softmax-temperature", type=float, default=1.0)
+    parser.add_argument("--act-ste-input-scale", type=float, default=1.0)
     parser.add_argument("--lut-storage", choices=["expanded", "compact"], default="expanded")
     parser.add_argument("--output-correction", choices=["none", "bias", "affine"], default="none")
     parser.add_argument("--eval-baseline", action="store_true")
@@ -210,6 +215,11 @@ def main() -> None:
         weight_group_size=args.weight_group_size,
         lut_quant_bits=args.lut_quant_bits,
         weight_code_reassign_iters=args.weight_code_reassign_iters,
+        weight_center_refine_iters=args.weight_center_refine_iters,
+        weight_center_refine_reg=args.weight_center_refine_reg,
+        act_train_mode=args.act_train_mode,
+        act_softmax_temperature=args.act_softmax_temperature,
+        act_ste_input_scale=args.act_ste_input_scale,
         output_correction=args.output_correction,
         seed=args.seed,
     )
