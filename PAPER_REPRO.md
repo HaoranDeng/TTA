@@ -55,6 +55,7 @@ Current baseline-alignment status:
 |---|---|---:|---:|---:|---:|---:|
 | Paper FP16 | customized Qwen 3 1.7B | full paper eval | 88.80 | 0.00 | 33.10 | 0.00 |
 | `lutllm_base_instruction_g8_all196_shufcalib_ka64_calib1024_k5_init_actonly_ppl256` FP16 | internal instruction 8-shot GLUE, 0-shot MMLU | 256/task | 82.88 | -5.92 | 29.69 | -3.41 |
+| `lutllm_base_instruction_g8_all196_shufcalib_steqat1000_int8_actonly_ppl128` FP16 | internal instruction 8-shot GLUE, 0-shot MMLU | 128/task | 83.07 | -5.73 | 33.59 | +0.49 |
 | `baseline_prompt_grid_qwen3_1p7b_base_512_more_shots/instruction_g8_m0_plain` | internal instruction 8-shot GLUE, 0-shot MMLU | 512/task | 82.35 | -6.45 | 28.52 | -4.58 |
 | `baseline_prompt_grid_qwen3_1p7b_base_512_more_shots/instruction_g16_m8_plain` | internal instruction 16-shot GLUE, 8-shot MMLU | 512/task | 81.52 | -7.28 | 30.27 | -2.83 |
 | `lmeval_qwen3_1p7b_base_glue6_limit1024` | standard EleutherAI `lm_eval` GLUE prompts | 1024/task limit | 71.63 | -17.17 | - | - |
@@ -69,6 +70,7 @@ Latest all-196 diagnostic gap:
 |---|---:|---:|---:|---:|---:|---:|---:|
 | FP16 baseline | 82.88 | 88.80 | -5.92 | 29.69 | 33.10 | -3.41 | 16.45 |
 | Act Quant, `Ka=64`, no QAT | 61.07 | 87.20 | -26.13 | 6.25 | 31.80 | -25.55 | 332.60 |
+| centers-only STE Act Quant, 1000 steps | 70.96 | 87.20 | -16.24 | 7.81 | 31.80 | -23.99 | 335.62 |
 
 Prompt grid, 64 examples/task, SQuAD skipped:
 
@@ -202,6 +204,15 @@ After the prompt grid above, the formal public-checkpoint reproduction path is `
 | same | Act Quant, `Ka=64`, no QAT | 332.60 | 50.4 | 70.3 | 60.5 | 68.4 | 62.9 | 53.9 | 6.2 |
 
 This is the closest current public-checkpoint reproduction protocol before QAT. It still fails the paper reproduction target: same-run FP16 is `-5.92` GLUE points below paper FP16, and no-QAT activation quantization is `-26.13` GLUE points below the paper `+ Act. Quant.` row. The quantization drop is `-21.81` GLUE points here, while the paper reports roughly `-1.63` from FP16 to `+ Act. Quant.`.
+
+128 examples/task, 8-shot GLUE instruction prompt, 0-shot MMLU-Pro, SQuAD skipped, all 196 target linears:
+
+| Run | Stage | WikiText PPL | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `lutllm_base_instruction_g8_all196_shufcalib_steqat1000_int8_actonly_ppl128` | FP16 baseline | 16.45 | 81.2 | 75.0 | 82.0 | 87.5 | 79.7 | 93.0 | 33.6 |
+| same | centers-only STE Act Quant, 1000 steps | 335.62 | 68.0 | 75.0 | 62.5 | 64.1 | 72.7 | 83.6 | 7.8 |
+
+This QAT run trained `33,030,144` activation-center parameters for 1000 supervised steps and quantized all 196 transformer-block linears. It improves GLUE over no-QAT activation quantization, but it still does not reproduce the paper: GLUE is `70.96` versus paper `+ Act. Quant.` `87.20` (`-16.24`), and MMLU-Pro is `7.81` versus `31.80` (`-23.99`). The same-run quantization drop is `-12.11` GLUE points and `-25.78` MMLU-Pro points, while the paper's drop from FP16 to `+ Act. Quant.` is about `-1.63` GLUE and `-1.30` MMLU-Pro.
 
 64 examples/task, SQuAD skipped, all 196 target linears:
 

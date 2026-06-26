@@ -33,6 +33,7 @@ Most recent scai7 reproduction finding:
 - The public paper artifact does not expose the exact benchmark harness or the customized checkpoint. The paper text says the FPGA prototype uses a customized Qwen 3 1.7B model and describes continuing training on FineWeb and WikiQA.
 - FP16 is not yet aligned to the paper. The closest public-checkpoint protocol found so far is `Qwen/Qwen3-1.7B-Base` with instruction few-shot prompts, but it is still `-6.45` GLUE points below the paper FP16 row on a 512-example sweep.
 - The latest all-196-linear run on the closest protocol (`instruction`, 8-shot GLUE, 256 rows/task) gives FP16 GLUE `82.88`, which is still `-5.92` below paper FP16. Its no-QAT activation-quantized result gives GLUE `61.07`, which is `-26.13` below the paper `+ Act. Quant.` row.
+- A 1000-step centers-only STE-QAT run on the same all-196 scope improves Act Quant GLUE to `70.96`, but this is still `-16.24` below the paper `+ Act. Quant.` row. MMLU-Pro is `7.81`, still `-23.99` below paper.
 - New meaningful quantization runs still quantize all 196 transformer-block linear layers, but until the FP16 baseline is closer, their accuracy should be treated as diagnostic rather than a paper reproduction.
 
 Current FP16 baseline-alignment gap:
@@ -41,6 +42,7 @@ Current FP16 baseline-alignment gap:
 |---|---|---:|---:|---:|---:|---:|
 | Paper FP16 | customized Qwen 3 1.7B | full paper eval | 88.80 | 0.00 | 33.10 | 0.00 |
 | `lutllm_base_instruction_g8_all196_shufcalib_ka64_calib1024_k5_init_actonly_ppl256` FP16 | internal instruction 8-shot GLUE, 0-shot MMLU | 256/task | 82.88 | -5.92 | 29.69 | -3.41 |
+| `lutllm_base_instruction_g8_all196_shufcalib_steqat1000_int8_actonly_ppl128` FP16 | internal instruction 8-shot GLUE, 0-shot MMLU | 128/task | 83.07 | -5.73 | 33.59 | +0.49 |
 | `baseline_prompt_grid_qwen3_1p7b_base_512_more_shots/instruction_g8_m0_plain` | internal instruction 8-shot GLUE, 0-shot MMLU | 512/task | 82.35 | -6.45 | 28.52 | -4.58 |
 | `baseline_prompt_grid_qwen3_1p7b_base_512_more_shots/instruction_g16_m8_plain` | internal instruction 16-shot GLUE, 8-shot MMLU | 512/task | 81.52 | -7.28 | 30.27 | -2.83 |
 | `lmeval_qwen3_1p7b_base_glue6_limit1024` | standard EleutherAI `lm_eval` GLUE prompts | 1024/task limit | 71.63 | -17.17 | - | - |
@@ -62,6 +64,8 @@ Formal all-196-linear LUT-LLM reproduction attempts on the corrected Base+instru
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
 | `lutllm_base_instruction_g8_all196_shufcalib_ka64_calib1024_k5_init_actonly_ppl256` | FP16 baseline | 256 | 81.6 | 74.2 | 82.8 | 84.4 | 79.7 | 94.5 | 29.7 |
 | same | Act Quant, `Ka=64`, no QAT | 256 | 50.4 | 70.3 | 60.5 | 68.4 | 62.9 | 53.9 | 6.2 |
+| `lutllm_base_instruction_g8_all196_shufcalib_steqat1000_int8_actonly_ppl128` | FP16 baseline | 128 | 81.2 | 75.0 | 82.0 | 87.5 | 79.7 | 93.0 | 33.6 |
+| same | centers-only STE Act Quant, 1000 steps | 128 | 68.0 | 75.0 | 62.5 | 64.1 | 72.7 | 83.6 | 7.8 |
 | `lutllm_base_instruction_all196_batched_traincalib_steqat1000_int8_64_actonly` | FP16 baseline | 64 | 82.8 | 67.2 | 81.2 | 84.4 | 78.1 | 87.5 | 39.1 |
 | same | simplified STE Act Quant | 64 | 37.5 | 68.8 | 51.6 | 46.9 | 51.6 | 60.9 | 9.4 |
 | `lutllm_base_instruction_all196_batched_traincalib_actlutfit10_int8_final16_v4` | FP16 baseline | 16 | 87.5 | 56.2 | 75.0 | 75.0 | 87.5 | 81.2 | 62.5 |
@@ -73,6 +77,7 @@ Current gap to the paper on the latest all-196 diagnostic:
 |---|---:|---:|---:|---:|---:|---:|---:|
 | FP16 baseline | 82.88 | 88.80 | -5.92 | 29.69 | 33.10 | -3.41 | 16.45 |
 | Act Quant, `Ka=64`, no QAT | 61.07 | 87.20 | -26.13 | 6.25 | 31.80 | -25.55 | 332.60 |
+| centers-only STE Act Quant, 1000 steps | 70.96 | 87.20 | -16.24 | 7.81 | 31.80 | -23.99 | 335.62 |
 
 After commit `3708f19`, paper-supervised calibration/training batches are shuffled before selecting calibration batches. This avoids the earlier artifact where the first calibration batches came mostly from MNLI. New all-layer act-quant runs with WikiText PPL:
 
