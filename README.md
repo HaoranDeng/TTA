@@ -31,8 +31,19 @@ Paper Table III reference for Qwen 3 1.7B:
 Most recent scai7 reproduction finding:
 
 - The public paper artifact does not expose the exact benchmark harness or the customized checkpoint. The paper text says the FPGA prototype uses a customized Qwen 3 1.7B model and describes continuing training on FineWeb and WikiQA.
-- The closest public-checkpoint baseline found so far is `Qwen/Qwen3-1.7B-Base` with the new `--prompt-template instruction` evaluator. It matches the paper's MMLU-Pro baseline closely, but SQuAD v2 remains far below the paper.
-- New formal quantization runs therefore use all 196 transformer-block linear layers, `Qwen/Qwen3-1.7B-Base`, instruction prompts, `Ka=64`, `Kw=16`, `subdim=2`, INT8 compact final LUTs, and GLUE train split for supervised calibration/training batches.
+- FP16 is not yet aligned to the paper. The closest public-checkpoint protocol found so far is `Qwen/Qwen3-1.7B-Base` with instruction few-shot prompts, but it is still `-6.45` GLUE points below the paper FP16 row on a 512-example sweep.
+- New meaningful quantization runs still quantize all 196 transformer-block linear layers, but until the FP16 baseline is closer, their accuracy should be treated as diagnostic rather than a paper reproduction.
+
+Current FP16 baseline-alignment gap:
+
+| Run | Protocol | Samples | GLUE Avg | Gap vs Paper FP16 GLUE | MMLU-Pro | Gap vs Paper FP16 MMLU |
+|---|---|---:|---:|---:|---:|---:|
+| Paper FP16 | customized Qwen 3 1.7B | full paper eval | 88.80 | 0.00 | 33.10 | 0.00 |
+| `baseline_prompt_grid_qwen3_1p7b_base_512_more_shots/instruction_g8_m0_plain` | internal instruction 8-shot GLUE, 0-shot MMLU | 512/task | 82.35 | -6.45 | 28.52 | -4.58 |
+| `baseline_prompt_grid_qwen3_1p7b_base_512_more_shots/instruction_g16_m8_plain` | internal instruction 16-shot GLUE, 8-shot MMLU | 512/task | 81.52 | -7.28 | 30.27 | -2.83 |
+| `lmeval_qwen3_1p7b_base_glue6_limit1024` | standard EleutherAI `lm_eval` GLUE prompts | 1024/task limit | 71.63 | -17.17 | - | - |
+| `lmeval_qwen3_1p7b_glue6_limit1024` | standard `lm_eval`, non-Base public checkpoint | 1024/task limit | 62.01 | -26.79 | - | - |
+| `lmeval_taskadapt_glue1024_500_glue6_limit1024` | simple GLUE-only task adaptation, then standard `lm_eval` | 1024/task limit | 67.97 | -20.83 | - | - |
 
 Updated public-checkpoint baselines:
 

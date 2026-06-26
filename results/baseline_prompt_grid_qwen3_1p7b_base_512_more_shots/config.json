@@ -1,0 +1,55 @@
+{
+  "device": "cuda",
+  "dtype": "bfloat16",
+  "model_id": "Qwen/Qwen3-1.7B-Base",
+  "output_dir": "results/baseline_prompt_grid_qwen3_1p7b_base_512_more_shots",
+  "paper_samples": 512,
+  "parsed_variants": [
+    {
+      "glue_shot_count": 8,
+      "mmlu_shot_count": 0,
+      "name": "instruction_g8_m0_plain",
+      "prompt_style": "plain",
+      "prompt_template": "instruction"
+    },
+    {
+      "glue_shot_count": 8,
+      "mmlu_shot_count": 5,
+      "name": "instruction_g8_m5_plain",
+      "prompt_style": "plain",
+      "prompt_template": "instruction"
+    },
+    {
+      "glue_shot_count": 12,
+      "mmlu_shot_count": 5,
+      "name": "instruction_g12_m5_plain",
+      "prompt_style": "plain",
+      "prompt_template": "instruction"
+    },
+    {
+      "glue_shot_count": 16,
+      "mmlu_shot_count": 5,
+      "name": "instruction_g16_m5_plain",
+      "prompt_style": "plain",
+      "prompt_template": "instruction"
+    },
+    {
+      "glue_shot_count": 24,
+      "mmlu_shot_count": 5,
+      "name": "instruction_g24_m5_plain",
+      "prompt_style": "plain",
+      "prompt_template": "instruction"
+    },
+    {
+      "glue_shot_count": 16,
+      "mmlu_shot_count": 8,
+      "name": "instruction_g16_m8_plain",
+      "prompt_style": "plain",
+      "prompt_template": "instruction"
+    }
+  ],
+  "seed": 123,
+  "skip_squad": true,
+  "trust_remote_code": false,
+  "variants": "instruction:8:0:plain,instruction:8:5:plain,instruction:12:5:plain,instruction:16:5:plain,instruction:24:5:plain,instruction:16:8:plain"
+}

@@ -1,0 +1,327 @@
+{
+  "device": "cuda",
+  "dtype": "torch.bfloat16",
+  "load_seconds": 6.0976679739542305,
+  "model_id": "Qwen/Qwen3-1.7B-Base",
+  "paper_samples": 512,
+  "variants": {
+    "instruction_g12_m5_plain": {
+      "config": {
+        "glue_shot_count": 12,
+        "mmlu_shot_count": 5,
+        "name": "instruction_g12_m5_plain",
+        "prompt_style": "plain",
+        "prompt_template": "instruction"
+      },
+      "results": {
+        "mmlu_pro": {
+          "accuracy": 0.279296875,
+          "correct": 143,
+          "seconds": 60.40382434404455,
+          "total": 512
+        },
+        "mnli": {
+          "accuracy": 0.7890625,
+          "correct": 404,
+          "seconds": 20.84091031202115,
+          "total": 512
+        },
+        "mrpc": {
+          "accuracy": 0.7401960784313726,
+          "correct": 302,
+          "seconds": 12.320248018018901,
+          "total": 408
+        },
+        "qnli": {
+          "accuracy": 0.8125,
+          "correct": 416,
+          "seconds": 14.498711221851408,
+          "total": 512
+        },
+        "qqp": {
+          "accuracy": 0.833984375,
+          "correct": 427,
+          "seconds": 11.290617509977892,
+          "total": 512
+        },
+        "rte": {
+          "accuracy": 0.7653429602888087,
+          "correct": 212,
+          "seconds": 11.379368314985186,
+          "total": 277
+        },
+        "sst2": {
+          "accuracy": 0.943359375,
+          "correct": 483,
+          "seconds": 7.8657351119909436,
+          "total": 512
+        }
+      }
+    },
+    "instruction_g16_m5_plain": {
+      "config": {
+        "glue_shot_count": 16,
+        "mmlu_shot_count": 5,
+        "name": "instruction_g16_m5_plain",
+        "prompt_style": "plain",
+        "prompt_template": "instruction"
+      },
+      "results": {
+        "mmlu_pro": {
+          "accuracy": 0.279296875,
+          "correct": 143,
+          "seconds": 60.37480002082884,
+          "total": 512
+        },
+        "mnli": {
+          "accuracy": 0.775390625,
+          "correct": 397,
+          "seconds": 26.559010477969423,
+          "total": 512
+        },
+        "mrpc": {
+          "accuracy": 0.7450980392156863,
+          "correct": 304,
+          "seconds": 15.677611069986597,
+          "total": 408
+        },
+        "qnli": {
+          "accuracy": 0.814453125,
+          "correct": 417,
+          "seconds": 17.79907606705092,
+          "total": 512
+        },
+        "qqp": {
+          "accuracy": 0.828125,
+          "correct": 424,
+          "seconds": 13.625216891989112,
+          "total": 512
+        },
+        "rte": {
+          "accuracy": 0.7870036101083032,
+          "correct": 218,
+          "seconds": 16.338919759029523,
+          "total": 277
+        },
+        "sst2": {
+          "accuracy": 0.94140625,
+          "correct": 482,
+          "seconds": 9.530441243899986,
+          "total": 512
+        }
+      }
+    },
+    "instruction_g16_m8_plain": {
+      "config": {
+        "glue_shot_count": 16,
+        "mmlu_shot_count": 8,
+        "name": "instruction_g16_m8_plain",
+        "prompt_style": "plain",
+        "prompt_template": "instruction"
+      },
+      "results": {
+        "mmlu_pro": {
+          "accuracy": 0.302734375,
+          "correct": 155,
+          "seconds": 84.84165952098556,
+          "total": 512
+        },
+        "mnli": {
+          "accuracy": 0.775390625,
+          "correct": 397,
+          "seconds": 26.55819552601315,
+          "total": 512
+        },
+        "mrpc": {
+          "accuracy": 0.7450980392156863,
+          "correct": 304,
+          "seconds": 15.621761467074975,
+          "total": 408
+        },
+        "qnli": {
+          "accuracy": 0.814453125,
+          "correct": 417,
+          "seconds": 17.722727093845606,
+          "total": 512
+        },
+        "qqp": {
+          "accuracy": 0.828125,
+          "correct": 424,
+          "seconds": 13.588503886945546,
+          "total": 512
+        },
+        "rte": {
+          "accuracy": 0.7870036101083032,
+          "correct": 218,
+          "seconds": 16.30284994887188,
+          "total": 277
+        },
+        "sst2": {
+          "accuracy": 0.94140625,
+          "correct": 482,
+          "seconds": 9.489315523998812,
+          "total": 512
+        }
+      }
+    },
+    "instruction_g24_m5_plain": {
+      "config": {
+        "glue_shot_count": 24,
+        "mmlu_shot_count": 5,
+        "name": "instruction_g24_m5_plain",
+        "prompt_style": "plain",
+        "prompt_template": "instruction"
+      },
+      "results": {
+        "mmlu_pro": {
+          "accuracy": 0.279296875,
+          "correct": 143,
+          "seconds": 60.43847336410545,
+          "total": 512
+        },
+        "mnli": {
+          "accuracy": 0.759765625,
+          "correct": 389,
+          "seconds": 40.16071608220227,
+          "total": 512
+        },
+        "mrpc": {
+          "accuracy": 0.7181372549019608,
+          "correct": 293,
+          "seconds": 22.450458496809006,
+          "total": 408
+        },
+        "qnli": {
+          "accuracy": 0.82421875,
+          "correct": 422,
+          "seconds": 25.76783112389967,
+          "total": 512
+        },
+        "qqp": {
+          "accuracy": 0.8203125,
+          "correct": 420,
+          "seconds": 18.737377277109772,
+          "total": 512
+        },
+        "rte": {
+          "accuracy": 0.7978339350180506,
+          "correct": 221,
+          "seconds": 27.42569707892835,
+          "total": 277
+        },
+        "sst2": {
+          "accuracy": 0.955078125,
+          "correct": 489,
+          "seconds": 12.03867746796459,
+          "total": 512
+        }
+      }
+    },
+    "instruction_g8_m0_plain": {
+      "config": {
+        "glue_shot_count": 8,
+        "mmlu_shot_count": 0,
+        "name": "instruction_g8_m0_plain",
+        "prompt_style": "plain",
+        "prompt_template": "instruction"
+      },
+      "results": {
+        "mmlu_pro": {
+          "accuracy": 0.28515625,
+          "correct": 146,
+          "seconds": 13.72588137211278,
+          "total": 512
+        },
+        "mnli": {
+          "accuracy": 0.787109375,
+          "correct": 403,
+          "seconds": 15.370317476103082,
+          "total": 512
+        },
+        "mrpc": {
+          "accuracy": 0.7377450980392157,
+          "correct": 301,
+          "seconds": 9.632712163962424,
+          "total": 408
+        },
+        "qnli": {
+          "accuracy": 0.8203125,
+          "correct": 420,
+          "seconds": 11.037320185918361,
+          "total": 512
+        },
+        "qqp": {
+          "accuracy": 0.849609375,
+          "correct": 435,
+          "seconds": 8.921921105124056,
+          "total": 512
+        },
+        "rte": {
+          "accuracy": 0.8050541516245487,
+          "correct": 223,
+          "seconds": 8.145718926098198,
+          "total": 277
+        },
+        "sst2": {
+          "accuracy": 0.94140625,
+          "correct": 482,
+          "seconds": 6.619027824839577,
+          "total": 512
+        }
+      }
+    },
+    "instruction_g8_m5_plain": {
+      "config": {
+        "glue_shot_count": 8,
+        "mmlu_shot_count": 5,
+        "name": "instruction_g8_m5_plain",
+        "prompt_style": "plain",
+        "prompt_template": "instruction"
+      },
+      "results": {
+        "mmlu_pro": {
+          "accuracy": 0.279296875,
+          "correct": 143,
+          "seconds": 60.38813638384454,
+          "total": 512
+        },
+        "mnli": {
+          "accuracy": 0.787109375,
+          "correct": 403,
+          "seconds": 14.879780869930983,
+          "total": 512
+        },
+        "mrpc": {
+          "accuracy": 0.7377450980392157,
+          "correct": 301,
+          "seconds": 9.519615752156824,
+          "total": 408
+        },
+        "qnli": {
+          "accuracy": 0.8203125,
+          "correct": 420,
+          "seconds": 10.884547191904858,
+          "total": 512
+        },
+        "qqp": {
+          "accuracy": 0.849609375,
+          "correct": 435,
+          "seconds": 8.76050141104497,
+          "total": 512
+        },
+        "rte": {
+          "accuracy": 0.8050541516245487,
+          "correct": 223,
+          "seconds": 8.082678211852908,
+          "total": 277
+        },
+        "sst2": {
+          "accuracy": 0.94140625,
+          "correct": 482,
+          "seconds": 6.529559452086687,
+          "total": 512
+        }
+      }
+    }
+  }
+}

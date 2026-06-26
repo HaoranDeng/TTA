@@ -1,0 +1,69 @@
+{
+  "device": "cuda",
+  "dtype": "bfloat16",
+  "model_id": "Qwen/Qwen3-1.7B-Base",
+  "output_dir": "results/baseline_prompt_grid_qwen3_1p7b_base_512_align",
+  "paper_samples": 512,
+  "parsed_variants": [
+    {
+      "glue_shot_count": 0,
+      "mmlu_shot_count": 0,
+      "name": "simple_g0_m0_plain",
+      "prompt_style": "plain",
+      "prompt_template": "simple"
+    },
+    {
+      "glue_shot_count": 0,
+      "mmlu_shot_count": 0,
+      "name": "instruction_g0_m0_plain",
+      "prompt_style": "plain",
+      "prompt_template": "instruction"
+    },
+    {
+      "glue_shot_count": 3,
+      "mmlu_shot_count": 3,
+      "name": "instruction_g3_m3_plain",
+      "prompt_style": "plain",
+      "prompt_template": "instruction"
+    },
+    {
+      "glue_shot_count": 5,
+      "mmlu_shot_count": 5,
+      "name": "instruction_g5_m5_plain",
+      "prompt_style": "plain",
+      "prompt_template": "instruction"
+    },
+    {
+      "glue_shot_count": 8,
+      "mmlu_shot_count": 5,
+      "name": "instruction_g8_m5_plain",
+      "prompt_style": "plain",
+      "prompt_template": "instruction"
+    },
+    {
+      "glue_shot_count": 3,
+      "mmlu_shot_count": 3,
+      "name": "instruction_g3_m3_chat",
+      "prompt_style": "chat",
+      "prompt_template": "instruction"
+    },
+    {
+      "glue_shot_count": 0,
+      "mmlu_shot_count": 0,
+      "name": "lm_eval_g0_m0_plain",
+      "prompt_style": "plain",
+      "prompt_template": "lm_eval"
+    },
+    {
+      "glue_shot_count": 3,
+      "mmlu_shot_count": 3,
+      "name": "lm_eval_g3_m3_plain",
+      "prompt_style": "plain",
+      "prompt_template": "lm_eval"
+    }
+  ],
+  "seed": 123,
+  "skip_squad": true,
+  "trust_remote_code": false,
+  "variants": "simple:0:0:plain,instruction:0:0:plain,instruction:3:3:plain,instruction:5:5:plain,instruction:8:5:plain,instruction:3:3:chat,lm_eval:0:0:plain,lm_eval:3:3:plain"
+}

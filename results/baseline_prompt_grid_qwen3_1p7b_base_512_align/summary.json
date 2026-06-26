@@ -1,0 +1,433 @@
+{
+  "device": "cuda",
+  "dtype": "torch.bfloat16",
+  "load_seconds": 5.902500821975991,
+  "model_id": "Qwen/Qwen3-1.7B-Base",
+  "paper_samples": 512,
+  "variants": {
+    "instruction_g0_m0_plain": {
+      "config": {
+        "glue_shot_count": 0,
+        "mmlu_shot_count": 0,
+        "name": "instruction_g0_m0_plain",
+        "prompt_style": "plain",
+        "prompt_template": "instruction"
+      },
+      "results": {
+        "mmlu_pro": {
+          "accuracy": 0.28515625,
+          "correct": 146,
+          "seconds": 13.31786763900891,
+          "total": 512
+        },
+        "mnli": {
+          "accuracy": 0.7578125,
+          "correct": 388,
+          "seconds": 7.0309725070837885,
+          "total": 512
+        },
+        "mrpc": {
+          "accuracy": 0.678921568627451,
+          "correct": 277,
+          "seconds": 4.415179372066632,
+          "total": 408
+        },
+        "qnli": {
+          "accuracy": 0.796875,
+          "correct": 408,
+          "seconds": 5.545363197103143,
+          "total": 512
+        },
+        "qqp": {
+          "accuracy": 0.845703125,
+          "correct": 433,
+          "seconds": 5.480012448970228,
+          "total": 512
+        },
+        "rte": {
+          "accuracy": 0.7833935018050542,
+          "correct": 217,
+          "seconds": 3.9081052378751338,
+          "total": 277
+        },
+        "sst2": {
+          "accuracy": 0.8515625,
+          "correct": 436,
+          "seconds": 5.525119240162894,
+          "total": 512
+        }
+      }
+    },
+    "instruction_g3_m3_chat": {
+      "config": {
+        "glue_shot_count": 3,
+        "mmlu_shot_count": 3,
+        "name": "instruction_g3_m3_chat",
+        "prompt_style": "chat",
+        "prompt_template": "instruction"
+      },
+      "results": {
+        "mmlu_pro": {
+          "accuracy": 0.12890625,
+          "correct": 66,
+          "seconds": 37.876751268981025,
+          "total": 512
+        },
+        "mnli": {
+          "accuracy": 0.298828125,
+          "correct": 153,
+          "seconds": 8.797568114008754,
+          "total": 512
+        },
+        "mrpc": {
+          "accuracy": 0.3161764705882353,
+          "correct": 129,
+          "seconds": 5.799654416972771,
+          "total": 408
+        },
+        "qnli": {
+          "accuracy": 0.5390625,
+          "correct": 276,
+          "seconds": 6.989112589973956,
+          "total": 512
+        },
+        "qqp": {
+          "accuracy": 0.650390625,
+          "correct": 333,
+          "seconds": 6.085470650810748,
+          "total": 512
+        },
+        "rte": {
+          "accuracy": 0.4729241877256318,
+          "correct": 131,
+          "seconds": 3.6606208530720323,
+          "total": 277
+        },
+        "sst2": {
+          "accuracy": 0.46484375,
+          "correct": 238,
+          "seconds": 5.846682464005426,
+          "total": 512
+        }
+      }
+    },
+    "instruction_g3_m3_plain": {
+      "config": {
+        "glue_shot_count": 3,
+        "mmlu_shot_count": 3,
+        "name": "instruction_g3_m3_plain",
+        "prompt_style": "plain",
+        "prompt_template": "instruction"
+      },
+      "results": {
+        "mmlu_pro": {
+          "accuracy": 0.283203125,
+          "correct": 145,
+          "seconds": 36.98057981999591,
+          "total": 512
+        },
+        "mnli": {
+          "accuracy": 0.8046875,
+          "correct": 412,
+          "seconds": 8.56607187888585,
+          "total": 512
+        },
+        "mrpc": {
+          "accuracy": 0.7352941176470589,
+          "correct": 300,
+          "seconds": 5.735797018976882,
+          "total": 408
+        },
+        "qnli": {
+          "accuracy": 0.806640625,
+          "correct": 413,
+          "seconds": 6.845252630067989,
+          "total": 512
+        },
+        "qqp": {
+          "accuracy": 0.841796875,
+          "correct": 431,
+          "seconds": 6.017825355986133,
+          "total": 512
+        },
+        "rte": {
+          "accuracy": 0.7870036101083032,
+          "correct": 218,
+          "seconds": 4.258495173184201,
+          "total": 277
+        },
+        "sst2": {
+          "accuracy": 0.923828125,
+          "correct": 473,
+          "seconds": 5.731107091996819,
+          "total": 512
+        }
+      }
+    },
+    "instruction_g5_m5_plain": {
+      "config": {
+        "glue_shot_count": 5,
+        "mmlu_shot_count": 5,
+        "name": "instruction_g5_m5_plain",
+        "prompt_style": "plain",
+        "prompt_template": "instruction"
+      },
+      "results": {
+        "mmlu_pro": {
+          "accuracy": 0.279296875,
+          "correct": 143,
+          "seconds": 60.310170537093654,
+          "total": 512
+        },
+        "mnli": {
+          "accuracy": 0.80859375,
+          "correct": 414,
+          "seconds": 11.005954738007858,
+          "total": 512
+        },
+        "mrpc": {
+          "accuracy": 0.7181372549019608,
+          "correct": 293,
+          "seconds": 7.422840123064816,
+          "total": 408
+        },
+        "qnli": {
+          "accuracy": 0.80078125,
+          "correct": 410,
+          "seconds": 8.486199314938858,
+          "total": 512
+        },
+        "qqp": {
+          "accuracy": 0.828125,
+          "correct": 424,
+          "seconds": 6.546353185083717,
+          "total": 512
+        },
+        "rte": {
+          "accuracy": 0.7689530685920578,
+          "correct": 213,
+          "seconds": 5.8698344780132174,
+          "total": 277
+        },
+        "sst2": {
+          "accuracy": 0.935546875,
+          "correct": 479,
+          "seconds": 6.020504812942818,
+          "total": 512
+        }
+      }
+    },
+    "instruction_g8_m5_plain": {
+      "config": {
+        "glue_shot_count": 8,
+        "mmlu_shot_count": 5,
+        "name": "instruction_g8_m5_plain",
+        "prompt_style": "plain",
+        "prompt_template": "instruction"
+      },
+      "results": {
+        "mmlu_pro": {
+          "accuracy": 0.279296875,
+          "correct": 143,
+          "seconds": 60.40384790999815,
+          "total": 512
+        },
+        "mnli": {
+          "accuracy": 0.787109375,
+          "correct": 403,
+          "seconds": 15.008095445111394,
+          "total": 512
+        },
+        "mrpc": {
+          "accuracy": 0.7377450980392157,
+          "correct": 301,
+          "seconds": 9.579065785976127,
+          "total": 408
+        },
+        "qnli": {
+          "accuracy": 0.8203125,
+          "correct": 420,
+          "seconds": 11.050137211801484,
+          "total": 512
+        },
+        "qqp": {
+          "accuracy": 0.849609375,
+          "correct": 435,
+          "seconds": 8.733584627974778,
+          "total": 512
+        },
+        "rte": {
+          "accuracy": 0.8050541516245487,
+          "correct": 223,
+          "seconds": 8.114744717022404,
+          "total": 277
+        },
+        "sst2": {
+          "accuracy": 0.94140625,
+          "correct": 482,
+          "seconds": 6.43781184614636,
+          "total": 512
+        }
+      }
+    },
+    "lm_eval_g0_m0_plain": {
+      "config": {
+        "glue_shot_count": 0,
+        "mmlu_shot_count": 0,
+        "name": "lm_eval_g0_m0_plain",
+        "prompt_style": "plain",
+        "prompt_template": "lm_eval"
+      },
+      "results": {
+        "mmlu_pro": {
+          "accuracy": 0.26953125,
+          "correct": 138,
+          "seconds": 15.672533921897411,
+          "total": 512
+        },
+        "mnli": {
+          "accuracy": 0.5703125,
+          "correct": 292,
+          "seconds": 5.6534905708394945,
+          "total": 512
+        },
+        "mrpc": {
+          "accuracy": 0.6838235294117647,
+          "correct": 279,
+          "seconds": 5.631232615094632,
+          "total": 408
+        },
+        "qnli": {
+          "accuracy": 0.4609375,
+          "correct": 236,
+          "seconds": 6.994481624104083,
+          "total": 512
+        },
+        "qqp": {
+          "accuracy": 0.349609375,
+          "correct": 179,
+          "seconds": 6.910420858068392,
+          "total": 512
+        },
+        "rte": {
+          "accuracy": 0.7689530685920578,
+          "correct": 213,
+          "seconds": 3.062564600026235,
+          "total": 277
+        },
+        "sst2": {
+          "accuracy": 0.46484375,
+          "correct": 238,
+          "seconds": 5.504192708060145,
+          "total": 512
+        }
+      }
+    },
+    "lm_eval_g3_m3_plain": {
+      "config": {
+        "glue_shot_count": 3,
+        "mmlu_shot_count": 3,
+        "name": "lm_eval_g3_m3_plain",
+        "prompt_style": "plain",
+        "prompt_template": "lm_eval"
+      },
+      "results": {
+        "mmlu_pro": {
+          "accuracy": 0.296875,
+          "correct": 152,
+          "seconds": 46.2525630381424,
+          "total": 512
+        },
+        "mnli": {
+          "accuracy": 0.611328125,
+          "correct": 313,
+          "seconds": 6.465082567883655,
+          "total": 512
+        },
+        "mrpc": {
+          "accuracy": 0.6838235294117647,
+          "correct": 279,
+          "seconds": 6.190143156098202,
+          "total": 408
+        },
+        "qnli": {
+          "accuracy": 0.4609375,
+          "correct": 236,
+          "seconds": 7.6200352548621595,
+          "total": 512
+        },
+        "qqp": {
+          "accuracy": 0.349609375,
+          "correct": 179,
+          "seconds": 7.310876602074131,
+          "total": 512
+        },
+        "rte": {
+          "accuracy": 0.8014440433212996,
+          "correct": 222,
+          "seconds": 3.3317973830271512,
+          "total": 277
+        },
+        "sst2": {
+          "accuracy": 0.466796875,
+          "correct": 239,
+          "seconds": 5.642530123936012,
+          "total": 512
+        }
+      }
+    },
+    "simple_g0_m0_plain": {
+      "config": {
+        "glue_shot_count": 0,
+        "mmlu_shot_count": 0,
+        "name": "simple_g0_m0_plain",
+        "prompt_style": "plain",
+        "prompt_template": "simple"
+      },
+      "results": {
+        "mmlu_pro": {
+          "accuracy": 0.28515625,
+          "correct": 146,
+          "seconds": 12.962516240077093,
+          "total": 512
+        },
+        "mnli": {
+          "accuracy": 0.3515625,
+          "correct": 180,
+          "seconds": 7.608291093027219,
+          "total": 512
+        },
+        "mrpc": {
+          "accuracy": 0.7205882352941176,
+          "correct": 294,
+          "seconds": 4.6120657089632004,
+          "total": 408
+        },
+        "qnli": {
+          "accuracy": 0.68359375,
+          "correct": 350,
+          "seconds": 5.694576432928443,
+          "total": 512
+        },
+        "qqp": {
+          "accuracy": 0.55078125,
+          "correct": 282,
+          "seconds": 5.474011557176709,
+          "total": 512
+        },
+        "rte": {
+          "accuracy": 0.5270758122743683,
+          "correct": 146,
+          "seconds": 3.9511413231957704,
+          "total": 277
+        },
+        "sst2": {
+          "accuracy": 0.5703125,
+          "correct": 292,
+          "seconds": 5.547987751895562,
+          "total": 512
+        }
+      }
+    }
+  }
+}

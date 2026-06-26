@@ -1,0 +1,14 @@
+{
+  "device": "cuda",
+  "dtype": "bfloat16",
+  "glue_shot_count": 0,
+  "mmlu_shot_count": 0,
+  "model_id": "Qwen/Qwen3-1.7B-Base",
+  "output_dir": "results/baseline_qwen3_1p7b_base_lmeval_template_128",
+  "paper_samples": 128,
+  "prompt_style": "plain",
+  "prompt_template": "lm_eval",
+  "seed": 123,
+  "skip_squad": false,
+  "trust_remote_code": false
+}

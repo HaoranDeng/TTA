@@ -47,7 +47,20 @@ Important limitation: this is not yet a byte-identical reproduction of the paper
 
 These runs use 128 validation/test examples per task. They are not directly comparable to Table III because the paper's exact evaluation harness is not public in the artifact, and this repo uses simple prompt-based scoring/generation.
 
-Updated protocol search: the original plain prompts were the main cause of the huge FP16 mismatch on MMLU-Pro and several GLUE tasks. A small grid over public Qwen3 checkpoints found that `Qwen/Qwen3-1.7B-Base` with `--prompt-template instruction --prompt-style plain` is the closest public-checkpoint baseline. It matches the paper's MMLU-Pro baseline, but SQuAD v2 is still much lower, consistent with the paper's statement that the prototype uses a customized Qwen 3 1.7B checkpoint rather than the raw public HF checkpoint.
+Updated protocol search: the original plain prompts were the main cause of the huge FP16 mismatch on MMLU-Pro and several GLUE tasks. Larger sweeps on scai7 show that the raw public checkpoints still do not match the paper FP16 row. The closest public-checkpoint protocol found so far is `Qwen/Qwen3-1.7B-Base` with instruction few-shot prompts, but the best 512-example GLUE average is still `82.35` versus the paper's `88.80`.
+
+Current baseline-alignment status:
+
+| Run | Protocol | Samples | GLUE Avg | Gap vs Paper FP16 GLUE | MMLU-Pro | Gap vs Paper FP16 MMLU |
+|---|---|---:|---:|---:|---:|---:|
+| Paper FP16 | customized Qwen 3 1.7B | full paper eval | 88.80 | 0.00 | 33.10 | 0.00 |
+| `baseline_prompt_grid_qwen3_1p7b_base_512_more_shots/instruction_g8_m0_plain` | internal instruction 8-shot GLUE, 0-shot MMLU | 512/task | 82.35 | -6.45 | 28.52 | -4.58 |
+| `baseline_prompt_grid_qwen3_1p7b_base_512_more_shots/instruction_g16_m8_plain` | internal instruction 16-shot GLUE, 8-shot MMLU | 512/task | 81.52 | -7.28 | 30.27 | -2.83 |
+| `lmeval_qwen3_1p7b_base_glue6_limit1024` | standard EleutherAI `lm_eval` GLUE prompts | 1024/task limit | 71.63 | -17.17 | - | - |
+| `lmeval_qwen3_1p7b_glue6_limit1024` | standard `lm_eval`, non-Base public checkpoint | 1024/task limit | 62.01 | -26.79 | - | - |
+| `lmeval_taskadapt_glue1024_500_glue6_limit1024` | simple GLUE-only task adaptation, then standard `lm_eval` | 1024/task limit | 67.97 | -20.83 | - | - |
+
+Interpretation: standard public `lm_eval` prompts do not explain the paper's FP16 row; they make GLUE substantially worse. Simple GLUE-only continued training for 500 updates also failed to move toward the paper. The remaining FP16 mismatch is therefore likely due to the paper's customized checkpoint and/or an undisclosed task/evaluation protocol. All quantized all-196-linear results below remain useful diagnostics, but they are not a faithful reproduction until this FP16 row is matched.
 
 Prompt grid, 64 examples/task, SQuAD skipped:
 
