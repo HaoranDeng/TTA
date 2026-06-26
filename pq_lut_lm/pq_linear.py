@@ -26,6 +26,7 @@ class PQConfig:
     weight_code_reassign_iters: int = 0
     weight_center_refine_iters: int = 0
     weight_center_refine_reg: float = 1e-4
+    weight_center_refine_blend: float = 1.0
     act_train_mode: str = "hard"
     act_softmax_temperature: float = 1.0
     act_ste_input_scale: float = 1.0
@@ -345,6 +346,7 @@ def refine_weight_centers_output_aware(
     init_codes: torch.Tensor,
     iters: int,
     reg: float,
+    blend: float,
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """Update weight centroids for fixed codes using calibration-output reconstruction."""
     if iters <= 0:
@@ -354,6 +356,7 @@ def refine_weight_centers_output_aware(
     act_centers = act_centers.float().contiguous()
     centers = init_centers.clone().float()
     codes = init_codes.clone().long()
+    blend = max(0.0, min(float(blend), 1.0))
     target = calib @ weight_group.t()
     m, kw, subdim = centers.shape
     n, out_features = target.shape
@@ -379,7 +382,7 @@ def refine_weight_centers_output_aware(
             nonempty = counts > 0
             lhs = counts[:, None, None] * xtx[None, :, :] + float(reg) * eye[None, :, :]
             updated = torch.linalg.solve(lhs[nonempty], rhs[nonempty].unsqueeze(2)).squeeze(2)
-            centers[mi, nonempty] = updated
+            centers[mi, nonempty] = (1.0 - blend) * centers[mi, nonempty] + blend * updated
             new_lut = act_centers[mi].matmul(centers[mi].t())
             pred.add_(new_lut.index_select(0, act_codes[:, mi]).index_select(1, codes[mi]))
     if pred.shape != (n, out_features):
@@ -560,6 +563,7 @@ class PQLUTLinear(nn.Module):
                     wc,
                     config.weight_center_refine_iters,
                     config.weight_center_refine_reg,
+                    config.weight_center_refine_blend,
                 )
             lut = torch.einsum("mks,mws->mkw", act_centers, cw)
             stored_lut, dequant_lut, scale, zeropoint = _quantize_lut_batched(lut, config.lut_quant_bits)
@@ -692,6 +696,7 @@ class PQLUTLinear(nn.Module):
             "weight_code_reassign_iters": self.config.weight_code_reassign_iters,
             "weight_center_refine_iters": self.config.weight_center_refine_iters,
             "weight_center_refine_reg": self.config.weight_center_refine_reg,
+            "weight_center_refine_blend": self.config.weight_center_refine_blend,
             "Ka": self.config.ka,
             "Kw": self.config.kw,
             "distance": self.config.distance,

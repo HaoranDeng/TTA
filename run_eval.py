@@ -55,6 +55,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--weight-code-reassign-iters", type=int, default=0)
     parser.add_argument("--weight-center-refine-iters", type=int, default=0)
     parser.add_argument("--weight-center-refine-reg", type=float, default=1e-4)
+    parser.add_argument("--weight-center-refine-blend", type=float, default=1.0)
     parser.add_argument("--output-correction", choices=["none", "bias", "affine"], default="none")
     parser.add_argument("--seed", type=int, default=123)
     parser.add_argument("--skip-pq", action="store_true")
@@ -169,6 +170,7 @@ def main() -> None:
             weight_code_reassign_iters=args.weight_code_reassign_iters,
             weight_center_refine_iters=args.weight_center_refine_iters,
             weight_center_refine_reg=args.weight_center_refine_reg,
+            weight_center_refine_blend=args.weight_center_refine_blend,
             output_correction=args.output_correction,
             seed=args.seed,
         )
