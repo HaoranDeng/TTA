@@ -44,7 +44,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--ppl-tokens", type=int, default=4096)
     parser.add_argument("--ppl-batch-size", type=int, default=1)
     parser.add_argument("--prompt-style", choices=["plain", "chat"], default="plain")
-    parser.add_argument("--prompt-template", choices=["simple", "instruction"], default="simple")
+    parser.add_argument("--prompt-template", choices=["simple", "instruction", "lm_eval"], default="simple")
     parser.add_argument("--glue-shot-count", type=int, default=0)
     parser.add_argument("--mmlu-shot-count", type=int, default=0)
     parser.add_argument("--skip-squad", action="store_true")

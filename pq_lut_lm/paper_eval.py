@@ -61,8 +61,10 @@ def glue_prompt_and_labels(
     row: dict[str, Any],
     prompt_template: str = "simple",
 ) -> tuple[str, list[str], int]:
-    if prompt_template not in {"simple", "instruction"}:
+    if prompt_template not in {"simple", "instruction", "lm_eval"}:
         raise ValueError(f"Unsupported GLUE prompt template: {prompt_template}")
+    if prompt_template == "lm_eval":
+        return glue_lm_eval_prompt_and_labels(task, row)
     if prompt_template == "instruction":
         return glue_instruction_prompt_and_labels(task, row)
     if task == "sst2":
@@ -103,6 +105,47 @@ def glue_prompt_and_labels(
             "Relationship:"
         )
         return prompt, [" entailment", " not entailment"], int(row["label"])
+    raise ValueError(f"Unsupported GLUE task: {task}")
+
+
+def glue_lm_eval_prompt_and_labels(task: str, row: dict[str, Any]) -> tuple[str, list[str], int]:
+    if task == "sst2":
+        prompt = f"{row['sentence']}\nQuestion: Is this sentence positive or negative?\nAnswer:"
+        return prompt, ["negative", "positive"], int(row["label"])
+    if task == "mrpc":
+        prompt = (
+            f"Sentence 1: {row['sentence1']}\n"
+            f"Sentence 2: {row['sentence2']}\n"
+            "Question: Do both sentences mean the same thing?\n"
+            "Answer:"
+        )
+        return prompt, ["no", "yes"], int(row["label"])
+    if task == "qqp":
+        prompt = (
+            f"Question 1: {row['question1']}\n"
+            f"Question 2: {row['question2']}\n"
+            "Question: Do both questions ask the same thing?\n"
+            "Answer:"
+        )
+        return prompt, ["no", "yes"], int(row["label"])
+    if task == "mnli":
+        prompt = (
+            f"{row['premise']}\n"
+            f"Question: {row['hypothesis']} True, False or Neither?\n"
+            "Answer:"
+        )
+        return prompt, ["True", "Neither", "False"], int(row["label"])
+    if task == "qnli":
+        prompt = (
+            f"{row['question']}\n"
+            f"{row['sentence']}\n"
+            "Question: Does this response answer the question?\n"
+            "Answer:"
+        )
+        return prompt, ["yes", "no"], int(row["label"])
+    if task == "rte":
+        prompt = f"{row['sentence1']}\nQuestion: {row['sentence2']} True or False?\nAnswer:"
+        return prompt, ["True", "False"], int(row["label"])
     raise ValueError(f"Unsupported GLUE task: {task}")
 
 
@@ -236,10 +279,25 @@ def load_mmlu_pro_rows(max_samples: int, split: str = "test") -> list[dict[str, 
 
 
 def format_mmlu_pro_prompt(row: dict[str, Any], prompt_template: str = "simple") -> tuple[str, list[str]]:
-    if prompt_template not in {"simple", "instruction"}:
+    if prompt_template not in {"simple", "instruction", "lm_eval"}:
         raise ValueError(f"Unsupported MMLU-Pro prompt template: {prompt_template}")
     letters = [chr(ord("A") + i) for i in range(10)]
     options = row["options"]
+    if prompt_template == "lm_eval":
+        category = row.get("category", "the subject")
+        prompt = (
+            "The following are multiple choice questions (with answers) about "
+            f"{category}. Think step by step and then finish your answer with "
+            '"the answer is (X)" where X is the correct letter choice.\n\n'
+            "Question:\n"
+            f"{row['question']}\n"
+            "Options:\n"
+        )
+        for i, option in enumerate(options):
+            prompt += f"{letters[i]}. {option.strip()}\n"
+        prompt += "Answer: Let's think step by step."
+        labels = [f" The answer is ({letters[i]})" for i in range(len(options))]
+        return prompt, labels
     if prompt_template == "instruction":
         prompt = "Choose the single best answer. Respond with only the option letter.\n"
     else:
@@ -355,8 +413,14 @@ def evaluate_squad_v2(
     device: torch.device,
     max_new_tokens: int = 24,
     prompt_style: str = "plain",
+    prompt_template: str = "simple",
 ) -> dict[str, Any]:
-    rows = _take(load_dataset("squad_v2", split="validation"), max_samples)
+    if prompt_template == "lm_eval":
+        rows = _take(load_dataset("lighteval/squad_v2", split="validation"), max_samples)
+    elif prompt_template in {"simple", "instruction"}:
+        rows = _take(load_dataset("squad_v2", split="validation"), max_samples)
+    else:
+        raise ValueError(f"Unsupported SQuAD prompt template: {prompt_template}")
     total_f1 = 0.0
     predictions = []
     if device.type == "cuda":
@@ -364,12 +428,20 @@ def evaluate_squad_v2(
     start = time.perf_counter()
     model.eval()
     for row in rows:
-        prompt = (
-            "Answer the question from the context. If the answer is not in the context, answer No Answer.\n"
-            f"Context: {row['context']}\n"
-            f"Question: {row['question']}\n"
-            "Answer:"
-        )
+        if prompt_template == "lm_eval":
+            prompt = (
+                f"Title: {row.get('title', '')}\n\n"
+                f"Background: {row['context']}\n\n"
+                f"Question: {row['question']}\n\n"
+                "Answer:"
+            )
+        else:
+            prompt = (
+                "Answer the question from the context. If the answer is not in the context, answer No Answer.\n"
+                f"Context: {row['context']}\n"
+                f"Question: {row['question']}\n"
+                "Answer:"
+            )
         prompt = format_prompt_for_style(tokenizer, prompt, prompt_style)
         ids = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=2048).to(device)
         out = model.generate(
@@ -395,17 +467,31 @@ def evaluate_squad_v2(
     }
 
 
-def make_squad_supervised_examples(max_samples: int) -> list[tuple[str, str]]:
+def make_squad_supervised_examples(max_samples: int, prompt_template: str = "simple") -> list[tuple[str, str]]:
     examples = []
-    for row in _take(load_dataset("squad_v2", split="train"), max_samples):
+    if prompt_template == "lm_eval":
+        rows = _take(load_dataset("lighteval/squad_v2", split="train"), max_samples)
+    elif prompt_template in {"simple", "instruction"}:
+        rows = _take(load_dataset("squad_v2", split="train"), max_samples)
+    else:
+        raise ValueError(f"Unsupported SQuAD prompt template: {prompt_template}")
+    for row in rows:
         answers = row["answers"].get("text", [])
-        answer = answers[0] if answers else " No Answer"
-        prompt = (
-            "Answer the question from the context. If the answer is not in the context, answer No Answer.\n"
-            f"Context: {row['context']}\n"
-            f"Question: {row['question']}\n"
-            "Answer:"
-        )
+        answer = answers[0] if answers else "unanswerable"
+        if prompt_template == "lm_eval":
+            prompt = (
+                f"Title: {row.get('title', '')}\n\n"
+                f"Background: {row['context']}\n\n"
+                f"Question: {row['question']}\n\n"
+                "Answer:"
+            )
+        else:
+            prompt = (
+                "Answer the question from the context. If the answer is not in the context, answer No Answer.\n"
+                f"Context: {row['context']}\n"
+                f"Question: {row['question']}\n"
+                "Answer:"
+            )
         examples.append((prompt, " " + answer.strip()))
     return examples
 
@@ -425,7 +511,7 @@ def make_paper_supervised_batches(
         examples.extend(make_glue_supervised_examples(task, per_task, prompt_template=prompt_template))
     examples.extend(make_mmlu_pro_supervised_examples(per_task, prompt_template=prompt_template))
     if include_squad:
-        examples.extend(make_squad_supervised_examples(per_task))
+        examples.extend(make_squad_supervised_examples(per_task, prompt_template=prompt_template))
 
     pad_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
     encoded = []
@@ -498,7 +584,14 @@ def evaluate_paper_tasks(
         results[task] = {k: v for k, v in metric.items() if k != "predictions"}
     if include_squad:
         print("Evaluating squad_v2", flush=True)
-        metric = evaluate_squad_v2(model, tokenizer, max_samples_per_task, device, prompt_style=prompt_style)
+        metric = evaluate_squad_v2(
+            model,
+            tokenizer,
+            max_samples_per_task,
+            device,
+            prompt_style=prompt_style,
+            prompt_template=prompt_template,
+        )
         results["squad_v2"] = {k: v for k, v in metric.items() if k != "predictions"}
     print("Evaluating mmlu_pro", flush=True)
     metric = evaluate_mmlu_pro(
