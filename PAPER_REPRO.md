@@ -223,6 +223,7 @@ Hardware scale for the shuffled-calibration runs:
 |---|---:|---:|---:|---:|---:|---:|
 | all196 `Ka=64` | 196 | 33,030,144 | 86,016.0 MiB | 704,643,072 | 1,548,288 | 16,515,072 |
 | all196 `Ka=256` | 196 | 132,120,576 | 344,064.0 MiB | 704,643,072 | 2,064,384 | 66,060,288 |
+| all196 `subdim=4, Ka=64` | 196 | 33,030,144 | 43,008.0 MiB | 352,321,536 | 774,144 | 8,257,536 |
 | all197 `Ka=64`, incl. `lm_head` | 197 | 33,161,216 | 105,008.0 MiB | 860,225,536 | 1,554,432 | 16,580,608 |
 
 Interpretation: shuffling calibration removes the task-order artifact, and increasing the activation codebook from `Ka=64` to `Ka=256` improves PPL and several GLUE metrics slightly. It still does not approach the paper's `+ Act. Quant.` row. The current centers-only STE QAT can improve some classification metrics, but it worsens WikiText PPL and remains far from paper accuracy. This points back to the missing paper pieces: trainable lookup-table values or fused lookup/reduce QAT, adjustable-gradient STE, GPTVQ, and possibly the customized checkpoint/task adaptation.
@@ -236,21 +237,29 @@ These runs continue from the corrected shuffled-calibration setup. All rows quan
 | `lutllm_base_instruction_all196_wikitext_steqat1000_int8_64_actonly_ppl64` | WikiText STE Act Quant, 1000 steps | 64 | 104.5 | 37.5 | 34.4 | 50.0 | 64.1 | 51.6 | 56.2 | 12.5 |
 | `lutllm_base_instruction_all196_wikitext_steqat3000_lr1e4_int8_64_actonly_ppl64` | WikiText STE Act Quant, 3000 steps, lr=1e-4 | 64 | 101.3 | 40.6 | 34.4 | 46.9 | 62.5 | 50.0 | 50.0 | 10.9 |
 | `lutllm_base_instruction_all196_wikitext_steqat5000_int8_64_actonly_ppl64` | WikiText STE Act Quant, 5000 steps, lr=3e-4 | 64 | 749.3 | 34.4 | 32.8 | 46.9 | 65.6 | 50.0 | 51.6 | 9.4 |
+| `lutllm_base_instruction_all196_wikitext_softhard_steqat1000_temp05_actonly_ppl64` | WikiText soft-hard STE, temp=0.5, 1000 steps | 64 | 467.1 | 31.2 | 32.8 | 46.9 | 67.2 | 50.0 | 56.2 | 10.9 |
+| `lutllm_base_instruction_all196_wikitext_hard_steqat1000_ingrad0_actonly_ppl64` | WikiText hard STE, input-gradient scale=0, 1000 steps | 64 | 499.7 | 34.4 | 32.8 | 48.4 | 65.6 | 50.0 | 51.6 | 14.1 |
+| `lutllm_base_instruction_all196_shufcalib_subdim4_ka64_calib1024_k5_init_actonly_ppl64` | Act Quant, `subdim=4`, `Ka=64`, no QAT | 64 | 3,356.9 | 32.8 | 57.8 | 48.4 | 31.2 | 50.0 | 46.9 | 9.4 |
 | `lutllm_base_instruction_all196_shufcalib_denseqat300_centers3e4_dense1e5_actonly_ppl32` | centers + dense linear QAT, 300 steps | 32 | 472.2 | 40.6 | 75.0 | 53.1 | 68.8 | 65.6 | 78.1 | 3.1 |
 | `lutllm_base_instruction_all196_shufcalib_steqat500_int8_final32_ppl` | Act Quant before final LUT | 32 | 464.3 | 50.0 | 68.8 | 65.6 | 62.5 | 65.6 | 81.2 | 15.6 |
 | same | compact INT8 final LUT with local k-means weight VQ | 32 | 39,716.5 | 31.2 | 40.6 | 28.1 | 59.4 | 56.2 | 37.5 | 3.1 |
 | `lutllm_base_instruction_all196_shufcalib_steqat500_int8_final16_affine_ppl` | compact INT8 final LUT + per-output affine correction | 16 | 10,768.6 | 31.2 | 37.5 | 62.5 | 62.5 | 62.5 | 37.5 | 6.2 |
 | `lutllm_base_instruction_all196_shufcalib_steqat500_int8_final16_reassign1_ppl` | compact INT8 final LUT + output-aware weight-code reassignment, 1 pass | 16 | 98,591.5 | 25.0 | 37.5 | 62.5 | 62.5 | 62.5 | 50.0 | 12.5 |
+| `lutllm_base_instruction_all196_shufcalib_steqat500_int8_final16_centerrefine1_ppl` | compact INT8 final LUT + LS weight-center refinement | 16 | 945,281.6 | 25.0 | 37.5 | 62.5 | 62.5 | 62.5 | 31.2 | 0.0 |
+| `lutllm_base_instruction_all196_shufcalib_steqat500_int8_final16_centerrefine1_blend01_ppl` | compact INT8 final LUT + damped LS center refinement, blend=0.1 | 16 | 945,281.6 | 25.0 | 37.5 | 62.5 | 62.5 | 62.5 | 31.2 | 0.0 |
 | `lutllm_base_instruction_all196_shufcalib_actlutfit50_actonly16_ppl` | direct expanded Act-LUT fit, 50 local steps | 16 | 608.5 | 25.0 | 81.2 | 68.8 | 62.5 | 68.8 | 50.0 | 0.0 |
 
 Findings:
 
 - WikiText LM-loss QAT improves PPL relative to task-supervised centers-only QAT, but the best PPL is still about `101`, far from the FP16 `16.4`, and GLUE/MMLU-Pro collapse remains.
 - Longer centers-only QAT is not monotonic: `5000` steps at `3e-4` degraded PPL to `749`.
+- Soft-hard activation STE and an input-gradient scale of `0` were tested as inferred adjustable-gradient variants; both were worse than the hard STE WikiText QAT baseline.
+- `subdim=4` was tested because the official artifact's setting file mentions `vec_len=4`. It halves lookups and the expanded activation-LUT size but gives much worse PPL, so it does not explain the paper gap in this scaffold.
 - Naively unfreezing dense linear weights during QAT did not help; it improved a few small-sample GLUE cells but damaged PPL and MMLU-Pro.
 - The compact final LUT path is currently dominated by local k-means weight VQ error: PPL jumps to about `39,716`.
 - A per-output affine correction reduces the diagnostic final-LUT PPL to about `10,769`, but GLUE/MMLU-Pro accuracy remains near random.
 - The first implemented output-aware weight-code reassignment pass (`--weight-code-reassign-iters 1`) did not help: with 128 calibration vectors per layer it reached PPL about `98,591`, although MMLU-Pro moved from `6.2` to `12.5` on a very small 16-row diagnostic.
+- Least-squares weight-center refinement, both undamped and with `blend=0.1`, overfit or destabilized the compact LUT and reached PPL about `945,282`.
 - Direct local expanded Act-LUT fitting is also insufficient, so simply training lookup-table values layerwise against dense linear outputs does not reproduce the paper's end-to-end QAT.
 
 Next implementation target: replace the current one-pass code reassignment with a closer GPTQ/GPTVQ-style weight quantizer that updates codes and/or centers under a second-order or blockwise reconstruction objective. The one-pass diagnostic shows that simple coordinate reassignment is not enough.
@@ -369,7 +378,7 @@ python3 run_lutllm_qat.py \
   --eval-final-lut
 ```
 
-The `--train-source paper` mode trains activation codebooks on supervised GLUE/SQuAD/MMLU-Pro-style prompt+answer examples instead of WikiText continuation loss. `--output-correction affine` fits a post-hoc per-output affine correction during final LUT conversion; this is not GPTVQ, but it is a useful lightweight approximation for reducing final layer-output error. `--weight-code-reassign-iters 1` enables the experimental output-aware final weight-code reassignment diagnostic.
+The `--train-source paper` mode trains activation codebooks on supervised GLUE/SQuAD/MMLU-Pro-style prompt+answer examples instead of WikiText continuation loss. `--output-correction affine` fits a post-hoc per-output affine correction during final LUT conversion; this is not GPTVQ, but it is a useful lightweight approximation for reducing final layer-output error. `--weight-code-reassign-iters 1` enables the experimental output-aware final weight-code reassignment diagnostic. `--weight-center-refine-iters` enables the LS centroid-refinement diagnostic. `--act-train-mode {hard,soft,soft_hard}` and `--act-ste-input-scale` test inferred activation-STE variants.
 
 Direct activation-LUT fitting with reconstructed final LUT:
 

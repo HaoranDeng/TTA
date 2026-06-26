@@ -69,6 +69,7 @@ Shuffled-calibration hardware scale:
 |---|---:|---:|---:|---:|---:|---:|
 | all196 `Ka=64` | 196 | 33,030,144 | 86,016.0 MiB | 704,643,072 | 1,548,288 | 16,515,072 |
 | all196 `Ka=256` | 196 | 132,120,576 | 344,064.0 MiB | 704,643,072 | 2,064,384 | 66,060,288 |
+| all196 `subdim=4, Ka=64` | 196 | 33,030,144 | 43,008.0 MiB | 352,321,536 | 774,144 | 8,257,536 |
 | all197 `Ka=64`, incl. `lm_head` | 197 | 33,161,216 | 105,008.0 MiB | 860,225,536 | 1,554,432 | 16,580,608 |
 
 Additional all-196 attempts:
@@ -78,14 +79,19 @@ Additional all-196 attempts:
 | `lutllm_base_instruction_all196_wikitext_steqat1000_int8_64_actonly_ppl64` | WikiText STE Act Quant, 1000 steps | 64 | 104.5 | 37.5 | 34.4 | 50.0 | 64.1 | 51.6 | 56.2 | 12.5 |
 | `lutllm_base_instruction_all196_wikitext_steqat3000_lr1e4_int8_64_actonly_ppl64` | WikiText STE Act Quant, 3000 steps, lr=1e-4 | 64 | 101.3 | 40.6 | 34.4 | 46.9 | 62.5 | 50.0 | 50.0 | 10.9 |
 | `lutllm_base_instruction_all196_wikitext_steqat5000_int8_64_actonly_ppl64` | WikiText STE Act Quant, 5000 steps, lr=3e-4 | 64 | 749.3 | 34.4 | 32.8 | 46.9 | 65.6 | 50.0 | 51.6 | 9.4 |
+| `lutllm_base_instruction_all196_wikitext_softhard_steqat1000_temp05_actonly_ppl64` | WikiText soft-hard STE, temp=0.5, 1000 steps | 64 | 467.1 | 31.2 | 32.8 | 46.9 | 67.2 | 50.0 | 56.2 | 10.9 |
+| `lutllm_base_instruction_all196_wikitext_hard_steqat1000_ingrad0_actonly_ppl64` | WikiText hard STE, input-gradient scale=0, 1000 steps | 64 | 499.7 | 34.4 | 32.8 | 48.4 | 65.6 | 50.0 | 51.6 | 14.1 |
+| `lutllm_base_instruction_all196_shufcalib_subdim4_ka64_calib1024_k5_init_actonly_ppl64` | Act Quant, `subdim=4`, `Ka=64`, no QAT | 64 | 3,356.9 | 32.8 | 57.8 | 48.4 | 31.2 | 50.0 | 46.9 | 9.4 |
 | `lutllm_base_instruction_all196_shufcalib_denseqat300_centers3e4_dense1e5_actonly_ppl32` | centers + dense linear QAT, 300 steps | 32 | 472.2 | 40.6 | 75.0 | 53.1 | 68.8 | 65.6 | 78.1 | 3.1 |
 | `lutllm_base_instruction_all196_shufcalib_steqat500_int8_final32_ppl` | Act Quant before final LUT | 32 | 464.3 | 50.0 | 68.8 | 65.6 | 62.5 | 65.6 | 81.2 | 15.6 |
 | same | compact INT8 final LUT with local k-means weight VQ | 32 | 39,716.5 | 31.2 | 40.6 | 28.1 | 59.4 | 56.2 | 37.5 | 3.1 |
 | `lutllm_base_instruction_all196_shufcalib_steqat500_int8_final16_affine_ppl` | compact INT8 final LUT + per-output affine correction | 16 | 10,768.6 | 31.2 | 37.5 | 62.5 | 62.5 | 62.5 | 37.5 | 6.2 |
 | `lutllm_base_instruction_all196_shufcalib_steqat500_int8_final16_reassign1_ppl` | compact INT8 final LUT + output-aware weight-code reassignment, 1 pass | 16 | 98,591.5 | 25.0 | 37.5 | 62.5 | 62.5 | 62.5 | 50.0 | 12.5 |
+| `lutllm_base_instruction_all196_shufcalib_steqat500_int8_final16_centerrefine1_ppl` | compact INT8 final LUT + LS weight-center refinement | 16 | 945,281.6 | 25.0 | 37.5 | 62.5 | 62.5 | 62.5 | 31.2 | 0.0 |
+| `lutllm_base_instruction_all196_shufcalib_steqat500_int8_final16_centerrefine1_blend01_ppl` | compact INT8 final LUT + damped LS center refinement, blend=0.1 | 16 | 945,281.6 | 25.0 | 37.5 | 62.5 | 62.5 | 62.5 | 31.2 | 0.0 |
 | `lutllm_base_instruction_all196_shufcalib_actlutfit50_actonly16_ppl` | direct expanded Act-LUT fit, 50 local steps | 16 | 608.5 | 25.0 | 81.2 | 68.8 | 62.5 | 68.8 | 50.0 | 0.0 |
 
-Interpretation: WikiText loss can reduce PPL versus task-supervised centers-only QAT, but it is still far from FP16 and damages downstream accuracy. Naively training dense linear weights alongside activation centers does not recover accuracy. A per-output affine correction reduces final-LUT PPL relative to the local k-means final run, but accuracy remains near random. The first output-aware weight-code reassignment attempt (`--weight-code-reassign-iters 1`) also does not recover PPL or accuracy. The compact final LUT path is still dominated by missing GPTVQ-style reconstruction-aware weight quantization, not just by scale/bias error.
+Interpretation: WikiText loss can reduce PPL versus task-supervised centers-only QAT, but it is still far from FP16 and damages downstream accuracy. Naively training dense linear weights alongside activation centers does not recover accuracy. The tested soft-hard STE and input-gradient scaling variants do not improve act-only PPL. `subdim=4` halves lookups and expanded LUT size but destroys PPL in this scaffold. A per-output affine correction reduces final-LUT PPL relative to the local k-means final run, but accuracy remains near random. The first output-aware weight-code reassignment and least-squares centroid-refinement attempts also do not recover PPL or accuracy. The compact final LUT path is still dominated by missing GPTVQ-style reconstruction-aware weight quantization, not just by scale/bias error.
 
 The all-196 final LUT run uses compact INT8 LUT storage `2,688.0 MiB`, packed weight codes `336.0 MiB`, and `704,643,072` table lookups per token. Its expanded FP16 activation-LUT intermediate would be `86,016.0 MiB`, which is why direct Act-LUT evaluation is very slow in the PyTorch prototype. Earlier 7-linear runs are now treated only as debugging/profiling runs, not formal reproduction results.
 
@@ -221,6 +227,8 @@ Two extra switches are useful for the scai7 full-layer runs:
 - `--lut-storage compact` stores the base `M * groups * Ka * Kw` LUT instead of the expanded `M * Ka * out_features` LUT. This is slower in PyTorch but avoids huge expanded LUT tensors for 7B experiments.
 - `--output-correction {bias,affine}` fits a simple per-output post-hoc correction on calibration activations. This is not part of the LUT-LLM paper, but it is a useful PTQ diagnostic because it separates scale/bias error from centroid/codebook error.
 - `--weight-code-reassign-iters N` runs an experimental output-reconstruction-aware coordinate reassignment of final weight codes after local k-means weight VQ. This is a diagnostic toward GPTVQ, not a full GPTVQ implementation.
+- `--weight-center-refine-iters N` runs an experimental least-squares update of final weight centroids against calibration-output reconstruction; it currently overfits and is retained as a negative diagnostic.
+- `--act-train-mode {hard,soft,soft_hard}` and `--act-ste-input-scale` test inferred activation-STE variants. The tested soft-hard and input-gradient-scale variants did not improve the all-196 act-only result.
 
 ## Output Files
 
