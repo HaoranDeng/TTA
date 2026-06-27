@@ -74,6 +74,42 @@ Latest all-196 diagnostic gap:
 | `subdim=4, Ka=64` centers-only STE Act Quant, 1000 steps | 46.09 | 87.20 | -41.11 | 7.81 | 31.80 | -23.99 | 19,947.91 |
 | `subdim=2, Ka=128` centers-only STE Act Quant, 1000 steps | 68.75 | 87.20 | -18.45 | 7.81 | 31.80 | -23.99 | 217.62 |
 
+### Simple RTN Weight-Only Baselines
+
+These runs start from the simplest quantization path before adding LUT-LLM-specific activation VQ or final lookup tables. They use `Qwen/Qwen3-1.7B-Base`, instruction prompts, 8-shot GLUE, 0-shot MMLU-Pro, 256 rows/task, SQuAD skipped, and 4096-token WikiText PPL. Every RTN row quantizes all 196 transformer-block target linears matching `q/k/v/o/gate/up/down_proj`; `lm_head` is excluded. The PyTorch module stores dequantized weights and runs dense linears, so this is an accuracy sanity check, not an optimized INT8 kernel benchmark.
+
+Quality:
+
+| Run | Stage | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | GLUE Avg | MMLU-Pro | WikiText PPL |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Paper FP16 | target | 87.6 | 86.5 | 92.9 | 91.2 | 80.9 | 93.7 | 88.80 | 33.10 | - |
+| Paper RTN INT8 | target | 86.7 | 80.2 | 88.0 | 89.3 | 70.4 | 87.4 | 83.67 | 23.60 | - |
+| `rtn_int8_perchannel_qwen3_1p7b_base_instruction_g8_all196_ppl256` | FP16 baseline | 81.6 | 74.2 | 82.8 | 84.4 | 79.7 | 94.5 | 82.88 | 29.69 | 16.45 |
+| same | RTN INT8 per-channel | 83.6 | 76.2 | 81.6 | 84.4 | 78.1 | 94.5 | 83.07 | 30.08 | 16.59 |
+| `rtn_int8_group128_qwen3_1p7b_base_instruction_g8_all196_ppl256` | FP16 baseline | 81.6 | 74.2 | 82.8 | 84.4 | 79.7 | 94.5 | 82.88 | 29.69 | 16.45 |
+| same | RTN INT8 group128 | 82.8 | 75.0 | 82.4 | 84.4 | 80.9 | 94.5 | 83.33 | 28.91 | 16.53 |
+| `rtn_int8_pertensor_qwen3_1p7b_base_instruction_g8_all196_ppl256` | FP16 baseline | 81.6 | 74.2 | 82.8 | 84.4 | 79.7 | 94.5 | 82.88 | 29.69 | 16.45 |
+| same | RTN INT8 per-tensor | 84.0 | 74.6 | 80.1 | 82.0 | 80.1 | 94.1 | 82.49 | 30.08 | 18.06 |
+
+Gap to the paper:
+
+| Stage | GLUE Avg | Paper Target | Gap | Quant Drop vs Same FP16 | MMLU-Pro | Paper Target | Gap | PPL Delta vs Same FP16 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Same-run FP16 | 82.88 | Paper FP16 88.80 | -5.92 | - | 29.69 | Paper FP16 33.10 | -3.41 | - |
+| RTN INT8 per-channel | 83.07 | Paper RTN 83.67 | -0.60 | +0.19 | 30.08 | Paper RTN 23.60 | +6.48 | +0.14 |
+| RTN INT8 group128 | 83.33 | Paper RTN 83.67 | -0.34 | +0.45 | 28.91 | Paper RTN 23.60 | +5.31 | +0.08 |
+| RTN INT8 per-tensor | 82.49 | Paper RTN 83.67 | -1.18 | -0.39 | 30.08 | Paper RTN 23.60 | +6.48 | +1.61 |
+
+Hardware and quantization scale:
+
+| Method | Quantized Linears | Codebook / Levels | Packed Weight Payload | Scale Count | FP16 Scale Storage | LUT Lookups / Token | Dense MAC / Token | Weighted Weight MSE |
+|---|---:|---|---:|---:|---:|---:|---:|---:|
+| RTN INT8 per-channel | 196 | no codebook; 256 integer levels per output-channel scale | 1,344.0 MiB | 573,440 | 1.094 MiB | 0 | 1,409,286,144 | 1.169e-7 |
+| RTN INT8 group128 | 196 | no codebook; 256 integer levels per 128-weight group scale | 1,344.0 MiB | 11,010,048 | 21.000 MiB | 0 | 1,409,286,144 | 5.833e-8 |
+| RTN INT8 per-tensor | 196 | no codebook; 256 integer levels per tensor scale | 1,344.0 MiB | 196 | 0.000374 MiB | 0 | 1,409,286,144 | 2.360e-6 |
+
+Interpretation: these basic RTN runs do not explain the paper's RTN INT8 row. The same public-checkpoint FP16 baseline is still `-5.92` GLUE points below paper FP16, so this is not a faithful Table III reproduction. More importantly, within the same protocol, weight-only INT8 RTN barely changes accuracy: per-channel and group128 slightly improve GLUE within sampling noise, and per-tensor only drops `0.39` GLUE points. The paper's RTN row drops about `5.13` GLUE points and `9.50` MMLU-Pro points from its FP16 baseline, so their RTN is likely not equivalent to this weight-only dense-dequantized RTN. The remaining candidates are activation quantization, a harsher scaling implementation, a different checkpoint/eval protocol, or some combination of these.
+
 Prompt grid, 64 examples/task, SQuAD skipped:
 
 | Run | Model / Prompt | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |

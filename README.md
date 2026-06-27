@@ -85,6 +85,27 @@ Current gap to the paper on the latest all-196 diagnostic:
 | `subdim=4, Ka=64` centers-only STE Act Quant, 1000 steps | 46.09 | 87.20 | -41.11 | 7.81 | 31.80 | -23.99 | 19,947.91 |
 | `subdim=2, Ka=128` centers-only STE Act Quant, 1000 steps | 68.75 | 87.20 | -18.45 | 7.81 | 31.80 | -23.99 | 217.62 |
 
+Simple RTN weight-only sanity check on the same corrected Base+instruction protocol (`Qwen/Qwen3-1.7B-Base`, 256 rows/task, 8-shot GLUE, 0-shot MMLU-Pro, SQuAD skipped, 4096-token WikiText PPL). These rows quantize all 196 transformer-block linears, but they are dense dequantized PyTorch linears, not LUT inference.
+
+| Method | Scope | GLUE Avg | Paper Target | Gap | Quant Drop vs Same FP16 | MMLU-Pro | Paper Target | Gap | WikiText PPL |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Paper FP16 | customized Qwen 3 1.7B | 88.80 | 88.80 | 0.00 | - | 33.10 | 33.10 | 0.00 | - |
+| Same-run FP16 | public Base checkpoint | 82.88 | 88.80 | -5.92 | - | 29.69 | 33.10 | -3.41 | 16.45 |
+| Paper RTN INT8 | paper setup | 83.67 | 83.67 | 0.00 | -5.13 | 23.60 | 23.60 | 0.00 | - |
+| RTN INT8 per-channel | all 196 linears | 83.07 | 83.67 | -0.60 | +0.19 | 30.08 | 23.60 | +6.48 | 16.59 |
+| RTN INT8 group128 | all 196 linears | 83.33 | 83.67 | -0.34 | +0.45 | 28.91 | 23.60 | +5.31 | 16.53 |
+| RTN INT8 per-tensor | all 196 linears | 82.49 | 83.67 | -1.18 | -0.39 | 30.08 | 23.60 | +6.48 | 18.06 |
+
+RTN hardware estimate for Qwen 3 1.7B all-196 target linears:
+
+| Method | Codebook / Levels | Packed Weight Payload | Scale Count | FP16 Scale Storage | LUT Lookups / Token | Dense MAC / Token |
+|---|---|---:|---:|---:|---:|---:|
+| RTN INT8 per-channel | no codebook; 256 integer levels per output-channel scale | 1,344.0 MiB | 573,440 | 1.094 MiB | 0 | 1,409,286,144 |
+| RTN INT8 group128 | no codebook; 256 integer levels per 128-weight group scale | 1,344.0 MiB | 11,010,048 | 21.000 MiB | 0 | 1,409,286,144 |
+| RTN INT8 per-tensor | no codebook; 256 integer levels per tensor scale | 1,344.0 MiB | 196 | 0.000374 MiB | 0 | 1,409,286,144 |
+
+Interpretation: the simplest weight-only RTN path does not reproduce the paper's RTN degradation. On this public-checkpoint protocol, per-channel and group128 RTN are essentially lossless, and even per-tensor RTN only drops GLUE by `0.39` points. The paper RTN row likely includes a harsher or different quantization/evaluation setup, such as activation quantization, a different scale granularity, or the customized checkpoint/protocol mismatch already visible in FP16.
+
 After commit `3708f19`, paper-supervised calibration/training batches are shuffled before selecting calibration batches. This avoids the earlier artifact where the first calibration batches came mostly from MNLI. New all-layer act-quant runs with WikiText PPL:
 
 | Run | Scope | Stage | Samples | WikiText PPL | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
