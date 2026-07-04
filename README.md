@@ -32,13 +32,26 @@ Most recent scai7 reproduction finding:
 
 - The public paper artifact does not expose the exact benchmark harness or the customized checkpoint. The paper text says the FPGA prototype uses a customized Qwen 3 1.7B model and describes continuing training on FineWeb and WikiQA.
 - FP16 is not yet aligned to the paper. The closest public-checkpoint protocol found so far is `Qwen/Qwen3-1.7B-Base` with instruction few-shot prompts, but it remains below the paper FP16 row on GLUE and far below it on this repo's current SQuAD generation protocol.
-- Latest first-step reproduction attempt: `lutllm_base_instruction_g8_all196_paperlike_squad_ka64_steqat1000_actonly_ppl64_chunk1` uses all 196 transformer-block linears, `subdim=2`, `Ka=64`, Chebyshev activation assignment, instruction prompts, 8-shot GLUE, 0-shot MMLU-Pro, 64 rows/task, and SQuAD included. Same-run FP16 is GLUE `83.33`, MMLU-Pro `39.06`, SQuAD F1 `31.86`, WikiText PPL `16.45`. The `+ Act. Quant.` result is GLUE `64.06`, MMLU-Pro `12.50`, SQuAD F1 `25.71`, WikiText PPL `207.19`.
-- Gap to the paper on that first-step run: FP16 is `-5.47` GLUE, `+5.96` MMLU-Pro, and `-40.94` SQuAD F1 versus paper FP16. `+ Act. Quant.` is `-23.14` GLUE, `-19.30` MMLU-Pro, and `-44.59` SQuAD F1 versus the paper `+ Act. Quant.` row.
-- Adding the paper's stated reconstruction-loss idea helps but does not close the gap. `lutllm_base_instruction_g8_all196_paperlike_squad_ka64_recon01_dense_steqat1000_actonly_ppl64_chunk1` trains activation centers plus all target dense linear weights with `reconstruction_loss_ratio=0.1`. It reaches GLUE `71.88`, MMLU-Pro `18.75`, SQuAD F1 `32.74`, WikiText PPL `242.19`, leaving gaps of `-15.33`, `-13.05`, and `-37.56` versus paper `+ Act. Quant.`.
+- Earlier formal first-step attempt: `lutllm_base_instruction_g8_all196_paperlike_squad_ka64_steqat1000_actonly_ppl64_chunk1` uses all 196 transformer-block linears, `subdim=2`, `Ka=64`, Chebyshev activation assignment, instruction prompts, 8-shot GLUE, 0-shot MMLU-Pro, 64 rows/task, and SQuAD included. Same-run FP16 is GLUE `83.33`, MMLU-Pro `39.06`, SQuAD F1 `31.86`, WikiText PPL `16.45`. The `+ Act. Quant.` result is GLUE `64.06`, MMLU-Pro `12.50`, SQuAD F1 `25.71`, WikiText PPL `207.19`.
+- Gap to the paper on that earlier first-step run: FP16 is `-5.47` GLUE, `+5.96` MMLU-Pro, and `-40.94` SQuAD F1 versus paper FP16. `+ Act. Quant.` is `-23.14` GLUE, `-19.30` MMLU-Pro, and `-44.59` SQuAD F1 versus the paper `+ Act. Quant.` row.
+- The first reconstruction-loss attempt helped but did not close the gap. `lutllm_base_instruction_g8_all196_paperlike_squad_ka64_recon01_dense_steqat1000_actonly_ppl64_chunk1` trains activation centers plus all target dense linear weights with `reconstruction_loss_ratio=0.1`. It reaches GLUE `71.88`, MMLU-Pro `18.75`, SQuAD F1 `32.74`, WikiText PPL `242.19`, leaving gaps of `-15.33`, `-13.05`, and `-37.56` versus paper `+ Act. Quant.`.
 - The FineWeb/WikiQA pilot `lutllm_base_instruction_g8_all196_lutllmpaperdata_ka64_recon01_dense_steqat1000_actonly_ppl64_chunk1` improves PPL relative to the task-supervised reconstruction run (`109.93` vs `242.19`) but hurts downstream quality: GLUE `54.43`, MMLU-Pro `12.50`, SQuAD F1 `3.37`. A small 1000-step approximation of the paper's training data is therefore not enough.
 - A 1000-step centers-only STE-QAT run on the same all-196 scope improves Act Quant GLUE to `70.96`, but this is still `-16.24` below the paper `+ Act. Quant.` row. MMLU-Pro is `7.81`, still `-23.99` below paper.
 - New meaningful quantization runs still quantize all 196 transformer-block linear layers, but until the FP16 baseline is closer, their accuracy should be treated as diagnostic rather than a paper reproduction.
-- Code update after this run: `run_lutllm_qat.py` now supports `--reconstruction-loss-ratio` and a `lutllm_paper` train source that approximates the paper's FineWeb 512-token pretrain plus WikiQA finetune data mix.
+- Code update after this run: `run_lutllm_qat.py` now supports `--reconstruction-loss-ratio` and a `lutllm_paper` train source that approximates the paper's FineWeb 512-token pretrain plus WikiQA finetune data mix. `pq_lut_lm/paper_eval.py` also fixes supervised prompt truncation so long SQuAD/WikiQA prompts preserve completion labels instead of masking nearly the whole answer.
+
+July 4 continued first-step reproduction attempts, all with all 196 transformer-block linears quantized:
+
+| Run | Stage | GLUE Avg | Gap vs Paper Act GLUE | MMLU-Pro | Gap vs Paper Act MMLU | SQuADv2 F1 | Gap vs Paper Act SQuAD | WikiText PPL |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| Paper `+ Act. Quant.` target | target | 87.20 | 0.00 | 31.80 | 0.00 | 70.30 | 0.00 | - |
+| `lutllm_base_instruction_g8_all196_fixedlabels_seq512_ka64_recon01_dense1e7_steqat2000_actonly_squad64_ppl64` | fixed-label, `Ka=64`, recon 0.1 + dense LR `1e-7`, 2000 steps | 76.56 | -10.64 | 9.38 | -22.43 | 35.52 | -34.78 | 92.80 |
+| `lutllm_base_instruction_g8_all196_ka64_calib8192_k10_recon01_centersonly_steqat2000_actonly_squad64_ppl64_fixedlabels` | fixed-label, 8192 calib vectors/layer, KMeans 10, centers-only | 73.70 | -13.50 | 10.94 | -20.86 | 32.75 | -37.55 | 144.20 |
+| `lutllm_base_instruction_g8_all196_ka256_recon01_dense_steqat1000_actonly_squad64_ppl64` | `Ka=256`, recon 0.1 + dense LR `1e-6`, 1000 steps | 71.09 | -16.11 | 23.44 | -8.36 | 33.18 | -37.12 | 107.73 |
+| `lutllm_base_instruction_g8_all196_fixedlabels_ka64_calib8192_k10_recon1_centersonly_lr3e5_steqat2000_actonly_squad64_ppl64` | fixed-label, recon 1.0, centers-only LR `3e-5` | 68.49 | -18.71 | 7.81 | -23.99 | 33.90 | -36.40 | 157.09 |
+| `lutllm_base_instruction_g8_all196_cheb_softhard_t05_recon01_dense_steqat1000_actonly_squad64_ppl64_retry` | soft-hard STE temp 0.5, recon 0.1 + dense | 64.84 | -22.36 | 12.50 | -19.30 | 37.80 | -32.50 | 297.71 |
+
+Current best first-step rows are split by metric, not solved: fixed-label `Ka=64` dense gives the best GLUE/PPL so far, soft-hard gives the best SQuAD F1, and `Ka=256` gives the best MMLU-Pro. None is close to the paper's first-stage row yet.
 
 Current FP16 baseline-alignment gap:
 

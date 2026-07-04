@@ -4,3 +4,7 @@ __pycache__/
 .cache/
 results/*/run.log
 results/*/pid
+results/*/watcher.log
+results/*/watcher.pid
+results/*/checkpoint_final/
+results/*/checkpoint_step*/

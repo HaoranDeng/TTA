@@ -50,6 +50,7 @@ Current implementation additions for the first-stage reproduction:
 - `SCORE_COMPLETION_BATCH_SIZE=1` allows memory-safe GLUE/MMLU-Pro completion scoring for activation-VQ models.
 - `--reconstruction-loss-ratio` adds a dense-output reconstruction MSE term during STE QAT. This approximates the paper's stated reconstruction-loss ratio `0.1`.
 - `--train-source lutllm_paper` approximates the paper's FineWeb 512-token pretrain plus WikiQA finetune data mix.
+- Supervised prompt/completion encoding now preserves completion labels under left truncation. This matters for long SQuAD/WikiQA prompts: the old path could mask nearly all answer tokens after truncation, weakening task-adaptation and QAT supervision.
 
 ## scai7 Runs
 
@@ -78,6 +79,10 @@ Latest all-196 diagnostic gap:
 
 | Stage | GLUE Avg | Paper Target | Gap | MMLU-Pro | Paper Target | Gap | WikiText PPL |
 |---|---:|---:|---:|---:|---:|---:|---:|
+| Fixed-label `Ka=64`, seq512, reconstruction 0.1 + dense LR `1e-7`, 2000 steps | 76.56 | 87.20 | -10.64 | 9.38 | 31.80 | -22.43 | 92.80 |
+| Fixed-label `Ka=64`, 8192 calib vectors/layer, KMeans 10, centers-only, 2000 steps | 73.70 | 87.20 | -13.50 | 10.94 | 31.80 | -20.86 | 144.20 |
+| `Ka=256`, reconstruction 0.1 + dense weights, 1000 steps | 71.09 | 87.20 | -16.11 | 23.44 | 31.80 | -8.36 | 107.73 |
+| Fixed-label `Ka=64`, reconstruction 1.0, centers-only LR `3e-5`, 2000 steps | 68.49 | 87.20 | -18.71 | 7.81 | 31.80 | -23.99 | 157.09 |
 | Paper-like first-step FP16, SQuAD included | 83.33 | 88.80 | -5.47 | 39.06 | 33.10 | +5.96 | 16.45 |
 | Paper-like centers-only STE Act Quant, SQuAD included | 64.06 | 87.20 | -23.14 | 12.50 | 31.80 | -19.30 | 207.19 |
 | Paper-like reconstruction 0.1 + dense-weight STE Act Quant, SQuAD included | 71.88 | 87.20 | -15.33 | 18.75 | 31.80 | -13.05 | 242.19 |
@@ -87,6 +92,19 @@ Latest all-196 diagnostic gap:
 | centers-only STE Act Quant, 1000 steps | 70.96 | 87.20 | -16.24 | 7.81 | 31.80 | -23.99 | 335.62 |
 | `subdim=4, Ka=64` centers-only STE Act Quant, 1000 steps | 46.09 | 87.20 | -41.11 | 7.81 | 31.80 | -23.99 | 19,947.91 |
 | `subdim=2, Ka=128` centers-only STE Act Quant, 1000 steps | 68.75 | 87.20 | -18.45 | 7.81 | 31.80 | -23.99 | 217.62 |
+
+July 4 continuation summary, including SQuAD gaps to the paper's first-stage target:
+
+| Run | Stage | GLUE Avg | Gap vs Paper Act GLUE | MMLU-Pro | Gap vs Paper Act MMLU | SQuADv2 F1 | Gap vs Paper Act SQuAD | WikiText PPL |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| Paper `+ Act. Quant.` target | target | 87.20 | 0.00 | 31.80 | 0.00 | 70.30 | 0.00 | - |
+| `lutllm_base_instruction_g8_all196_fixedlabels_seq512_ka64_recon01_dense1e7_steqat2000_actonly_squad64_ppl64` | fixed-label, `Ka=64`, recon 0.1 + dense LR `1e-7`, 2000 steps | 76.56 | -10.64 | 9.38 | -22.43 | 35.52 | -34.78 | 92.80 |
+| `lutllm_base_instruction_g8_all196_ka64_calib8192_k10_recon01_centersonly_steqat2000_actonly_squad64_ppl64_fixedlabels` | fixed-label, 8192 calib vectors/layer, KMeans 10, centers-only | 73.70 | -13.50 | 10.94 | -20.86 | 32.75 | -37.55 | 144.20 |
+| `lutllm_base_instruction_g8_all196_ka256_recon01_dense_steqat1000_actonly_squad64_ppl64` | `Ka=256`, recon 0.1 + dense LR `1e-6`, 1000 steps | 71.09 | -16.11 | 23.44 | -8.36 | 33.18 | -37.12 | 107.73 |
+| `lutllm_base_instruction_g8_all196_fixedlabels_ka64_calib8192_k10_recon1_centersonly_lr3e5_steqat2000_actonly_squad64_ppl64` | fixed-label, recon 1.0, centers-only LR `3e-5` | 68.49 | -18.71 | 7.81 | -23.99 | 33.90 | -36.40 | 157.09 |
+| `lutllm_base_instruction_g8_all196_cheb_softhard_t05_recon01_dense_steqat1000_actonly_squad64_ppl64_retry` | soft-hard STE temp 0.5, recon 0.1 + dense | 64.84 | -22.36 | 12.50 | -19.30 | 37.80 | -32.50 | 297.71 |
+
+Interpretation: the fixed-label truncation repair and longer `Ka=64` dense QAT improve GLUE to `76.56`, the best all-196 first-step result so far, but MMLU-Pro collapses. Increasing the codebook to `Ka=256` improves MMLU-Pro to `23.44` and PPL to `107.73`, but still leaves GLUE and SQuAD far below the paper. The result is still not a reproduction of Table III; it is a constrained reverse-engineering attempt around missing QAT/evaluation details.
 
 ### Latest First-Step Act. Quant. Attempt
 

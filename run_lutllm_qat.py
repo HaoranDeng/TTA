@@ -139,7 +139,7 @@ def make_lutllm_paper_train_batches(
     prompt_style: str,
 ) -> list[dict[str, torch.Tensor]]:
     """Approximate the paper's FineWeb pretrain + WikiQA finetune data mix."""
-    from pq_lut_lm.paper_eval import format_completion_for_style, format_prompt_for_style
+    from pq_lut_lm.paper_eval import encode_prompt_completion
 
     pad_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
     eos_id = tokenizer.eos_token_id if tokenizer.eos_token_id is not None else pad_id
@@ -166,19 +166,9 @@ def make_lutllm_paper_train_batches(
     for row in islice(positives, max(0, wikiqa_samples)):
         prompt = f"Answer the question.\nQuestion: {row['question']}\nAnswer:"
         completion = " " + str(row["answer"]).strip()
-        prompt = format_prompt_for_style(tokenizer, prompt, prompt_style)
-        completion = format_completion_for_style(completion, prompt_style)
-        prompt_ids = tokenizer(prompt, return_tensors="pt", add_special_tokens=False).input_ids[0]
-        full_ids = tokenizer(prompt + completion, return_tensors="pt", add_special_tokens=False).input_ids[0]
-        if full_ids.numel() > max_length:
-            full_ids = full_ids[-max_length:]
-            prompt_len = min(prompt_ids.numel(), full_ids.numel() - 1)
-        else:
-            prompt_len = prompt_ids.numel()
-        labels = full_ids.clone()
-        labels[:prompt_len] = -100
-        if (labels != -100).any():
-            rows.append((full_ids, labels))
+        item = encode_prompt_completion(tokenizer, prompt, completion, max_length, prompt_style)
+        if item is not None:
+            rows.append(item)
 
     batches = []
     current: list[tuple[torch.Tensor, torch.Tensor]] = []

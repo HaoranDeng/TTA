@@ -496,6 +496,36 @@ def make_squad_supervised_examples(max_samples: int, prompt_template: str = "sim
     return examples
 
 
+def encode_prompt_completion(
+    tokenizer: Any,
+    prompt: str,
+    completion: str,
+    max_length: int,
+    prompt_style: str = "plain",
+) -> tuple[torch.Tensor, torch.Tensor] | None:
+    """Encode supervised text while preserving completion labels under truncation."""
+    prompt = format_prompt_for_style(tokenizer, prompt, prompt_style)
+    completion = format_completion_for_style(completion, prompt_style)
+    prompt_ids = tokenizer(prompt, return_tensors="pt", add_special_tokens=False).input_ids[0]
+    completion_ids = tokenizer(completion, return_tensors="pt", add_special_tokens=False).input_ids[0]
+    if completion_ids.numel() == 0:
+        return None
+    if completion_ids.numel() >= max_length:
+        full_ids = completion_ids[-max_length:]
+        prompt_len = 0
+    else:
+        max_prompt_len = max_length - completion_ids.numel()
+        if prompt_ids.numel() > max_prompt_len:
+            prompt_ids = prompt_ids[-max_prompt_len:]
+        full_ids = torch.cat([prompt_ids, completion_ids], dim=0)
+        prompt_len = prompt_ids.numel()
+    labels = full_ids.clone()
+    labels[:prompt_len] = -100
+    if not (labels != -100).any():
+        return None
+    return full_ids, labels
+
+
 def make_paper_supervised_batches(
     tokenizer: Any,
     max_samples_per_task: int,
@@ -518,19 +548,9 @@ def make_paper_supervised_batches(
     pad_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
     encoded = []
     for prompt, completion in examples:
-        prompt = format_prompt_for_style(tokenizer, prompt, prompt_style)
-        completion = format_completion_for_style(completion, prompt_style)
-        prompt_ids = tokenizer(prompt, return_tensors="pt", add_special_tokens=False).input_ids[0]
-        full_ids = tokenizer(prompt + completion, return_tensors="pt", add_special_tokens=False).input_ids[0]
-        if full_ids.numel() > max_length:
-            full_ids = full_ids[-max_length:]
-            prompt_len = min(prompt_ids.numel(), full_ids.numel() - 1)
-        else:
-            prompt_len = prompt_ids.numel()
-        labels = full_ids.clone()
-        labels[:prompt_len] = -100
-        if (labels != -100).any():
-            encoded.append((full_ids, labels))
+        item = encode_prompt_completion(tokenizer, prompt, completion, max_length, prompt_style)
+        if item is not None:
+            encoded.append(item)
 
     batches = []
     rows: list[tuple[torch.Tensor, torch.Tensor]] = []
