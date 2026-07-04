@@ -50,6 +50,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--train-dense-linears", action="store_true")
     parser.add_argument("--dense-lr", type=float, default=1e-5)
+    parser.add_argument("--task-loss-ratio", type=float, default=1.0)
     parser.add_argument("--reconstruction-loss-ratio", type=float, default=0.0)
     parser.add_argument("--paper-samples", type=int, default=16)
     parser.add_argument("--eval-ppl", action="store_true")
@@ -364,7 +365,7 @@ def main() -> None:
         out = model(**model_inputs, labels=labels)
         task_loss = out.loss
         recon_loss = ste_reconstruction_loss(model) if use_reconstruction_loss else None
-        loss = task_loss
+        loss = args.task_loss_ratio * task_loss
         if recon_loss is not None:
             loss = loss + args.reconstruction_loss_ratio * recon_loss
         loss.backward()
@@ -388,6 +389,7 @@ def main() -> None:
         "losses": train_losses,
         "task_losses": task_losses,
         "reconstruction_losses": reconstruction_losses,
+        "task_loss_ratio": args.task_loss_ratio,
         "reconstruction_loss_ratio": args.reconstruction_loss_ratio,
         "train_dense_linears": args.train_dense_linears,
         "center_param_count": center_param_count,
