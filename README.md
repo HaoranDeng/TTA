@@ -31,16 +31,21 @@ Paper Table III reference for Qwen 3 1.7B:
 Most recent scai7 reproduction finding:
 
 - The public paper artifact does not expose the exact benchmark harness or the customized checkpoint. The paper text says the FPGA prototype uses a customized Qwen 3 1.7B model and describes continuing training on FineWeb and WikiQA.
-- FP16 is not yet aligned to the paper. The closest public-checkpoint protocol found so far is `Qwen/Qwen3-1.7B-Base` with instruction few-shot prompts, but it is still `-6.45` GLUE points below the paper FP16 row on a 512-example sweep.
-- The latest all-196-linear run on the closest protocol (`instruction`, 8-shot GLUE, 256 rows/task) gives FP16 GLUE `82.88`, which is still `-5.92` below paper FP16. Its no-QAT activation-quantized result gives GLUE `61.07`, which is `-26.13` below the paper `+ Act. Quant.` row.
+- FP16 is not yet aligned to the paper. The closest public-checkpoint protocol found so far is `Qwen/Qwen3-1.7B-Base` with instruction few-shot prompts, but it remains below the paper FP16 row on GLUE and far below it on this repo's current SQuAD generation protocol.
+- Latest first-step reproduction attempt: `lutllm_base_instruction_g8_all196_paperlike_squad_ka64_steqat1000_actonly_ppl64_chunk1` uses all 196 transformer-block linears, `subdim=2`, `Ka=64`, Chebyshev activation assignment, instruction prompts, 8-shot GLUE, 0-shot MMLU-Pro, 64 rows/task, and SQuAD included. Same-run FP16 is GLUE `83.33`, MMLU-Pro `39.06`, SQuAD F1 `31.86`, WikiText PPL `16.45`. The `+ Act. Quant.` result is GLUE `64.06`, MMLU-Pro `12.50`, SQuAD F1 `25.71`, WikiText PPL `207.19`.
+- Gap to the paper on that first-step run: FP16 is `-5.47` GLUE, `+5.96` MMLU-Pro, and `-40.94` SQuAD F1 versus paper FP16. `+ Act. Quant.` is `-23.14` GLUE, `-19.30` MMLU-Pro, and `-44.59` SQuAD F1 versus the paper `+ Act. Quant.` row.
+- Adding the paper's stated reconstruction-loss idea helps but does not close the gap. `lutllm_base_instruction_g8_all196_paperlike_squad_ka64_recon01_dense_steqat1000_actonly_ppl64_chunk1` trains activation centers plus all target dense linear weights with `reconstruction_loss_ratio=0.1`. It reaches GLUE `71.88`, MMLU-Pro `18.75`, SQuAD F1 `32.74`, WikiText PPL `242.19`, leaving gaps of `-15.33`, `-13.05`, and `-37.56` versus paper `+ Act. Quant.`.
+- The FineWeb/WikiQA pilot `lutllm_base_instruction_g8_all196_lutllmpaperdata_ka64_recon01_dense_steqat1000_actonly_ppl64_chunk1` improves PPL relative to the task-supervised reconstruction run (`109.93` vs `242.19`) but hurts downstream quality: GLUE `54.43`, MMLU-Pro `12.50`, SQuAD F1 `3.37`. A small 1000-step approximation of the paper's training data is therefore not enough.
 - A 1000-step centers-only STE-QAT run on the same all-196 scope improves Act Quant GLUE to `70.96`, but this is still `-16.24` below the paper `+ Act. Quant.` row. MMLU-Pro is `7.81`, still `-23.99` below paper.
 - New meaningful quantization runs still quantize all 196 transformer-block linear layers, but until the FP16 baseline is closer, their accuracy should be treated as diagnostic rather than a paper reproduction.
+- Code update after this run: `run_lutllm_qat.py` now supports `--reconstruction-loss-ratio` and a `lutllm_paper` train source that approximates the paper's FineWeb 512-token pretrain plus WikiQA finetune data mix.
 
 Current FP16 baseline-alignment gap:
 
 | Run | Protocol | Samples | GLUE Avg | Gap vs Paper FP16 GLUE | MMLU-Pro | Gap vs Paper FP16 MMLU |
 |---|---|---:|---:|---:|---:|---:|
 | Paper FP16 | customized Qwen 3 1.7B | full paper eval | 88.80 | 0.00 | 33.10 | 0.00 |
+| `lutllm_base_instruction_g8_all196_paperlike_squad_ka64_steqat1000_actonly_ppl64_chunk1` FP16 | internal instruction 8-shot GLUE, 0-shot MMLU, SQuAD included | 64/task | 83.33 | -5.47 | 39.06 | +5.96 |
 | `lutllm_base_instruction_g8_all196_shufcalib_ka64_calib1024_k5_init_actonly_ppl256` FP16 | internal instruction 8-shot GLUE, 0-shot MMLU | 256/task | 82.88 | -5.92 | 29.69 | -3.41 |
 | `lutllm_base_instruction_g8_all196_shufcalib_steqat1000_int8_actonly_ppl128` FP16 | internal instruction 8-shot GLUE, 0-shot MMLU | 128/task | 83.07 | -5.73 | 33.59 | +0.49 |
 | `baseline_prompt_grid_qwen3_1p7b_base_512_more_shots/instruction_g8_m0_plain` | internal instruction 8-shot GLUE, 0-shot MMLU | 512/task | 82.35 | -6.45 | 28.52 | -4.58 |
@@ -62,6 +67,10 @@ Formal all-196-linear LUT-LLM reproduction attempts on the corrected Base+instru
 
 | Run | Stage | Samples | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `lutllm_base_instruction_g8_all196_paperlike_squad_ka64_steqat1000_actonly_ppl64_chunk1` | FP16 baseline, SQuAD included | 64 | 84.4 | 73.4 | 81.2 | 87.5 | 76.6 | 96.9 | 39.1 |
+| same | centers-only STE Act Quant, 1000 steps, SQuAD included | 64 | 57.8 | 71.9 | 60.9 | 51.6 | 53.1 | 89.1 | 12.5 |
+| `lutllm_base_instruction_g8_all196_paperlike_squad_ka64_recon01_dense_steqat1000_actonly_ppl64_chunk1` | reconstruction 0.1 + dense-weight STE Act Quant, SQuAD included | 64 | 54.7 | 75.0 | 70.3 | 68.8 | 75.0 | 87.5 | 18.8 |
+| `lutllm_base_instruction_g8_all196_lutllmpaperdata_ka64_recon01_dense_steqat1000_actonly_ppl64_chunk1` | FineWeb/WikiQA + reconstruction 0.1 + dense-weight STE Act Quant | 64 | 32.8 | 67.2 | 57.8 | 34.4 | 50.0 | 84.4 | 12.5 |
 | `lutllm_base_instruction_g8_all196_shufcalib_ka64_calib1024_k5_init_actonly_ppl256` | FP16 baseline | 256 | 81.6 | 74.2 | 82.8 | 84.4 | 79.7 | 94.5 | 29.7 |
 | same | Act Quant, `Ka=64`, no QAT | 256 | 50.4 | 70.3 | 60.5 | 68.4 | 62.9 | 53.9 | 6.2 |
 | `lutllm_base_instruction_g8_all196_shufcalib_steqat1000_int8_actonly_ppl128` | FP16 baseline | 128 | 81.2 | 75.0 | 82.0 | 87.5 | 79.7 | 93.0 | 33.6 |
@@ -79,6 +88,10 @@ Current gap to the paper on the latest all-196 diagnostic:
 
 | Stage | GLUE Avg | Paper Target | Gap | MMLU-Pro | Paper Target | Gap | WikiText PPL |
 |---|---:|---:|---:|---:|---:|---:|---:|
+| Paper-like first-step FP16, SQuAD included | 83.33 | 88.80 | -5.47 | 39.06 | 33.10 | +5.96 | 16.45 |
+| Paper-like centers-only STE Act Quant, SQuAD included | 64.06 | 87.20 | -23.14 | 12.50 | 31.80 | -19.30 | 207.19 |
+| Paper-like reconstruction 0.1 + dense-weight STE Act Quant, SQuAD included | 71.88 | 87.20 | -15.33 | 18.75 | 31.80 | -13.05 | 242.19 |
+| FineWeb/WikiQA reconstruction 0.1 + dense-weight STE Act Quant | 54.43 | 87.20 | -32.77 | 12.50 | 31.80 | -19.30 | 109.93 |
 | FP16 baseline | 82.88 | 88.80 | -5.92 | 29.69 | 33.10 | -3.41 | 16.45 |
 | Act Quant, `Ka=64`, no QAT | 61.07 | 87.20 | -26.13 | 6.25 | 31.80 | -25.55 | 332.60 |
 | centers-only STE Act Quant, 1000 steps | 70.96 | 87.20 | -16.24 | 7.81 | 31.80 | -23.99 | 335.62 |

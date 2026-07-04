@@ -6,16 +6,20 @@ import json
 import os
 import random
 import time
+from itertools import islice
 from pathlib import Path
 from typing import Any
 
 import torch
+from datasets import load_dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from pq_lut_lm.activation_quant import (
     STEActivationQuantLinear,
     convert_ste_act_quant_to_lut,
     replace_with_ste_act_quant,
+    set_ste_reconstruction_loss_enabled,
+    ste_reconstruction_loss,
     trainable_act_center_parameters,
 )
 from pq_lut_lm.eval_utils import load_wikitext_texts, make_lm_batches
@@ -33,9 +37,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dtype", choices=["float16", "bfloat16", "float32"], default="bfloat16")
     parser.add_argument("--trust-remote-code", action="store_true")
     parser.add_argument("--seq-len", type=int, default=64)
-    parser.add_argument("--train-source", choices=["wikitext", "paper"], default="wikitext")
+    parser.add_argument("--train-source", choices=["wikitext", "paper", "lutllm_paper"], default="wikitext")
     parser.add_argument("--train-tokens", type=int, default=8192)
     parser.add_argument("--task-train-samples", type=int, default=32)
+    parser.add_argument("--fineweb-config", default="sample-10BT")
+    parser.add_argument("--fineweb-sequences", type=int, default=256)
+    parser.add_argument("--wikiqa-samples", type=int, default=512)
     parser.add_argument("--calib-tokens", type=int, default=1024)
     parser.add_argument("--calib-batches", type=int, default=4)
     parser.add_argument("--calib-vectors-per-layer", type=int, default=256)
@@ -43,6 +50,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--train-dense-linears", action="store_true")
     parser.add_argument("--dense-lr", type=float, default=1e-5)
+    parser.add_argument("--reconstruction-loss-ratio", type=float, default=0.0)
     parser.add_argument("--paper-samples", type=int, default=16)
     parser.add_argument("--eval-ppl", action="store_true")
     parser.add_argument("--ppl-tokens", type=int, default=4096)
@@ -52,6 +60,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--glue-shot-count", type=int, default=0)
     parser.add_argument("--mmlu-shot-count", type=int, default=0)
     parser.add_argument("--skip-squad", action="store_true")
+    parser.add_argument("--train-include-squad", action="store_true")
     parser.add_argument("--target-regex", default=DEFAULT_TARGET_REGEX)
     parser.add_argument("--include-lm-head", action="store_true")
     parser.add_argument("--max-linears", type=int, default=None)
@@ -105,6 +114,84 @@ def shuffled_batches(batches: list[dict[str, torch.Tensor]], seed: int) -> list[
     return out
 
 
+def collate_supervised_rows(
+    rows: list[tuple[torch.Tensor, torch.Tensor]],
+    pad_id: int,
+) -> dict[str, torch.Tensor]:
+    max_len = max(ids.numel() for ids, _ in rows)
+    input_ids = torch.full((len(rows), max_len), pad_id, dtype=torch.long)
+    labels = torch.full((len(rows), max_len), -100, dtype=torch.long)
+    attention_mask = torch.zeros_like(input_ids)
+    for row, (ids, row_labels) in enumerate(rows):
+        input_ids[row, : ids.numel()] = ids
+        labels[row, : row_labels.numel()] = row_labels
+        attention_mask[row, : ids.numel()] = 1
+    return {"input_ids": input_ids, "attention_mask": attention_mask, "labels": labels}
+
+
+def make_lutllm_paper_train_batches(
+    tokenizer: Any,
+    max_length: int,
+    batch_size: int,
+    fineweb_config: str,
+    fineweb_sequences: int,
+    wikiqa_samples: int,
+    prompt_style: str,
+) -> list[dict[str, torch.Tensor]]:
+    """Approximate the paper's FineWeb pretrain + WikiQA finetune data mix."""
+    from pq_lut_lm.paper_eval import format_completion_for_style, format_prompt_for_style
+
+    pad_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
+    eos_id = tokenizer.eos_token_id if tokenizer.eos_token_id is not None else pad_id
+    rows: list[tuple[torch.Tensor, torch.Tensor]] = []
+
+    fineweb = load_dataset("HuggingFaceFW/fineweb", fineweb_config, split="train", streaming=True)
+    token_buffer: list[int] = []
+    for record in fineweb:
+        text = str(record.get("text", "")).strip()
+        if not text:
+            continue
+        token_buffer.extend(tokenizer(text, add_special_tokens=False).input_ids)
+        token_buffer.append(int(eos_id))
+        while len(token_buffer) >= max_length and len(rows) < fineweb_sequences:
+            ids = torch.tensor(token_buffer[:max_length], dtype=torch.long)
+            labels = ids.clone()
+            rows.append((ids, labels))
+            token_buffer = token_buffer[max_length:]
+        if len(rows) >= fineweb_sequences:
+            break
+
+    wikiqa = load_dataset("wiki_qa", split="train")
+    positives = (row for row in wikiqa if int(row.get("label", 0)) == 1)
+    for row in islice(positives, max(0, wikiqa_samples)):
+        prompt = f"Answer the question.\nQuestion: {row['question']}\nAnswer:"
+        completion = " " + str(row["answer"]).strip()
+        prompt = format_prompt_for_style(tokenizer, prompt, prompt_style)
+        completion = format_completion_for_style(completion, prompt_style)
+        prompt_ids = tokenizer(prompt, return_tensors="pt", add_special_tokens=False).input_ids[0]
+        full_ids = tokenizer(prompt + completion, return_tensors="pt", add_special_tokens=False).input_ids[0]
+        if full_ids.numel() > max_length:
+            full_ids = full_ids[-max_length:]
+            prompt_len = min(prompt_ids.numel(), full_ids.numel() - 1)
+        else:
+            prompt_len = prompt_ids.numel()
+        labels = full_ids.clone()
+        labels[:prompt_len] = -100
+        if (labels != -100).any():
+            rows.append((full_ids, labels))
+
+    batches = []
+    current: list[tuple[torch.Tensor, torch.Tensor]] = []
+    for row in rows:
+        current.append(row)
+        if len(current) == batch_size:
+            batches.append(collate_supervised_rows(current, int(pad_id)))
+            current = []
+    if current:
+        batches.append(collate_supervised_rows(current, int(pad_id)))
+    return batches
+
+
 def dense_linear_parameters_under_ste(model: torch.nn.Module) -> list[torch.nn.Parameter]:
     params: list[torch.nn.Parameter] = []
     for module in model.modules():
@@ -144,15 +231,28 @@ def main() -> None:
     load_seconds = time.perf_counter() - load_start
 
     texts = load_wikitext_texts("train")
+    train_include_squad = args.train_include_squad or not args.skip_squad
     if args.train_source == "paper":
         train_batches = make_paper_supervised_batches(
             tokenizer,
             max_samples_per_task=args.task_train_samples,
             batch_size=1,
             max_length=args.seq_len,
-            include_squad=not args.skip_squad,
+            include_squad=train_include_squad,
             prompt_style=args.prompt_style,
             prompt_template=args.prompt_template,
+        )
+        train_batches = shuffled_batches(train_batches, args.seed)
+        calib_batches = strip_labels(train_batches[: args.calib_batches])
+    elif args.train_source == "lutllm_paper":
+        train_batches = make_lutllm_paper_train_batches(
+            tokenizer,
+            max_length=args.seq_len,
+            batch_size=1,
+            fineweb_config=args.fineweb_config,
+            fineweb_sequences=args.fineweb_sequences,
+            wikiqa_samples=args.wikiqa_samples,
+            prompt_style=args.prompt_style,
         )
         train_batches = shuffled_batches(train_batches, args.seed)
         calib_batches = strip_labels(train_batches[: args.calib_batches])
@@ -257,6 +357,10 @@ def main() -> None:
         param_groups.append({"params": dense_params, "lr": args.dense_lr})
     opt = torch.optim.AdamW(param_groups)
     train_losses = []
+    task_losses = []
+    reconstruction_losses = []
+    use_reconstruction_loss = args.reconstruction_loss_ratio > 0.0
+    set_ste_reconstruction_loss_enabled(model, use_reconstruction_loss)
     if device.type == "cuda":
         torch.cuda.synchronize(device)
     train_start = time.perf_counter()
@@ -268,18 +372,33 @@ def main() -> None:
         opt.zero_grad(set_to_none=True)
         model_inputs = {k: v for k, v in batch.items() if k != "labels"}
         out = model(**model_inputs, labels=labels)
-        loss = out.loss
+        task_loss = out.loss
+        recon_loss = ste_reconstruction_loss(model) if use_reconstruction_loss else None
+        loss = task_loss
+        if recon_loss is not None:
+            loss = loss + args.reconstruction_loss_ratio * recon_loss
         loss.backward()
         opt.step()
         value = float(loss.detach().cpu().item())
+        task_value = float(task_loss.detach().cpu().item())
+        recon_value = float(recon_loss.detach().cpu().item()) if recon_loss is not None else 0.0
         train_losses.append(value)
-        print(f"step {step + 1}/{args.train_steps} loss={value:.4f}", flush=True)
+        task_losses.append(task_value)
+        reconstruction_losses.append(recon_value)
+        print(
+            f"step {step + 1}/{args.train_steps} loss={value:.4f} "
+            f"task={task_value:.4f} recon={recon_value:.4f}",
+            flush=True,
+        )
     if device.type == "cuda":
         torch.cuda.synchronize(device)
     summary["act_qat_training"] = {
         "steps": args.train_steps,
         "seconds": time.perf_counter() - train_start,
         "losses": train_losses,
+        "task_losses": task_losses,
+        "reconstruction_losses": reconstruction_losses,
+        "reconstruction_loss_ratio": args.reconstruction_loss_ratio,
         "train_dense_linears": args.train_dense_linears,
         "center_param_count": center_param_count,
         "dense_linear_param_count": dense_param_count,

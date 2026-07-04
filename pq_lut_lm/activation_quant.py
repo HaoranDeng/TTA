@@ -37,6 +37,8 @@ class STEActivationQuantLinear(nn.Module):
         self.in_features = linear.in_features
         self.out_features = linear.out_features
         self.act_centers = nn.Parameter(act_centers.detach().clone().float())
+        self.reconstruction_loss_enabled = False
+        self.last_reconstruction_loss: torch.Tensor | None = None
 
     def quantize_activation(self, x: torch.Tensor) -> torch.Tensor:
         shape = x.shape
@@ -70,7 +72,17 @@ class STEActivationQuantLinear(nn.Module):
         return ste.reshape(shape)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.linear(self.quantize_activation(x).to(dtype=x.dtype))
+        self.last_reconstruction_loss = None
+        quantized = self.quantize_activation(x).to(dtype=x.dtype)
+        quantized_out = self.linear(quantized)
+        if self.training and self.reconstruction_loss_enabled:
+            with torch.no_grad():
+                dense_out = self.linear(x)
+            self.last_reconstruction_loss = torch.nn.functional.mse_loss(
+                quantized_out.float(),
+                dense_out.float(),
+            )
+        return quantized_out
 
     def hardware_stats(self) -> dict[str, Any]:
         m = self.in_features // self.config.subdim
@@ -446,6 +458,24 @@ def replace_with_fitted_activation_lut(
 
 def trainable_act_center_parameters(model: nn.Module) -> list[nn.Parameter]:
     return [m.act_centers for m in model.modules() if isinstance(m, STEActivationQuantLinear)]
+
+
+def set_ste_reconstruction_loss_enabled(model: nn.Module, enabled: bool) -> None:
+    for module in model.modules():
+        if isinstance(module, STEActivationQuantLinear):
+            module.reconstruction_loss_enabled = enabled
+            module.last_reconstruction_loss = None
+
+
+def ste_reconstruction_loss(model: nn.Module) -> torch.Tensor | None:
+    losses = [
+        module.last_reconstruction_loss
+        for module in model.modules()
+        if isinstance(module, STEActivationQuantLinear) and module.last_reconstruction_loss is not None
+    ]
+    if not losses:
+        return None
+    return torch.stack(losses).mean()
 
 
 @torch.no_grad()

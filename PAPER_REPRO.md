@@ -14,6 +14,7 @@ The paper's algorithm setup is:
 - Activation VQ: `subdim=2`, `Ka=64`.
 - Weight VQ: `Kw=16`, with INT8 quantized lookup tables.
 - Training: KMeans initialization, QAT with STE and custom fused forward/backward kernels.
+- Additional training details from the paper text: the authors report continuing training from Qwen 3 1.7B with FineWeb 512-token sequences and then WikiQA for 3 epochs, plus the LUT-DLA-style reconstruction loss ratio `0.1`.
 - Final conversion: reconstruct weights from trained lookup tables, apply GPTVQ, then precompute activation-codebook x weight-codebook LUTs.
 - Evaluation: GLUE, SQuAD v2, and MMLU-Pro.
 
@@ -43,6 +44,13 @@ New files:
 
 Important limitation: this is not yet a byte-identical reproduction of the paper. The missing pieces are the paper's custom fused QAT kernels, adjustable-gradient STE details, GPTVQ implementation, and exact benchmark harness/prompts. The current code is a transparent PyTorch reproduction scaffold that runs the same model family and datasets but not the undisclosed training/eval stack.
 
+Current implementation additions for the first-stage reproduction:
+
+- `--train-include-squad` separates train/calibration SQuAD inclusion from SQuAD evaluation skipping.
+- `SCORE_COMPLETION_BATCH_SIZE=1` allows memory-safe GLUE/MMLU-Pro completion scoring for activation-VQ models.
+- `--reconstruction-loss-ratio` adds a dense-output reconstruction MSE term during STE QAT. This approximates the paper's stated reconstruction-loss ratio `0.1`.
+- `--train-source lutllm_paper` approximates the paper's FineWeb 512-token pretrain plus WikiQA finetune data mix.
+
 ## scai7 Runs
 
 ### Prompt Evaluator Baselines
@@ -70,11 +78,53 @@ Latest all-196 diagnostic gap:
 
 | Stage | GLUE Avg | Paper Target | Gap | MMLU-Pro | Paper Target | Gap | WikiText PPL |
 |---|---:|---:|---:|---:|---:|---:|---:|
+| Paper-like first-step FP16, SQuAD included | 83.33 | 88.80 | -5.47 | 39.06 | 33.10 | +5.96 | 16.45 |
+| Paper-like centers-only STE Act Quant, SQuAD included | 64.06 | 87.20 | -23.14 | 12.50 | 31.80 | -19.30 | 207.19 |
+| Paper-like reconstruction 0.1 + dense-weight STE Act Quant, SQuAD included | 71.88 | 87.20 | -15.33 | 18.75 | 31.80 | -13.05 | 242.19 |
+| FineWeb/WikiQA reconstruction 0.1 + dense-weight STE Act Quant | 54.43 | 87.20 | -32.77 | 12.50 | 31.80 | -19.30 | 109.93 |
 | FP16 baseline | 82.88 | 88.80 | -5.92 | 29.69 | 33.10 | -3.41 | 16.45 |
 | Act Quant, `Ka=64`, no QAT | 61.07 | 87.20 | -26.13 | 6.25 | 31.80 | -25.55 | 332.60 |
 | centers-only STE Act Quant, 1000 steps | 70.96 | 87.20 | -16.24 | 7.81 | 31.80 | -23.99 | 335.62 |
 | `subdim=4, Ka=64` centers-only STE Act Quant, 1000 steps | 46.09 | 87.20 | -41.11 | 7.81 | 31.80 | -23.99 | 19,947.91 |
 | `subdim=2, Ka=128` centers-only STE Act Quant, 1000 steps | 68.75 | 87.20 | -18.45 | 7.81 | 31.80 | -23.99 | 217.62 |
+
+### Latest First-Step Act. Quant. Attempt
+
+Runs:
+
+- `lutllm_base_instruction_g8_all196_paperlike_squad_ka64_steqat1000_actonly_ppl64_chunk1`
+- `lutllm_base_instruction_g8_all196_paperlike_squad_ka64_recon01_dense_steqat1000_actonly_ppl64_chunk1`
+- `lutllm_base_instruction_g8_all196_lutllmpaperdata_ka64_recon01_dense_steqat1000_actonly_ppl64_chunk1`
+
+Purpose: reproduce the paper's first LUT-LLM stage, `+ Act. Quant.`, as directly as the public information allows. These runs use `Qwen/Qwen3-1.7B-Base`, all 196 transformer-block target linears, `subdim=2`, `Ka=64`, Chebyshev assignment, 1000 STE steps, instruction prompts, 8-shot GLUE, 0-shot MMLU-Pro, 64 rows/task, and SQuAD included. The first two train on the repo's paper-task supervised mix. The third switches to the new `lutllm_paper` training source, a small FineWeb/WikiQA approximation of the paper's described training data.
+
+Quality:
+
+| Stage | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | GLUE Avg | SQuADv2 F1 | MMLU-Pro | WikiText PPL |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Paper FP16 target | 87.6 | 86.5 | 92.9 | 91.2 | 80.9 | 93.7 | 88.80 | 72.8 | 33.1 | - |
+| Same-run FP16 | 84.4 | 73.4 | 81.2 | 87.5 | 76.6 | 96.9 | 83.33 | 31.9 | 39.1 | 16.45 |
+| Paper `+ Act. Quant.` target | 87.0 | 84.1 | 91.9 | 90.7 | 78.3 | 91.2 | 87.20 | 70.3 | 31.8 | - |
+| Same-run `+ Act. Quant.` | 57.8 | 71.9 | 60.9 | 51.6 | 53.1 | 89.1 | 64.06 | 25.7 | 12.5 | 207.19 |
+| Same-run `+ Act. Quant.` with reconstruction 0.1 + dense weights | 54.7 | 75.0 | 70.3 | 68.8 | 75.0 | 87.5 | 71.88 | 32.7 | 18.8 | 242.19 |
+| FineWeb/WikiQA `+ Act. Quant.` with reconstruction 0.1 + dense weights | 32.8 | 67.2 | 57.8 | 34.4 | 50.0 | 84.4 | 54.43 | 3.4 | 12.5 | 109.93 |
+
+Gap:
+
+| Stage | GLUE Gap | SQuADv2 Gap | MMLU-Pro Gap |
+|---|---:|---:|---:|
+| Same-run FP16 vs paper FP16 | -5.47 | -40.94 | +5.96 |
+| Same-run `+ Act. Quant.` vs paper `+ Act. Quant.` | -23.14 | -44.59 | -19.30 |
+| Reconstruction 0.1 + dense weights vs paper `+ Act. Quant.` | -15.33 | -37.56 | -13.05 |
+| FineWeb/WikiQA reconstruction 0.1 + dense weights vs paper `+ Act. Quant.` | -32.77 | -66.93 | -19.30 |
+
+Hardware scale for this first-stage activation VQ:
+
+| Quantized Linears | Activation Centers | Expanded Act-LUT FP16 | Expanded Entries | Lookups / Token | Act Code Bits / Token | Centroid Distance Vectors / Token |
+|---:|---:|---:|---:|---:|---:|---:|
+| 196 | 33,030,144 | 86,016.0 MiB | 45,097,156,608 | 704,643,072 | 1,548,288 | 16,515,072 |
+
+Interpretation: adding SQuAD to the formal all-196 first-step run did not recover the paper row. Adding the paper's stated reconstruction-loss idea helps GLUE, SQuAD, and MMLU-Pro on the task-supervised mix, but the result is still far from the paper and worsens WikiText PPL. Switching to the small FineWeb/WikiQA approximation improves PPL relative to the task-supervised reconstruction run but damages the downstream benchmark metrics. The current public-checkpoint FP16 SQuAD baseline is itself far below the paper. This points to the missing paper training stack: long FineWeb+WikiQA QAT, the exact adjustable-gradient STE/fused lookup kernels, trained lookup-table reconstruction, and the customized checkpoint/evaluation harness.
 
 ### Simple RTN Weight-Only Baselines
 

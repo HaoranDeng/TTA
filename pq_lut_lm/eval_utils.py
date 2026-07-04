@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import os
 import time
 from itertools import islice
 from typing import Any, Iterable
@@ -96,6 +97,31 @@ def _answer_index(row: dict[str, Any]) -> int:
 
 @torch.no_grad()
 def score_completions(
+    model: torch.nn.Module,
+    tokenizer: Any,
+    prompt: str,
+    completions: list[str],
+    device: torch.device,
+) -> list[float]:
+    max_batch = int(os.environ.get("SCORE_COMPLETION_BATCH_SIZE", "0") or "0")
+    if max_batch > 0 and len(completions) > max_batch:
+        scores = []
+        for start in range(0, len(completions), max_batch):
+            scores.extend(
+                _score_completions_batch(
+                    model,
+                    tokenizer,
+                    prompt,
+                    completions[start : start + max_batch],
+                    device,
+                )
+            )
+        return scores
+    return _score_completions_batch(model, tokenizer, prompt, completions, device)
+
+
+@torch.no_grad()
+def _score_completions_batch(
     model: torch.nn.Module,
     tokenizer: Any,
     prompt: str,
