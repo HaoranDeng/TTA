@@ -106,6 +106,18 @@ RTN hardware estimate for Qwen 3 1.7B all-196 target linears:
 
 Interpretation: the simplest weight-only RTN path does not reproduce the paper's RTN degradation. On this public-checkpoint protocol, per-channel and group128 RTN are essentially lossless, and even per-tensor RTN only drops GLUE by `0.39` points. The paper RTN row likely includes a harsher or different quantization/evaluation setup, such as activation quantization, a different scale granularity, or the customized checkpoint/protocol mismatch already visible in FP16.
 
+W8A8 activation-quantization follow-up, still all 196 target linears and the same 256-row protocol:
+
+| Method | Activation Scale | GLUE Avg | Gap vs Paper RTN | Drop vs Same FP16 | MMLU-Pro | Gap vs Paper RTN | WikiText PPL |
+|---|---|---:|---:|---:|---:|---:|---:|
+| W8A8 dynamic | per token, per linear | 81.90 | -1.77 | -0.98 | 29.30 | +5.70 | 17.30 |
+| W8A8 static | per input feature | 80.14 | -3.53 | -2.74 | 23.44 | -0.16 | 31.90 |
+| W8A8 static | per tensor | 52.34 | -31.33 | -30.54 | 12.11 | -11.49 | 31.50 |
+| SmoothQuant-style W8A8 `alpha=0.5` | smoothed, per tensor, 8 calib batches | 78.52 | -5.15 | -4.36 | 24.61 | +1.01 | 19.28 |
+| SmoothQuant-style W8A8 `alpha=0.7` | smoothed, per tensor, 8 calib batches | 81.12 | -2.55 | -1.76 | 23.83 | +0.23 | 21.63 |
+
+These W8A8 rows show that activation quantization can create RTN-like degradation, unlike weight-only RTN. The current SmoothQuant-style scaffold is still below the paper SmoothQuant target (`87.32` GLUE, `31.70` MMLU-Pro), but `alpha=0.7` gets close to the paper RTN MMLU-Pro while keeping GLUE much better than naive per-tensor activation quantization.
+
 After commit `3708f19`, paper-supervised calibration/training batches are shuffled before selecting calibration batches. This avoids the earlier artifact where the first calibration batches came mostly from MNLI. New all-layer act-quant runs with WikiText PPL:
 
 | Run | Scope | Stage | Samples | WikiText PPL | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | MMLU-Pro |

@@ -1,0 +1,87 @@
+{
+  "device": "cuda",
+  "dtype": "torch.bfloat16",
+  "load_seconds": 7.676157976966351,
+  "model_id": "Qwen/Qwen3-1.7B-Base",
+  "paper_samples": 256,
+  "w8a8_quantization": {
+    "activation_bits": 8,
+    "activation_granularity": "static_per_feature",
+    "activation_percentile": 1.0,
+    "calibration_seconds": 55.58030204009265,
+    "hardware_aggregate": {
+      "activation_bits_per_token": 4128768.0,
+      "activation_dynamic_scale_count_per_token": 0,
+      "activation_mib_per_1k_tokens_packed": 492.1875,
+      "activation_static_scale_count": 516096,
+      "activation_static_scale_mib_fp16": 0.984375,
+      "activation_values_per_token": 516096,
+      "adds_per_token": 0.0,
+      "dense_mac_per_token": 1409286144.0,
+      "int8_mac_per_token": 1409286144.0,
+      "lookups_per_token": 0.0,
+      "quantized_linears": 196,
+      "weight_bits_total": 11274289152.0,
+      "weight_count": 1409286144,
+      "weight_max_abs_error": 0.0063918717205524445,
+      "weight_mib_packed": 1344.0,
+      "weight_scale_count": 573440,
+      "weight_scale_mib_fp16": 1.09375,
+      "weighted_weight_mse": 1.1685484393876236e-07
+    },
+    "quantization_seconds": 7.23506298288703,
+    "weight_bits": 8,
+    "weight_granularity": "per_channel",
+    "weight_group_size": 0
+  },
+  "w8a8_quantized": {
+    "mmlu_pro": {
+      "accuracy": 0.234375,
+      "correct": 60,
+      "seconds": 11.27282384596765,
+      "total": 256
+    },
+    "mnli": {
+      "accuracy": 0.78515625,
+      "correct": 201,
+      "seconds": 12.108544881921262,
+      "total": 256
+    },
+    "mrpc": {
+      "accuracy": 0.73046875,
+      "correct": 187,
+      "seconds": 9.902428908739239,
+      "total": 256
+    },
+    "qnli": {
+      "accuracy": 0.80859375,
+      "correct": 207,
+      "seconds": 9.107652688864619,
+      "total": 256
+    },
+    "qqp": {
+      "accuracy": 0.80859375,
+      "correct": 207,
+      "seconds": 7.273790787905455,
+      "total": 256
+    },
+    "rte": {
+      "accuracy": 0.78125,
+      "correct": 200,
+      "seconds": 11.572275740094483,
+      "total": 256
+    },
+    "sst2": {
+      "accuracy": 0.89453125,
+      "correct": 229,
+      "seconds": 5.9402980068698525,
+      "total": 256
+    },
+    "wikitext_ppl": {
+      "nll": 3.4626703411340714,
+      "ppl": 31.90205223586123,
+      "seconds": 0.33547589695081115,
+      "tokens": 4080
+    }
+  }
+}

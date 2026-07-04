@@ -36,8 +36,10 @@ New files:
 - `run_paper_eval.py`: Qwen causal-LM evaluator for GLUE, SQuAD v2, and MMLU-Pro.
 - `run_lutllm_qat.py`: simplified LUT-LLM-style activation QAT with STE, followed by activation-weight LUT conversion.
 - `run_act_lut_fit.py`: layerwise direct activation-LUT fitting, least-squares reconstruction of dense weights from trained tables, and final activation-weight VQ.
+- `run_w8a8_quant.py`: RTN/W8A8 fake-quantization runner with dynamic/static activation scales and SmoothQuant-style smoothing.
 - `pq_lut_lm/paper_eval.py`: prompt-based GLUE/MMLU-Pro log-likelihood scoring and SQuADv2 short generation/F1.
 - `pq_lut_lm/activation_quant.py`: trainable activation VQ wrapper with STE, direct activation-LUT modules, and LUT-to-weight reconstruction.
+- `pq_lut_lm/w8a8_quant.py`: all-target-linear W8A8 wrapper used to test RTN/SmoothQuant-style activation quantization.
 
 Important limitation: this is not yet a byte-identical reproduction of the paper. The missing pieces are the paper's custom fused QAT kernels, adjustable-gradient STE details, GPTVQ implementation, and exact benchmark harness/prompts. The current code is a transparent PyTorch reproduction scaffold that runs the same model family and datasets but not the undisclosed training/eval stack.
 
@@ -109,6 +111,45 @@ Hardware and quantization scale:
 | RTN INT8 per-tensor | 196 | no codebook; 256 integer levels per tensor scale | 1,344.0 MiB | 196 | 0.000374 MiB | 0 | 1,409,286,144 | 2.360e-6 |
 
 Interpretation: these basic RTN runs do not explain the paper's RTN INT8 row. The same public-checkpoint FP16 baseline is still `-5.92` GLUE points below paper FP16, so this is not a faithful Table III reproduction. More importantly, within the same protocol, weight-only INT8 RTN barely changes accuracy: per-channel and group128 slightly improve GLUE within sampling noise, and per-tensor only drops `0.39` GLUE points. The paper's RTN row drops about `5.13` GLUE points and `9.50` MMLU-Pro points from its FP16 baseline, so their RTN is likely not equivalent to this weight-only dense-dequantized RTN. The remaining candidates are activation quantization, a harsher scaling implementation, a different checkpoint/eval protocol, or some combination of these.
+
+### W8A8 Activation-Quantization Baselines
+
+These runs extend RTN from weight-only to W8A8 fake quantization. They still quantize all 196 transformer-block target linears and use dense PyTorch matmuls after quant-dequant, so the timing is not an INT8-kernel benchmark. Unless noted, calibration uses 32 shuffled paper-style supervised batches with 2048 captured vectors/layer. SmoothQuant-style rows use 8 batches and 1024 vectors/layer to iterate quickly after fixing the smoothing implementation.
+
+Quality:
+
+| Run | Method | MNLI | MRPC | QNLI | QQP | RTE | SST-2 | GLUE Avg | MMLU-Pro | WikiText PPL |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Paper RTN INT8 | target | 86.7 | 80.2 | 88.0 | 89.3 | 70.4 | 87.4 | 83.67 | 23.60 | - |
+| Paper SmoothQuant | target | 87.0 | 85.3 | 91.7 | 89.6 | 79.1 | 91.2 | 87.32 | 31.70 | - |
+| Same-run FP16 | public Base checkpoint | 81.6 | 74.2 | 82.8 | 84.4 | 79.7 | 94.5 | 82.88 | 29.69 | 16.45 |
+| `w8a8_dynamic_pertoken_wperchannel_qwen3_1p7b_base_instruction_g8_all196_ppl256` | W8A8 dynamic per-token activation | 81.6 | 72.7 | 80.1 | 83.6 | 79.3 | 94.1 | 81.90 | 29.30 | 17.30 |
+| `w8a8_static_perfeature_wperchannel_qwen3_1p7b_base_instruction_g8_all196_ppl256` | W8A8 static per-feature activation | 78.5 | 73.0 | 80.9 | 80.9 | 78.1 | 89.5 | 80.14 | 23.44 | 31.90 |
+| `w8a8_static_pertensor_wperchannel_qwen3_1p7b_base_instruction_g8_all196_ppl256` | W8A8 static per-tensor activation | 38.7 | 30.5 | 52.3 | 65.2 | 52.0 | 75.4 | 52.34 | 12.11 | 31.50 |
+| `w8a8_smooth_a05_static_pertensor_wperchannel_qwen3_1p7b_base_instruction_g8_all196_ppl256_calib8` | SmoothQuant-style W8A8, `alpha=0.5` | 70.3 | 73.0 | 77.3 | 81.2 | 76.2 | 93.0 | 78.52 | 24.61 | 19.28 |
+| `w8a8_smooth_a07_static_pertensor_wperchannel_qwen3_1p7b_base_instruction_g8_all196_ppl256_calib8` | SmoothQuant-style W8A8, `alpha=0.7` | 79.7 | 76.6 | 79.3 | 77.7 | 80.5 | 93.0 | 81.12 | 23.83 | 21.63 |
+
+Gap to the paper:
+
+| Stage | GLUE Avg | Gap vs Paper RTN | Gap vs Paper SmoothQuant | Drop vs Same FP16 | MMLU-Pro | Gap vs Paper RTN | Gap vs Paper SmoothQuant | PPL Delta vs Same FP16 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| W8A8 dynamic per-token | 81.90 | -1.77 | -5.42 | -0.98 | 29.30 | +5.70 | -2.40 | +0.85 |
+| W8A8 static per-feature | 80.14 | -3.53 | -7.18 | -2.74 | 23.44 | -0.16 | -8.26 | +15.45 |
+| W8A8 static per-tensor | 52.34 | -31.33 | -34.98 | -30.54 | 12.11 | -11.49 | -19.59 | +15.05 |
+| SmoothQuant-style `alpha=0.5` | 78.52 | -5.15 | -8.80 | -4.36 | 24.61 | +1.01 | -7.09 | +2.84 |
+| SmoothQuant-style `alpha=0.7` | 81.12 | -2.55 | -6.20 | -1.76 | 23.83 | +0.23 | -7.87 | +5.18 |
+
+Hardware and quantization scale:
+
+| Method | Quantized Linears | Weight Payload | Activation Bits / Token | Activation Scale Storage | Dynamic Act Scales / Token | Smooth Scales | LUT Lookups / Token | INT8 MAC / Token |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| W8A8 dynamic per-token | 196 | 1,344.0 MiB | 4,128,768 | 0 | 196 | 0 | 0 | 1,409,286,144 |
+| W8A8 static per-feature | 196 | 1,344.0 MiB | 4,128,768 | 0.984 MiB | 0 | 0 | 0 | 1,409,286,144 |
+| W8A8 static per-tensor | 196 | 1,344.0 MiB | 4,128,768 | 0.000374 MiB | 0 | 0 | 0 | 1,409,286,144 |
+| SmoothQuant-style `alpha=0.5` | 196 | 1,344.0 MiB | 4,128,768 | 0.000374 MiB | 0 | 516,096 | 0 | 1,409,286,144 |
+| SmoothQuant-style `alpha=0.7` | 196 | 1,344.0 MiB | 4,128,768 | 0.000374 MiB | 0 | 516,096 | 0 | 1,409,286,144 |
+
+Interpretation: activation quantization is the first reproduction branch that creates paper-like RTN degradation. Dynamic per-token W8A8 is still too gentle, while static per-tensor W8A8 is far too harsh. Static per-feature W8A8 nearly matches the paper RTN MMLU-Pro (`23.44` vs `23.60`) but undershoots GLUE by `3.53` points. SmoothQuant-style smoothing recovers much of the naive per-tensor collapse; `alpha=0.7` is currently the best GLUE tradeoff among these W8A8 rows (`81.12`, `-2.55` vs paper RTN), but it is still far below the paper SmoothQuant GLUE target (`87.32`) and below the paper FP16 baseline. This again points to the remaining FP16/evaluation/checkpoint mismatch plus incomplete SmoothQuant details.
 
 Prompt grid, 64 examples/task, SQuAD skipped:
 
