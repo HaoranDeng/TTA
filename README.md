@@ -46,15 +46,21 @@ July 4 continued first-step reproduction attempts, all with all 196 transformer-
 |---|---|---:|---:|---:|---:|---:|---:|---:|
 | Paper `+ Act. Quant.` target | target | 87.20 | 0.00 | 31.80 | 0.00 | 70.30 | 0.00 | - |
 | `lutllm_base_instruction_g8_all196_fixedlabels_seq512_ka128_recon01_dense1e7_steqat1500_actonly_squad64_ppl64` | fixed-label, `Ka=128`, recon 0.1 + dense LR `1e-7`, 1500 steps | 79.43 | -7.77 | 7.81 | -23.99 | 31.96 | -38.34 | 66.77 |
+| `lutllm_base_instruction_g8_all196_fixedlabels_seq512_ka256_centersonly_lr1e4_recon01_steqat2000_squad64_ppl64` | fixed-label, `Ka=256`, centers-only, recon 0.1, LR `1e-4`, 2000 steps | 78.12 | -9.08 | 12.50 | -19.30 | 33.76 | -36.54 | 38.71 |
 | `lutllm_base_instruction_g8_all196_fixedlabels_seq512_ka64_recon01_dense1e7_steqat2000_actonly_squad64_ppl64` | fixed-label, `Ka=64`, recon 0.1 + dense LR `1e-7`, 2000 steps | 76.56 | -10.64 | 9.38 | -22.43 | 35.52 | -34.78 | 92.80 |
+| `lutllm_base_instruction_g8_all196_fixedlabels_seq512_ka256_recon1_task01_centersonly_lr1e5_steqat1500_squad64_ppl64` | fixed-label, `Ka=256`, centers-only, task 0.1 + recon 1.0, LR `1e-5` | 76.04 | -11.16 | 21.88 | -9.93 | 31.98 | -38.32 | 66.96 |
 | `lutllm_base_instruction_g8_all196_fixedlabels_ka256_recon01_dense_steqat1000_actonly_squad64_ppl64_control` | fixed-label control, `Ka=256`, recon 0.1 + dense LR `1e-6`, 1000 steps | 74.22 | -12.98 | 15.62 | -16.18 | 28.52 | -41.78 | 89.38 |
 | `lutllm_base_instruction_g8_all196_ka64_calib8192_k10_recon01_centersonly_steqat2000_actonly_squad64_ppl64_fixedlabels` | fixed-label, 8192 calib vectors/layer, KMeans 10, centers-only | 73.70 | -13.50 | 10.94 | -20.86 | 32.75 | -37.55 | 144.20 |
+| `lutllm_base_instruction_g8_all196_fixedlabels_seq512_ka128_balancedrecon1_task03_dense1e7_steqat1500_squad64_ppl64` | fixed-label, `Ka=128`, dense LR `1e-7`, task 0.3 + recon 1.0 | 72.92 | -14.28 | 12.50 | -19.30 | 23.59 | -46.71 | 83.41 |
+| `lutllm_base_instruction_g8_all196_fixedlabels_seq512_ka64_centersonly_lr5e5_recon01_steqat4000_squad64_ppl64` | fixed-label, `Ka=64`, centers-only, recon 0.1, LR `5e-5`, 4000 steps | 72.66 | -14.54 | 10.94 | -20.86 | 35.00 | -35.30 | 93.14 |
 | `lutllm_base_instruction_g8_all196_ka256_recon01_dense_steqat1000_actonly_squad64_ppl64` | `Ka=256`, recon 0.1 + dense LR `1e-6`, 1000 steps | 71.09 | -16.11 | 23.44 | -8.36 | 33.18 | -37.12 | 107.73 |
 | `lutllm_base_instruction_g8_all196_fixedlabels_ka64_calib8192_k10_recon1_centersonly_lr3e5_steqat2000_actonly_squad64_ppl64` | fixed-label, recon 1.0, centers-only LR `3e-5` | 68.49 | -18.71 | 7.81 | -23.99 | 33.90 | -36.40 | 157.09 |
+| `lutllm_base_instruction_g8_all196_fixedlabels_seq512_ka64_recon1_task01_centersonly_lr1e5_steqat2000_squad64_ppl64` | fixed-label, `Ka=64`, centers-only, task 0.1 + recon 1.0, LR `1e-5` | 67.45 | -19.75 | 15.62 | -16.18 | 4.05 | -66.25 | 93.21 |
 | `lutllm_base_instruction_g8_all196_cheb_softhard_t05_recon01_dense_steqat1000_actonly_squad64_ppl64_retry` | soft-hard STE temp 0.5, recon 0.1 + dense | 64.84 | -22.36 | 12.50 | -19.30 | 37.80 | -32.50 | 297.71 |
 | `lutllm_base_instruction_g8_all196_fixedlabels_ka64_calib8192_k10_recononly_centersonly_lr3e5_steqat1500_actonly_squad64_ppl64` | fixed-label, reconstruction-only, centers-only LR `3e-5` | 61.46 | -25.74 | 7.81 | -23.99 | 3.51 | -66.79 | 152.58 |
+| `lutllm_lutllmpaper_all196_seq512_ka64_centersonly_lr1e4_recon01_steqat3000_squad64_ppl64_bigdata` | FineWeb/WikiQA approximation, `Ka=64`, centers-only, recon 0.1 | 53.39 | -33.81 | 9.38 | -22.43 | 6.99 | -63.31 | 397.58 |
 
-Current best first-step rows are split by metric, not solved: fixed-label `Ka=128` dense gives the best GLUE/PPL so far, soft-hard gives the best SQuAD F1, and the older pre-label-fix `Ka=256` row gives the best MMLU-Pro. A fixed-label `Ka=256` control improves GLUE/PPL versus that older row but drops MMLU-Pro. None is close to the paper's first-stage row yet.
+Current best first-step rows are split by metric, not solved: fixed-label `Ka=128` dense gives the best GLUE so far, fixed-label `Ka=256` centers-only gives the best PPL, soft-hard gives the best SQuAD F1, and the older pre-label-fix `Ka=256` row still gives the best MMLU-Pro. The fixed-label `Ka=256` conservative row recovers MMLU-Pro to `21.88`, but GLUE and SQuAD remain far below paper. None is close to the paper's first-stage row yet.
 
 Current FP16 baseline-alignment gap:
 
