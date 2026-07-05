@@ -39,6 +39,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--fit-lr", type=float, default=1e-2)
     parser.add_argument("--fit-batch-size", type=int, default=128)
     parser.add_argument("--fit-lut-dtype", choices=["float16", "bfloat16", "float32"], default="float32")
+    parser.add_argument("--fit-centers", action="store_true")
+    parser.add_argument("--fit-center-lr", type=float, default=None)
+    parser.add_argument("--fit-temperature", type=float, default=1.0)
     parser.add_argument("--paper-samples", type=int, default=32)
     parser.add_argument("--eval-ppl", action="store_true")
     parser.add_argument("--ppl-tokens", type=int, default=4096)
@@ -226,6 +229,9 @@ def main() -> None:
         fit_lr=args.fit_lr,
         fit_batch_size=args.fit_batch_size,
         fit_lut_dtype=fit_lut_dtype,
+        fit_centers=args.fit_centers,
+        fit_center_lr=args.fit_center_lr,
+        fit_temperature=args.fit_temperature,
         device=device,
     )
     summary["act_lut_fit"] = {

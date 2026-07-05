@@ -191,6 +191,9 @@ class ActivationLUTLinear(nn.Module):
         fit_lr: float,
         fit_batch_size: int,
         fit_lut_dtype: torch.dtype = torch.float32,
+        fit_centers: bool = False,
+        fit_center_lr: float | None = None,
+        fit_temperature: float = 1.0,
     ) -> "ActivationLUTLinear":
         device = linear.weight.device
         if device.type == "cuda":
@@ -204,7 +207,12 @@ class ActivationLUTLinear(nn.Module):
 
         if fit_steps > 0:
             lut_param = nn.Parameter(lut.to(dtype=fit_lut_dtype))
-            opt = torch.optim.SGD([lut_param], lr=fit_lr)
+            params: list[dict[str, Any]] = [{"params": [lut_param], "lr": fit_lr}]
+            centers_param: nn.Parameter | None = None
+            if fit_centers:
+                centers_param = nn.Parameter(centers.detach().clone().float())
+                params.append({"params": [centers_param], "lr": fit_center_lr or fit_lr})
+            opt = torch.optim.AdamW(params, weight_decay=0.0)
             gen = torch.Generator(device=device)
             gen.manual_seed(config.seed)
             n = calib.shape[0]
@@ -216,13 +224,27 @@ class ActivationLUTLinear(nn.Module):
                 else:
                     batch_codes = codes
                     batch_target = target
-                pred = _activation_lut_forward(batch_codes, lut_param)
+                    batch_calib = calib
+                if centers_param is None:
+                    pred = _activation_lut_forward(batch_codes, lut_param)
+                else:
+                    batch_calib = calib[idx] if fit_batch_size > 0 and fit_batch_size < n else calib
+                    pred = _activation_lut_forward_soft_hard(
+                        batch_calib.float(),
+                        centers_param,
+                        lut_param,
+                        distance=config.distance,
+                        subdim=config.subdim,
+                        temperature=fit_temperature,
+                    )
                 if linear.bias is not None:
                     pred = pred + linear.bias.float()
                 loss = torch.nn.functional.mse_loss(pred.float(), batch_target)
                 opt.zero_grad(set_to_none=True)
                 loss.backward()
                 opt.step()
+            if centers_param is not None:
+                centers = centers_param.detach()
             lut = lut_param.detach().to(dtype=linear.weight.dtype)
 
         if device.type == "cuda":
@@ -296,6 +318,38 @@ def _activation_lut_forward(codes: torch.Tensor, lut: torch.Tensor, chunk_m: int
         idx = (codes[:, start:end].t() + offsets[:, None]).reshape(-1)
         vals = lut[start:end].reshape(-1, lut.shape[2]).index_select(0, idx)
         out = out + vals.reshape(end - start, n, lut.shape[2]).float().sum(dim=0)
+    return out
+
+
+def _activation_lut_forward_soft_hard(
+    x: torch.Tensor,
+    centers: torch.Tensor,
+    lut: torch.Tensor,
+    distance: str,
+    subdim: int,
+    temperature: float = 1.0,
+    chunk_m: int = 32,
+) -> torch.Tensor:
+    xv = x.reshape(x.shape[0], -1, subdim).float()
+    centers = centers.float()
+    lut = lut.float()
+    out = torch.zeros((xv.shape[0], lut.shape[2]), device=x.device, dtype=torch.float32)
+    temp = max(float(temperature), 1e-6)
+    for start in range(0, centers.shape[0], chunk_m):
+        end = min(start + chunk_m, centers.shape[0])
+        xb = xv[:, start:end]
+        cb = centers[start:end]
+        if distance == "chebyshev":
+            dist = (xb[:, :, None, :] - cb[None, :, :, :]).abs().amax(dim=3)
+        elif distance == "l2":
+            dist = ((xb[:, :, None, :] - cb[None, :, :, :]) ** 2).sum(dim=3)
+        else:
+            raise ValueError(f"Unsupported distance metric: {distance}")
+        probs = torch.softmax(-dist / temp, dim=2)
+        soft = torch.einsum("nmk,mko->no", probs, lut[start:end])
+        codes = dist.argmin(dim=2)
+        hard = _activation_lut_forward(codes, lut[start:end], chunk_m=chunk_m)
+        out = out + hard + (soft - soft.detach())
     return out
 
 
@@ -405,6 +459,9 @@ def replace_with_fitted_activation_lut(
     fit_lr: float = 1e-2,
     fit_batch_size: int = 0,
     fit_lut_dtype: torch.dtype = torch.float32,
+    fit_centers: bool = False,
+    fit_center_lr: float | None = None,
+    fit_temperature: float = 1.0,
     device: torch.device | None = None,
 ) -> QuantizationReport:
     if device is None:
@@ -439,6 +496,9 @@ def replace_with_fitted_activation_lut(
             fit_lr=fit_lr,
             fit_batch_size=fit_batch_size,
             fit_lut_dtype=fit_lut_dtype,
+            fit_centers=fit_centers,
+            fit_center_lr=fit_center_lr,
+            fit_temperature=fit_temperature,
         )
         _set_submodule(model, name, fitted)
         module_stats.append(fitted.hardware_stats())

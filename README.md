@@ -77,6 +77,14 @@ SQuAD baseline prompt probe on `Qwen/Qwen3-1.7B-Base`, 64 SQuAD v2 validation ex
 
 Interpretation: the SQuAD gap is not explained by the repo's current generation length or a simple prompt variant. The public checkpoint/protocol remains far below the paper FP16 SQuAD baseline before quantization.
 
+Trained activation-LUT diagnostic:
+
+| Run | Samples | GLUE Avg | Gap vs Paper Act GLUE | MMLU-Pro | Gap vs Paper Act MMLU | SQuADv2 F1 | Gap vs Paper Act SQuAD | WikiText PPL |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `actlutfit_centers_all196_ca64_fit50_cv2048_lr3e3_clr3e4_temp05_squad32_ppl64` | 32/task | 51.56 | -35.64 | 6.25 | -25.55 | 28.12 | -42.17 | 98,629.29 |
+
+This layerwise trained-LUT path fits expanded activation-LUT values and activation centers locally for all 196 target linears. It is closer to the paper phrase "trained lookup tables" than fixed-center LUT fitting, but it performs much worse than the STE activation-QAT path. Local LUT fitting is therefore not the missing ingredient by itself.
+
 Current FP16 baseline-alignment gap:
 
 | Run | Protocol | Samples | GLUE Avg | Gap vs Paper FP16 GLUE | MMLU-Pro | Gap vs Paper FP16 MMLU |

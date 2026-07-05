@@ -89,6 +89,14 @@ SQuAD v2 FP16/BF16 prompt probe on `Qwen/Qwen3-1.7B-Base`, 64 validation example
 
 Interpretation: the SQuAD gap is not explained by a short generation length or a simple prompt variant. The public checkpoint/protocol is far below the paper FP16 SQuAD row before any quantization is applied.
 
+Layerwise trained activation-LUT diagnostic:
+
+| Run | Samples | GLUE Avg | Gap vs Paper Act GLUE | MMLU-Pro | Gap vs Paper Act MMLU | SQuADv2 F1 | Gap vs Paper Act SQuAD | WikiText PPL |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `actlutfit_centers_all196_ca64_fit50_cv2048_lr3e3_clr3e4_temp05_squad32_ppl64` | 32/task | 51.56 | -35.64 | 6.25 | -25.55 | 28.12 | -42.17 | 98,629.29 |
+
+This run fits expanded activation-LUT values and activation centers locally for all 196 target linears. It is a closer diagnostic for the paper phrase "trained lookup tables" than fixed-center LUT fitting, but it performs substantially worse than the STE activation-QAT path. The missing detail is therefore not just local LUT-value training; the effective version likely depends on end-to-end fused QAT, the exact checkpoint/data, and/or GPTVQ reconstruction.
+
 Latest all-196 diagnostic gap:
 
 | Stage | GLUE Avg | Paper Target | Gap | MMLU-Pro | Paper Target | Gap | WikiText PPL |
