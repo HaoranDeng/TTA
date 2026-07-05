@@ -130,6 +130,8 @@ def collect_calibration_inputs(
     for batch in batches:
         batch = {k: v.to(device) for k, v in batch.items()}
         model(**batch)
+        if all(collector.count >= collector.max_vectors for collector in collectors.values()):
+            break
     if device.type == "cuda":
         torch.cuda.synchronize(device)
     elapsed = time.perf_counter() - start
