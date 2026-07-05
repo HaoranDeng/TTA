@@ -1,0 +1,15 @@
+{
+  "device": "cuda",
+  "dtype": "torch.bfloat16",
+  "fp16_baseline": {
+    "wikitext_ppl": {
+      "nll": 2.5929123163223267,
+      "ppl": 13.368648698329727,
+      "seconds": 0.3683137521147728,
+      "tokens": 4088
+    }
+  },
+  "load_seconds": 7.936460291966796,
+  "model_id": "results/taskadapt_fixedlabels_qwen3_1p7b_base_instruction_paperall_1000/checkpoint_final",
+  "paper_samples": 64
+}
