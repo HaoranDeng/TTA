@@ -1,0 +1,83 @@
+{
+  "act_qat_training": {
+    "center_param_count": 132120576,
+    "dense_linear_param_count": 0,
+    "losses": [],
+    "reconstruction_loss_ratio": 1.0,
+    "reconstruction_losses": [],
+    "seconds": 0.0010869968682527542,
+    "steps": 0,
+    "task_loss_ratio": 0.3,
+    "task_losses": [],
+    "train_dense_linears": false,
+    "weight_decay": 0.01
+  },
+  "act_quant": {
+    "mmlu_pro": {
+      "accuracy": 0.0625,
+      "correct": 4,
+      "seconds": 268.19464505603537,
+      "total": 64
+    },
+    "mnli": {
+      "accuracy": 0.640625,
+      "correct": 41,
+      "seconds": 258.6336849811487,
+      "total": 64
+    },
+    "mrpc": {
+      "accuracy": 0.703125,
+      "correct": 45,
+      "seconds": 223.19069883879274,
+      "total": 64
+    },
+    "qnli": {
+      "accuracy": 0.578125,
+      "correct": 37,
+      "seconds": 192.53596164798364,
+      "total": 64
+    },
+    "qqp": {
+      "accuracy": 0.6875,
+      "correct": 44,
+      "seconds": 141.18352368101478,
+      "total": 64
+    },
+    "rte": {
+      "accuracy": 0.578125,
+      "correct": 37,
+      "seconds": 238.89049981022254,
+      "total": 64
+    },
+    "squad_v2": {
+      "f1": 1.5625,
+      "seconds": 32.58323091408238,
+      "total": 64
+    },
+    "sst2": {
+      "accuracy": 0.640625,
+      "correct": 41,
+      "seconds": 83.0899875080213,
+      "total": 64
+    },
+    "wikitext_ppl": {
+      "nll": 5.394308984279633,
+      "ppl": 220.14996743494544,
+      "seconds": 8.956787766888738,
+      "tokens": 4088
+    }
+  },
+  "device": "cuda",
+  "dtype": "torch.bfloat16",
+  "fp16_baseline": {
+    "wikitext_ppl": {
+      "nll": 2.5929123163223267,
+      "ppl": 13.368648698329727,
+      "seconds": 0.5801238981075585,
+      "tokens": 4088
+    }
+  },
+  "load_seconds": 6.673016330227256,
+  "model_id": "results/taskadapt_fixedlabels_qwen3_1p7b_base_instruction_paperall_1000/checkpoint_final",
+  "paper_samples": 64
+}
