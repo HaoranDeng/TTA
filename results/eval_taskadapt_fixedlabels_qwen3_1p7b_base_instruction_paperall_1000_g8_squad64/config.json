@@ -1,0 +1,14 @@
+{
+  "device": "cuda",
+  "dtype": "bfloat16",
+  "glue_shot_count": 8,
+  "mmlu_shot_count": 0,
+  "model_id": "results/taskadapt_fixedlabels_qwen3_1p7b_base_instruction_paperall_1000/checkpoint_final",
+  "output_dir": "results/eval_taskadapt_fixedlabels_qwen3_1p7b_base_instruction_paperall_1000_g8_squad64",
+  "paper_samples": 64,
+  "prompt_style": "plain",
+  "prompt_template": "instruction",
+  "seed": 123,
+  "skip_squad": false,
+  "trust_remote_code": false
+}

@@ -154,6 +154,16 @@ July 4 continuation summary, including SQuAD gaps to the paper's first-stage tar
 
 Interpretation: the fixed-label truncation repair plus dense QAT improves GLUE to `79.43` with `Ka=128`, the best all-196 first-step GLUE result so far. Increasing the codebook to `Ka=256` improves PPL substantially (`38.71`) and a conservative `Ka=256` loss mix recovers MMLU-Pro to `21.88`, but neither setting recovers SQuAD or reaches the paper's first-step GLUE/MMLU targets. The newest `Ka=256` dense+centroid run does not improve that tradeoff, and the two newest strict public-paper-configuration `c_a=64` dense+centroid runs also fail to close the gap. The larger FineWeb/WikiQA approximation damages all downstream metrics, so the missing paper data/checkpoint recipe is not reproduced by the small public-data proxy. The result is still not a reproduction of Table III; it is a constrained reverse-engineering attempt around missing QAT/evaluation details.
 
+Task-adapted checkpoint diagnostic:
+
+| Run | Stage | GLUE Avg | Gap vs Paper Target | MMLU-Pro | Gap vs Paper Target | SQuADv2 F1 | Gap vs Paper Target | WikiText PPL |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| `eval_taskadapt_fixedlabels_qwen3_1p7b_base_instruction_paperall_1000_g8_squad64` | FP16 after fixed-label 1000-update task adaptation | 84.64 | -4.16 vs FP16 | 37.50 | +4.40 vs FP16 | 32.81 | -39.99 vs FP16 | - |
+| `lutllm_taskadapt_fixedlabels1000_all196_ka256_centersonly_task03_recon1_steqat1500_squad64_ppl64` | `Ka=256`, centers-only, task 0.3 + recon 1.0 | 77.34 | -9.86 vs Act | 25.00 | -6.80 vs Act | 33.73 | -36.57 vs Act | 54.94 |
+| `lutllm_taskadapt_fixedlabels1000_all196_ka128_dense_wd001_lr1e4_dense1e7_recon01_task1_steqat1500_squad64_ppl64` | `Ka=128`, dense+centroids, task 1.0 + recon 0.1 | 77.08 | -10.12 vs Act | 17.19 | -14.61 vs Act | 28.87 | -41.43 vs Act | 67.32 |
+
+Interpretation: fixed-label task adaptation improves the FP16 GLUE/MMLU starting point and reduces the baseline-alignment problem for those two metrics, but it still leaves SQuAD far below the paper FP16 row. Quantizing all 196 target linears from that checkpoint still drops GLUE by about 7 points, so this branch also has not reproduced the paper's first `+ Act. Quant.` row.
+
 ### Latest First-Step Act. Quant. Attempt
 
 Runs:

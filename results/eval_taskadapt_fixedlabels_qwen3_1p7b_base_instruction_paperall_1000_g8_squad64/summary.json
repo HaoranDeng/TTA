@@ -1,0 +1,56 @@
+{
+  "device": "cuda",
+  "dtype": "torch.bfloat16",
+  "load_seconds": 19.773732773959637,
+  "model_id": "results/taskadapt_fixedlabels_qwen3_1p7b_base_instruction_paperall_1000/checkpoint_final",
+  "paper_samples": 64,
+  "results": {
+    "mmlu_pro": {
+      "accuracy": 0.375,
+      "correct": 24,
+      "seconds": 1.654839756898582,
+      "total": 64
+    },
+    "mnli": {
+      "accuracy": 0.8125,
+      "correct": 52,
+      "seconds": 2.190792523790151,
+      "total": 64
+    },
+    "mrpc": {
+      "accuracy": 0.765625,
+      "correct": 49,
+      "seconds": 1.523207652848214,
+      "total": 64
+    },
+    "qnli": {
+      "accuracy": 0.8125,
+      "correct": 52,
+      "seconds": 1.411299993749708,
+      "total": 64
+    },
+    "qqp": {
+      "accuracy": 0.859375,
+      "correct": 55,
+      "seconds": 1.1386207761242986,
+      "total": 64
+    },
+    "rte": {
+      "accuracy": 0.859375,
+      "correct": 55,
+      "seconds": 1.867335821967572,
+      "total": 64
+    },
+    "squad_v2": {
+      "f1": 32.8125,
+      "seconds": 4.2737377332523465,
+      "total": 64
+    },
+    "sst2": {
+      "accuracy": 0.96875,
+      "correct": 62,
+      "seconds": 0.8624942293390632,
+      "total": 64
+    }
+  }
+}

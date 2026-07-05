@@ -85,6 +85,16 @@ Trained activation-LUT diagnostic:
 
 This layerwise trained-LUT path fits expanded activation-LUT values and activation centers locally for all 196 target linears. It is closer to the paper phrase "trained lookup tables" than fixed-center LUT fitting, but it performs much worse than the STE activation-QAT path. Local LUT fitting is therefore not the missing ingredient by itself.
 
+Task-adapted checkpoint diagnostic:
+
+| Run | Stage | GLUE Avg | Gap vs Paper Target | MMLU-Pro | Gap vs Paper Target | SQuADv2 F1 | Gap vs Paper Target | WikiText PPL |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| `eval_taskadapt_fixedlabels_qwen3_1p7b_base_instruction_paperall_1000_g8_squad64` | FP16 after fixed-label 1000-update task adaptation | 84.64 | -4.16 vs FP16 | 37.50 | +4.40 vs FP16 | 32.81 | -39.99 vs FP16 | - |
+| `lutllm_taskadapt_fixedlabels1000_all196_ka256_centersonly_task03_recon1_steqat1500_squad64_ppl64` | `Ka=256`, centers-only, task 0.3 + recon 1.0 | 77.34 | -9.86 vs Act | 25.00 | -6.80 vs Act | 33.73 | -36.57 vs Act | 54.94 |
+| `lutllm_taskadapt_fixedlabels1000_all196_ka128_dense_wd001_lr1e4_dense1e7_recon01_task1_steqat1500_squad64_ppl64` | `Ka=128`, dense+centroids, task 1.0 + recon 0.1 | 77.08 | -10.12 vs Act | 17.19 | -14.61 vs Act | 28.87 | -41.43 vs Act | 67.32 |
+
+The fixed-label task adaptation improves the FP16 GLUE/MMLU starting point, but SQuAD remains far below the paper FP16 baseline. Quantizing all 196 linears from that checkpoint still drops GLUE by about 7 points and does not reproduce the paper first-stage row.
+
 Current FP16 baseline-alignment gap:
 
 | Run | Protocol | Samples | GLUE Avg | Gap vs Paper FP16 GLUE | MMLU-Pro | Gap vs Paper FP16 MMLU |
