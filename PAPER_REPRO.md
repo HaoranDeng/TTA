@@ -82,6 +82,7 @@ Latest all-196 diagnostic gap:
 |---|---:|---:|---:|---:|---:|---:|---:|
 | Fixed-label `Ka=128`, seq512, reconstruction 0.1 + dense LR `1e-7`, 1500 steps | 79.43 | 87.20 | -7.77 | 7.81 | 31.80 | -23.99 | 66.77 |
 | Fixed-label `Ka=64`, seq512, reconstruction 0.1 + dense LR `1e-7`, 2000 steps | 76.56 | 87.20 | -10.64 | 9.38 | 31.80 | -22.43 | 92.80 |
+| Fixed-label `Ka=256`, reconstruction 0.1 + dense LR `1e-6`, 1000-step control | 74.22 | 87.20 | -12.98 | 15.62 | 31.80 | -16.18 | 89.38 |
 | Fixed-label `Ka=64`, 8192 calib vectors/layer, KMeans 10, centers-only, 2000 steps | 73.70 | 87.20 | -13.50 | 10.94 | 31.80 | -20.86 | 144.20 |
 | `Ka=256`, reconstruction 0.1 + dense weights, 1000 steps | 71.09 | 87.20 | -16.11 | 23.44 | 31.80 | -8.36 | 107.73 |
 | Fixed-label `Ka=64`, reconstruction 1.0, centers-only LR `3e-5`, 2000 steps | 68.49 | 87.20 | -18.71 | 7.81 | 31.80 | -23.99 | 157.09 |
@@ -103,13 +104,14 @@ July 4 continuation summary, including SQuAD gaps to the paper's first-stage tar
 | Paper `+ Act. Quant.` target | target | 87.20 | 0.00 | 31.80 | 0.00 | 70.30 | 0.00 | - |
 | `lutllm_base_instruction_g8_all196_fixedlabels_seq512_ka128_recon01_dense1e7_steqat1500_actonly_squad64_ppl64` | fixed-label, `Ka=128`, recon 0.1 + dense LR `1e-7`, 1500 steps | 79.43 | -7.77 | 7.81 | -23.99 | 31.96 | -38.34 | 66.77 |
 | `lutllm_base_instruction_g8_all196_fixedlabels_seq512_ka64_recon01_dense1e7_steqat2000_actonly_squad64_ppl64` | fixed-label, `Ka=64`, recon 0.1 + dense LR `1e-7`, 2000 steps | 76.56 | -10.64 | 9.38 | -22.43 | 35.52 | -34.78 | 92.80 |
+| `lutllm_base_instruction_g8_all196_fixedlabels_ka256_recon01_dense_steqat1000_actonly_squad64_ppl64_control` | fixed-label control, `Ka=256`, recon 0.1 + dense LR `1e-6`, 1000 steps | 74.22 | -12.98 | 15.62 | -16.18 | 28.52 | -41.78 | 89.38 |
 | `lutllm_base_instruction_g8_all196_ka64_calib8192_k10_recon01_centersonly_steqat2000_actonly_squad64_ppl64_fixedlabels` | fixed-label, 8192 calib vectors/layer, KMeans 10, centers-only | 73.70 | -13.50 | 10.94 | -20.86 | 32.75 | -37.55 | 144.20 |
 | `lutllm_base_instruction_g8_all196_ka256_recon01_dense_steqat1000_actonly_squad64_ppl64` | `Ka=256`, recon 0.1 + dense LR `1e-6`, 1000 steps | 71.09 | -16.11 | 23.44 | -8.36 | 33.18 | -37.12 | 107.73 |
 | `lutllm_base_instruction_g8_all196_fixedlabels_ka64_calib8192_k10_recon1_centersonly_lr3e5_steqat2000_actonly_squad64_ppl64` | fixed-label, recon 1.0, centers-only LR `3e-5` | 68.49 | -18.71 | 7.81 | -23.99 | 33.90 | -36.40 | 157.09 |
 | `lutllm_base_instruction_g8_all196_cheb_softhard_t05_recon01_dense_steqat1000_actonly_squad64_ppl64_retry` | soft-hard STE temp 0.5, recon 0.1 + dense | 64.84 | -22.36 | 12.50 | -19.30 | 37.80 | -32.50 | 297.71 |
 | `lutllm_base_instruction_g8_all196_fixedlabels_ka64_calib8192_k10_recononly_centersonly_lr3e5_steqat1500_actonly_squad64_ppl64` | fixed-label, reconstruction-only, centers-only LR `3e-5` | 61.46 | -25.74 | 7.81 | -23.99 | 3.51 | -66.79 | 152.58 |
 
-Interpretation: the fixed-label truncation repair plus dense QAT improves GLUE to `79.43` with `Ka=128`, the best all-196 first-step result so far, and lowers PPL to `66.77`. MMLU-Pro still collapses on the fixed-label dense runs. Increasing the codebook to `Ka=256` in the pre-fix control improves MMLU-Pro to `23.44` and PPL to `107.73`, but still leaves GLUE and SQuAD far below the paper. Reconstruction-only training fails badly on SQuAD. The result is still not a reproduction of Table III; it is a constrained reverse-engineering attempt around missing QAT/evaluation details.
+Interpretation: the fixed-label truncation repair plus dense QAT improves GLUE to `79.43` with `Ka=128`, the best all-196 first-step result so far, and lowers PPL to `66.77`. MMLU-Pro still collapses on the fixed-label dense runs. A fixed-label `Ka=256` control reaches GLUE `74.22`, MMLU-Pro `15.62`, SQuAD F1 `28.52`, and PPL `89.38`; it improves GLUE/PPL versus the older pre-label-fix `Ka=256` row but does not preserve that row's MMLU-Pro `23.44`. Reconstruction-only training fails badly on SQuAD. The result is still not a reproduction of Table III; it is a constrained reverse-engineering attempt around missing QAT/evaluation details.
 
 ### Latest First-Step Act. Quant. Attempt
 
