@@ -159,6 +159,7 @@ Task-adapted checkpoint diagnostic:
 | Run | Stage | GLUE Avg | Gap vs Paper Target | MMLU-Pro | Gap vs Paper Target | SQuADv2 F1 | Gap vs Paper Target | WikiText PPL |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
 | `eval_taskadapt_fixedlabels_qwen3_1p7b_base_instruction_paperall_1000_g8_squad64` | FP16 after fixed-label 1000-update task adaptation | 84.64 | -4.16 vs FP16 | 37.50 | +4.40 vs FP16 | 32.81 | -39.99 vs FP16 | - |
+| `lutllm_taskadapt_fixedlabels1000_all196_ka256_km5_sample4096_centersonly_lr1e5_recon1_task03_steqat2000_squad64_ppl64` | `Ka=256`, KMeans 5/sample 4096, task 0.3 + recon 1.0, 2000 steps | 79.69 | -7.51 vs Act | 12.50 | -19.30 vs Act | 29.85 | -40.45 vs Act | 56.05 |
 | `lutllm_taskadapt_fixedlabels1000_all196_ka256_km5_sample4096_centersonly_lr1e5_recon1_task03_steqat1500_repeat_squad64_ppl64` | `Ka=256`, KMeans 5/sample 4096, task 0.3 + recon 1.0, 1500 steps | 77.86 | -9.34 vs Act | 12.50 | -19.30 vs Act | 30.13 | -40.17 vs Act | 66.16 |
 | `lutllm_taskadapt_fixedlabels1000_all196_ka256_centersonly_task03_recon1_steqat1500_squad64_ppl64` | `Ka=256`, centers-only, task 0.3 + recon 1.0 | 77.34 | -9.86 vs Act | 25.00 | -6.80 vs Act | 33.73 | -36.57 vs Act | 54.94 |
 | `lutllm_taskadapt_fixedlabels1000_all196_ka128_dense_wd001_lr1e4_dense1e7_recon01_task1_steqat1500_squad64_ppl64` | `Ka=128`, dense+centroids, task 1.0 + recon 0.1 | 77.08 | -10.12 vs Act | 17.19 | -14.61 vs Act | 28.87 | -41.43 vs Act | 67.32 |
