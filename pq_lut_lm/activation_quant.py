@@ -66,6 +66,9 @@ class STEActivationQuantLinear(nn.Module):
                 qv = qv + (soft_qv - soft_qv.detach())
             else:
                 raise ValueError(f"Unsupported activation train mode: {self.config.act_train_mode}")
+        center_scale = float(self.config.act_ste_center_scale)
+        if center_scale != 1.0:
+            qv = qv.detach() + center_scale * (qv - qv.detach())
         q = qv.reshape_as(flat)
         # Forward value is quantized; gradients flow to both centers and upstream activations.
         ste = q + float(self.config.act_ste_input_scale) * (flat - flat.detach())
@@ -104,6 +107,7 @@ class STEActivationQuantLinear(nn.Module):
             "act_train_mode": self.config.act_train_mode,
             "act_softmax_temperature": self.config.act_softmax_temperature,
             "act_ste_input_scale": self.config.act_ste_input_scale,
+            "act_ste_center_scale": self.config.act_ste_center_scale,
             "act_center_values": m * self.config.ka * self.config.subdim,
             "weight_center_values": 0,
             "base_lut_entries": m * self.config.ka * self.out_features,

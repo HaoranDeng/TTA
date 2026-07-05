@@ -34,6 +34,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--prompt-template", choices=["simple", "instruction", "lm_eval"], default="lm_eval")
     parser.add_argument("--skip-squad", action="store_true")
     parser.add_argument("--skip-mmlu", action="store_true")
+    parser.add_argument("--squad-repeat", type=int, default=1)
     parser.add_argument("--seed", type=int, default=123)
     parser.add_argument("--save-every", type=int, default=0)
     return parser.parse_args()
@@ -89,6 +90,7 @@ def main() -> None:
         max_length=args.max_length,
         include_squad=not args.skip_squad,
         include_mmlu=not args.skip_mmlu,
+        squad_repeat=args.squad_repeat,
         prompt_style=args.prompt_style,
         prompt_template=args.prompt_template,
     )

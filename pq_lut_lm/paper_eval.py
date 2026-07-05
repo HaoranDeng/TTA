@@ -477,7 +477,7 @@ def make_squad_supervised_examples(max_samples: int, prompt_template: str = "sim
         raise ValueError(f"Unsupported SQuAD prompt template: {prompt_template}")
     for row in rows:
         answers = row["answers"].get("text", [])
-        answer = answers[0] if answers else "unanswerable"
+        answer = answers[0] if answers else "No Answer"
         if prompt_template == "lm_eval":
             prompt = (
                 f"Title: {row.get('title', '')}\n\n"
@@ -533,6 +533,7 @@ def make_paper_supervised_batches(
     max_length: int,
     include_squad: bool = True,
     include_mmlu: bool = True,
+    squad_repeat: int = 1,
     prompt_style: str = "plain",
     prompt_template: str = "simple",
 ) -> list[dict[str, torch.Tensor]]:
@@ -543,7 +544,8 @@ def make_paper_supervised_batches(
     if include_mmlu:
         examples.extend(make_mmlu_pro_supervised_examples(per_task, prompt_template=prompt_template))
     if include_squad:
-        examples.extend(make_squad_supervised_examples(per_task, prompt_template=prompt_template))
+        for _ in range(max(1, squad_repeat)):
+            examples.extend(make_squad_supervised_examples(per_task, prompt_template=prompt_template))
 
     pad_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
     encoded = []

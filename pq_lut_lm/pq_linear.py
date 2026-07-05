@@ -30,6 +30,7 @@ class PQConfig:
     act_train_mode: str = "hard"
     act_softmax_temperature: float = 1.0
     act_ste_input_scale: float = 1.0
+    act_ste_center_scale: float = 1.0
     output_correction: str = "none"
     seed: int = 123
 

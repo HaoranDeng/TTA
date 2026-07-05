@@ -63,6 +63,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mmlu-shot-count", type=int, default=0)
     parser.add_argument("--skip-squad", action="store_true")
     parser.add_argument("--train-include-squad", action="store_true")
+    parser.add_argument("--squad-repeat", type=int, default=1)
     parser.add_argument("--target-regex", default=DEFAULT_TARGET_REGEX)
     parser.add_argument("--include-lm-head", action="store_true")
     parser.add_argument("--max-linears", type=int, default=None)
@@ -81,7 +82,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--weight-center-refine-blend", type=float, default=1.0)
     parser.add_argument("--act-train-mode", choices=["hard", "soft", "soft_hard"], default="hard")
     parser.add_argument("--act-softmax-temperature", type=float, default=1.0)
+    parser.add_argument("--act-softmax-temperature-end", type=float, default=None)
     parser.add_argument("--act-ste-input-scale", type=float, default=1.0)
+    parser.add_argument("--act-ste-input-scale-end", type=float, default=None)
+    parser.add_argument("--act-ste-center-scale", type=float, default=1.0)
+    parser.add_argument("--act-ste-center-scale-end", type=float, default=None)
     parser.add_argument("--lut-storage", choices=["expanded", "compact"], default="expanded")
     parser.add_argument("--output-correction", choices=["none", "bias", "affine"], default="none")
     parser.add_argument("--eval-baseline", action="store_true")
@@ -194,6 +199,13 @@ def dense_linear_parameters_under_ste(model: torch.nn.Module) -> list[torch.nn.P
     return params
 
 
+def linear_schedule_value(start: float, end: float | None, step: int, steps: int) -> float:
+    if end is None or steps <= 1:
+        return float(start)
+    ratio = step / float(max(steps - 1, 1))
+    return float(start) + (float(end) - float(start)) * ratio
+
+
 def main() -> None:
     args = parse_args()
     torch.manual_seed(args.seed)
@@ -231,6 +243,7 @@ def main() -> None:
             batch_size=1,
             max_length=args.seq_len,
             include_squad=train_include_squad,
+            squad_repeat=args.squad_repeat,
             prompt_style=args.prompt_style,
             prompt_template=args.prompt_template,
         )
@@ -314,6 +327,7 @@ def main() -> None:
         act_train_mode=args.act_train_mode,
         act_softmax_temperature=args.act_softmax_temperature,
         act_ste_input_scale=args.act_ste_input_scale,
+        act_ste_center_scale=args.act_ste_center_scale,
         output_correction=args.output_correction,
         seed=args.seed,
     )
@@ -358,6 +372,24 @@ def main() -> None:
     train_start = time.perf_counter()
     model.train()
     for step in range(args.train_steps):
+        config.act_softmax_temperature = linear_schedule_value(
+            args.act_softmax_temperature,
+            args.act_softmax_temperature_end,
+            step,
+            args.train_steps,
+        )
+        config.act_ste_input_scale = linear_schedule_value(
+            args.act_ste_input_scale,
+            args.act_ste_input_scale_end,
+            step,
+            args.train_steps,
+        )
+        config.act_ste_center_scale = linear_schedule_value(
+            args.act_ste_center_scale,
+            args.act_ste_center_scale_end,
+            step,
+            args.train_steps,
+        )
         batch = train_batches[step % len(train_batches)]
         batch = {k: v.to(device) for k, v in batch.items()}
         labels = batch.get("labels", batch["input_ids"].clone())
@@ -379,7 +411,9 @@ def main() -> None:
         reconstruction_losses.append(recon_value)
         print(
             f"step {step + 1}/{args.train_steps} loss={value:.4f} "
-            f"task={task_value:.4f} recon={recon_value:.4f}",
+            f"task={task_value:.4f} recon={recon_value:.4f} "
+            f"temp={config.act_softmax_temperature:.4g} "
+            f"in_grad={config.act_ste_input_scale:.4g} center_grad={config.act_ste_center_scale:.4g}",
             flush=True,
         )
     if device.type == "cuda":
@@ -396,6 +430,12 @@ def main() -> None:
         "train_dense_linears": args.train_dense_linears,
         "center_param_count": center_param_count,
         "dense_linear_param_count": dense_param_count,
+        "act_softmax_temperature_start": args.act_softmax_temperature,
+        "act_softmax_temperature_end": args.act_softmax_temperature_end,
+        "act_ste_input_scale_start": args.act_ste_input_scale,
+        "act_ste_input_scale_end": args.act_ste_input_scale_end,
+        "act_ste_center_scale_start": args.act_ste_center_scale,
+        "act_ste_center_scale_end": args.act_ste_center_scale_end,
     }
     model.eval()
     save_json(out_dir / "summary.json", summary)
