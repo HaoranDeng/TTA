@@ -1,0 +1,1027 @@
+{
+  "model_id": "Qwen/Qwen3-1.7B-Base",
+  "prompt_style": "plain",
+  "results": {
+    "current_instruction_max16": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 0.3333333333333333,
+          "prediction": "The Normans were in Normandy from the 10th to the"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 31.614583333333336,
+      "seconds": 5.474162918049842
+    },
+    "current_instruction_max24": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 0.5714285714285714,
+          "prediction": "The Normans were in Normandy from the 10th to the 11th centuries."
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 31.85639880952381,
+      "seconds": 6.281533310189843
+    },
+    "current_instruction_max32": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 0.5714285714285714,
+          "prediction": "The Normans were in Normandy from the 10th to the 11th centuries."
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 31.763392857142858,
+      "seconds": 6.105500365141779
+    },
+    "current_instruction_max8": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 0.20000000000000004,
+          "prediction": "The Normans were in Normandy from"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 30.0,
+      "seconds": 5.269208780955523
+    },
+    "lighteval_style_max16": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 0.3076923076923077,
+          "prediction": "The Normans were in Normandy from the 10th century to the"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 0.42857142857142855,
+          "prediction": "The Normans first gained their separate identity in the 10th century."
+        }
+      ],
+      "f1": 27.87802475302475,
+      "seconds": 6.469052687752992
+    },
+    "lighteval_style_max24": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 0.26666666666666666,
+          "prediction": "The Normans were in Normandy from the 10th century to the 13th century."
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 0.42857142857142855,
+          "prediction": "The Normans first gained their separate identity in the 10th century."
+        }
+      ],
+      "f1": 27.467612044817923,
+      "seconds": 7.647224999964237
+    },
+    "lighteval_style_max32": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 0.26666666666666666,
+          "prediction": "The Normans were in Normandy from the 10th century to the 13th century."
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 0.42857142857142855,
+          "prediction": "The Normans first gained their separate identity in the 10th century."
+        }
+      ],
+      "f1": 27.278382571217243,
+      "seconds": 8.329347158316523
+    },
+    "lighteval_style_max8": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 0.20000000000000004,
+          "prediction": "The Normans were in Normandy from"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 0.1818181818181818,
+          "prediction": "The Normans first gained their separate identity"
+        }
+      ],
+      "f1": 25.379577020202028,
+      "seconds": 5.011568333953619
+    },
+    "plain_context_question_max16": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 0.3333333333333333,
+          "prediction": "The Normans were in Normandy from the 10th to the"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 0.42857142857142855,
+          "prediction": "The Normans first gained their separate identity in the 10th century."
+        }
+      ],
+      "f1": 19.815791847041847,
+      "seconds": 9.007450083270669
+    },
+    "plain_context_question_max24": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 0.47058823529411764,
+          "prediction": "The Normans were in Normandy from the 10th to the 11th centuries. They were people"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 0.42857142857142855,
+          "prediction": "The Normans first gained their separate identity in the 10th century."
+        }
+      ],
+      "f1": 20.63436320462733,
+      "seconds": 11.527065583039075
+    },
+    "plain_context_question_max32": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 0.3478260869565218,
+          "prediction": "The Normans were in Normandy from the 10th to the 11th centuries. They were people who came from a place called Denmark,"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 0.42857142857142855,
+          "prediction": "The Normans first gained their separate identity in the 10th century."
+        }
+      ],
+      "f1": 20.592787732465222,
+      "seconds": 13.220447872299701
+    },
+    "plain_context_question_max8": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 0.20000000000000004,
+          "prediction": "The Normans were in Normandy from"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 0.1818181818181818,
+          "prediction": "The Normans first gained their separate identity"
+        }
+      ],
+      "f1": 17.393465909090914,
+      "seconds": 5.716032214928418
+    },
+    "qa_only_max16": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th"
+        }
+      ],
+      "f1": 34.39867424242424,
+      "seconds": 4.553303513210267
+    },
+    "qa_only_max24": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th"
+        }
+      ],
+      "f1": 34.39867424242424,
+      "seconds": 4.410267840139568
+    },
+    "qa_only_max32": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th"
+        }
+      ],
+      "f1": 34.39867424242424,
+      "seconds": 4.415368834976107
+    },
+    "qa_only_max8": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 0.5714285714285715,
+          "prediction": "10th and 11"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th"
+        }
+      ],
+      "f1": 33.444940476190474,
+      "seconds": 4.126998458057642
+    },
+    "short_span_max16": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 0.8571428571428571,
+          "prediction": "Denmark, Iceland, Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 34.41220238095239,
+      "seconds": 4.044094901997596
+    },
+    "short_span_max24": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 0.8571428571428571,
+          "prediction": "Denmark, Iceland, Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 34.41220238095239,
+      "seconds": 3.946090269833803
+    },
+    "short_span_max32": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 0.8571428571428571,
+          "prediction": "Denmark, Iceland, Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 34.41220238095239,
+      "seconds": 4.120436252094805
+    },
+    "short_span_max8": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 0.5714285714285715,
+          "prediction": "10th and 11"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 0.8571428571428571,
+          "prediction": "Denmark, Iceland, Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 33.742559523809526,
+      "seconds": 3.935865656938404
+    }
+  },
+  "samples": 64
+}

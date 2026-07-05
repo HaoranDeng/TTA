@@ -50,6 +50,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--train-dense-linears", action="store_true")
     parser.add_argument("--dense-lr", type=float, default=1e-5)
+    parser.add_argument("--weight-decay", type=float, default=0.0)
     parser.add_argument("--task-loss-ratio", type=float, default=1.0)
     parser.add_argument("--reconstruction-loss-ratio", type=float, default=0.0)
     parser.add_argument("--paper-samples", type=int, default=16)
@@ -346,7 +347,7 @@ def main() -> None:
     param_groups: list[dict[str, Any]] = [{"params": center_params, "lr": args.lr}]
     if dense_params:
         param_groups.append({"params": dense_params, "lr": args.dense_lr})
-    opt = torch.optim.AdamW(param_groups)
+    opt = torch.optim.AdamW(param_groups, weight_decay=args.weight_decay)
     train_losses = []
     task_losses = []
     reconstruction_losses = []
@@ -391,6 +392,7 @@ def main() -> None:
         "reconstruction_losses": reconstruction_losses,
         "task_loss_ratio": args.task_loss_ratio,
         "reconstruction_loss_ratio": args.reconstruction_loss_ratio,
+        "weight_decay": args.weight_decay,
         "train_dense_linears": args.train_dense_linears,
         "center_param_count": center_param_count,
         "dense_linear_param_count": dense_param_count,

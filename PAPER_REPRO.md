@@ -11,8 +11,9 @@ Official artifact checked at `LUT-FPGA/LUT-LLM` commit `9ee2259d312f9b1119a398d8
 The paper's algorithm setup is:
 
 - Model: Qwen 3 1.7B.
-- Activation VQ: `subdim=2`, `Ka=64`.
-- Weight VQ: `Kw=16`, with INT8 quantized lookup tables.
+- Public quantization configuration from the arXiv v2 source: `G=512`, vector length `v=2`, activation codebook size `c_a=64`, weight codebook size `c_w=16`, with INT8 quantized lookup tables.
+- Activation VQ in this repo: `subdim=2`, `Ka=64` for strict paper-configuration attempts.
+- Weight VQ in this repo: `weight_group_size=512`, `Kw=16` for final-LUT attempts.
 - Training: KMeans initialization, QAT with STE and custom fused forward/backward kernels.
 - Additional training details from the paper text: the authors report continuing training from Qwen 3 1.7B with FineWeb 512-token sequences and then WikiQA for 3 epochs, plus the LUT-DLA-style reconstruction loss ratio `0.1`.
 - Final conversion: reconstruct weights from trained lookup tables, apply GPTVQ, then precompute activation-codebook x weight-codebook LUTs.
@@ -38,6 +39,7 @@ New files:
 - `run_lutllm_qat.py`: simplified LUT-LLM-style activation QAT with STE, followed by activation-weight LUT conversion.
 - `run_act_lut_fit.py`: layerwise direct activation-LUT fitting, least-squares reconstruction of dense weights from trained tables, and final activation-weight VQ.
 - `run_w8a8_quant.py`: RTN/W8A8 fake-quantization runner with dynamic/static activation scales and SmoothQuant-style smoothing.
+- `probe_squad_prompts.py`: FP16/BF16 SQuAD v2 prompt probe used to test whether the SQuAD gap is a simple prompt/generation-length issue.
 - `pq_lut_lm/paper_eval.py`: prompt-based GLUE/MMLU-Pro log-likelihood scoring and SQuADv2 short generation/F1.
 - `pq_lut_lm/activation_quant.py`: trainable activation VQ wrapper with STE, direct activation-LUT modules, and LUT-to-weight reconstruction.
 - `pq_lut_lm/w8a8_quant.py`: all-target-linear W8A8 wrapper used to test RTN/SmoothQuant-style activation quantization.
@@ -50,6 +52,7 @@ Current implementation additions for the first-stage reproduction:
 - `SCORE_COMPLETION_BATCH_SIZE=1` allows memory-safe GLUE/MMLU-Pro completion scoring for activation-VQ models.
 - `--reconstruction-loss-ratio` adds a dense-output reconstruction MSE term during STE QAT. This approximates the paper's stated reconstruction-loss ratio `0.1`.
 - `--task-loss-ratio` allows reconstruction-only ablations without changing the default task-loss behavior.
+- `--weight-decay` now records and controls AdamW weight decay explicitly. Dense+centroid QAT can be run with `0.0` or with the earlier implicit PyTorch default `0.01`.
 - `--train-source lutllm_paper` approximates the paper's FineWeb 512-token pretrain plus WikiQA finetune data mix.
 - Supervised prompt/completion encoding now preserves completion labels under left truncation. This matters for long SQuAD/WikiQA prompts: the old path could mask nearly all answer tokens after truncation, weakening task-adaptation and QAT supervision.
 
@@ -76,19 +79,33 @@ Current baseline-alignment status:
 
 Interpretation: standard public `lm_eval` prompts do not explain the paper's FP16 row; they make GLUE substantially worse. Simple GLUE-only continued training for 500 updates also failed to move toward the paper. The remaining FP16 mismatch is therefore likely due to the paper's customized checkpoint and/or an undisclosed task/evaluation protocol. All quantized all-196-linear results below remain useful diagnostics, but they are not a faithful reproduction until this FP16 row is matched.
 
+SQuAD v2 FP16/BF16 prompt probe on `Qwen/Qwen3-1.7B-Base`, 64 validation examples:
+
+| Prompt Probe | Best F1 | Gap vs Paper FP16 SQuAD |
+|---|---:|---:|
+| Current instruction prompt, max 24 new tokens | 31.86 | -40.94 |
+| Best simple probe (`short_span`, max 16/24/32) | 34.41 | -38.39 |
+| Best simple probe (`qa_only`, max 16/24/32) | 34.40 | -38.40 |
+
+Interpretation: the SQuAD gap is not explained by a short generation length or a simple prompt variant. The public checkpoint/protocol is far below the paper FP16 SQuAD row before any quantization is applied.
+
 Latest all-196 diagnostic gap:
 
 | Stage | GLUE Avg | Paper Target | Gap | MMLU-Pro | Paper Target | Gap | WikiText PPL |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | Fixed-label `Ka=128`, seq512, reconstruction 0.1 + dense LR `1e-7`, 1500 steps | 79.43 | 87.20 | -7.77 | 7.81 | 31.80 | -23.99 | 66.77 |
+| Fixed-label `Ka=256`, centers-only, task 0.3 + reconstruction 1.0, LR `1e-5`, 1500 steps | 78.39 | 87.20 | -8.81 | 12.50 | 31.80 | -19.30 | 64.89 |
 | Fixed-label `Ka=256`, centers-only, reconstruction 0.1, LR `1e-4`, 2000 steps | 78.12 | 87.20 | -9.08 | 12.50 | 31.80 | -19.30 | 38.71 |
+| `Ka=256`, dense+centroids, `weight_decay=0.01`, task 0.1 + reconstruction 1.0, 2000 steps | 77.60 | 87.20 | -9.60 | 15.62 | 31.80 | -16.18 | 64.78 |
 | Fixed-label `Ka=64`, seq512, reconstruction 0.1 + dense LR `1e-7`, 2000 steps | 76.56 | 87.20 | -10.64 | 9.38 | 31.80 | -22.43 | 92.80 |
 | Fixed-label `Ka=256`, centers-only, task 0.1 + reconstruction 1.0, LR `1e-5`, 1500 steps | 76.04 | 87.20 | -11.16 | 21.88 | 31.80 | -9.93 | 66.96 |
 | Fixed-label `Ka=256`, reconstruction 0.1 + dense LR `1e-6`, 1000-step control | 74.22 | 87.20 | -12.98 | 15.62 | 31.80 | -16.18 | 89.38 |
 | Fixed-label `Ka=64`, 8192 calib vectors/layer, KMeans 10, centers-only, 2000 steps | 73.70 | 87.20 | -13.50 | 10.94 | 31.80 | -20.86 | 144.20 |
+| Strict public paper config `c_a=64`, dense+centroids, `weight_decay=0`, task 1.0 + reconstruction 0.1, 3000 steps | 72.66 | 87.20 | -14.54 | 9.38 | 31.80 | -22.43 | 81.44 |
 | Fixed-label `Ka=128`, dense LR `1e-7`, task 0.3 + reconstruction 1.0, 1500 steps | 72.92 | 87.20 | -14.28 | 12.50 | 31.80 | -19.30 | 83.41 |
 | Fixed-label `Ka=64`, centers-only, reconstruction 0.1, LR `5e-5`, 4000 steps | 72.66 | 87.20 | -14.54 | 10.94 | 31.80 | -20.86 | 93.14 |
 | `Ka=256`, reconstruction 0.1 + dense weights, 1000 steps | 71.09 | 87.20 | -16.11 | 23.44 | 31.80 | -8.36 | 107.73 |
+| Strict public paper config `c_a=64`, dense+centroids, `weight_decay=0`, task 0.3 + reconstruction 1.0, 3000 steps | 69.01 | 87.20 | -18.19 | 14.06 | 31.80 | -17.74 | 92.32 |
 | Fixed-label `Ka=64`, reconstruction 1.0, centers-only LR `3e-5`, 2000 steps | 68.49 | 87.20 | -18.71 | 7.81 | 31.80 | -23.99 | 157.09 |
 | Fixed-label `Ka=64`, centers-only, task 0.1 + reconstruction 1.0, LR `1e-5`, 2000 steps | 67.45 | 87.20 | -19.75 | 15.62 | 31.80 | -16.18 | 93.21 |
 | Fixed-label `Ka=64`, reconstruction-only, centers-only LR `3e-5`, 1500 steps | 61.46 | 87.20 | -25.74 | 7.81 | 31.80 | -23.99 | 152.58 |
@@ -109,21 +126,25 @@ July 4 continuation summary, including SQuAD gaps to the paper's first-stage tar
 |---|---|---:|---:|---:|---:|---:|---:|---:|
 | Paper `+ Act. Quant.` target | target | 87.20 | 0.00 | 31.80 | 0.00 | 70.30 | 0.00 | - |
 | `lutllm_base_instruction_g8_all196_fixedlabels_seq512_ka128_recon01_dense1e7_steqat1500_actonly_squad64_ppl64` | fixed-label, `Ka=128`, recon 0.1 + dense LR `1e-7`, 1500 steps | 79.43 | -7.77 | 7.81 | -23.99 | 31.96 | -38.34 | 66.77 |
+| `lutllm_base_instruction_g8_all196_fixedlabels_seq512_ka256_recon1_task03_centersonly_lr1e5_steqat1500_squad64_ppl64` | fixed-label, `Ka=256`, centers-only, task 0.3 + recon 1.0, LR `1e-5` | 78.39 | -8.81 | 12.50 | -19.30 | 27.27 | -43.03 | 64.89 |
 | `lutllm_base_instruction_g8_all196_fixedlabels_seq512_ka256_centersonly_lr1e4_recon01_steqat2000_squad64_ppl64` | fixed-label, `Ka=256`, centers-only, recon 0.1, LR `1e-4` | 78.12 | -9.08 | 12.50 | -19.30 | 33.76 | -36.54 | 38.71 |
+| `lutllm_bigcode_all196_ka256_dense_wd001_lr1e5_dense1e7_recon1_task01_steqat2000_squad64_ppl64` | `Ka=256`, dense+centroids, `weight_decay=0.01`, task 0.1 + recon 1.0 | 77.60 | -9.60 | 15.62 | -16.18 | 31.46 | -38.84 | 64.78 |
 | `lutllm_base_instruction_g8_all196_fixedlabels_seq512_ka64_recon01_dense1e7_steqat2000_actonly_squad64_ppl64` | fixed-label, `Ka=64`, recon 0.1 + dense LR `1e-7`, 2000 steps | 76.56 | -10.64 | 9.38 | -22.43 | 35.52 | -34.78 | 92.80 |
 | `lutllm_base_instruction_g8_all196_fixedlabels_seq512_ka256_recon1_task01_centersonly_lr1e5_steqat1500_squad64_ppl64` | fixed-label, `Ka=256`, centers-only, task 0.1 + recon 1.0, LR `1e-5` | 76.04 | -11.16 | 21.88 | -9.93 | 31.98 | -38.32 | 66.96 |
 | `lutllm_base_instruction_g8_all196_fixedlabels_ka256_recon01_dense_steqat1000_actonly_squad64_ppl64_control` | fixed-label control, `Ka=256`, recon 0.1 + dense LR `1e-6`, 1000 steps | 74.22 | -12.98 | 15.62 | -16.18 | 28.52 | -41.78 | 89.38 |
 | `lutllm_base_instruction_g8_all196_ka64_calib8192_k10_recon01_centersonly_steqat2000_actonly_squad64_ppl64_fixedlabels` | fixed-label, 8192 calib vectors/layer, KMeans 10, centers-only | 73.70 | -13.50 | 10.94 | -20.86 | 32.75 | -37.55 | 144.20 |
+| `lutllm_paperexact_all196_ca64_dense_wd0_lr3e5_dense3e7_recon01_task1_steqat3000_squad64_ppl64` | strict public paper config `c_a=64`, dense+centroids, `weight_decay=0`, task 1.0 + recon 0.1 | 72.66 | -14.54 | 9.38 | -22.43 | 33.39 | -36.91 | 81.44 |
 | `lutllm_base_instruction_g8_all196_fixedlabels_seq512_ka128_balancedrecon1_task03_dense1e7_steqat1500_squad64_ppl64` | fixed-label, `Ka=128`, dense LR `1e-7`, task 0.3 + recon 1.0 | 72.92 | -14.28 | 12.50 | -19.30 | 23.59 | -46.71 | 83.41 |
 | `lutllm_base_instruction_g8_all196_fixedlabels_seq512_ka64_centersonly_lr5e5_recon01_steqat4000_squad64_ppl64` | fixed-label, `Ka=64`, centers-only, recon 0.1, LR `5e-5`, 4000 steps | 72.66 | -14.54 | 10.94 | -20.86 | 35.00 | -35.30 | 93.14 |
 | `lutllm_base_instruction_g8_all196_ka256_recon01_dense_steqat1000_actonly_squad64_ppl64` | `Ka=256`, recon 0.1 + dense LR `1e-6`, 1000 steps | 71.09 | -16.11 | 23.44 | -8.36 | 33.18 | -37.12 | 107.73 |
+| `lutllm_paperexact_all196_ca64_dense_wd0_lr1e5_dense1e7_recon1_task03_steqat3000_squad64_ppl64` | strict public paper config `c_a=64`, dense+centroids, `weight_decay=0`, task 0.3 + recon 1.0 | 69.01 | -18.19 | 14.06 | -17.74 | 5.94 | -64.36 | 92.32 |
 | `lutllm_base_instruction_g8_all196_fixedlabels_ka64_calib8192_k10_recon1_centersonly_lr3e5_steqat2000_actonly_squad64_ppl64` | fixed-label, recon 1.0, centers-only LR `3e-5` | 68.49 | -18.71 | 7.81 | -23.99 | 33.90 | -36.40 | 157.09 |
 | `lutllm_base_instruction_g8_all196_fixedlabels_seq512_ka64_recon1_task01_centersonly_lr1e5_steqat2000_squad64_ppl64` | fixed-label, `Ka=64`, centers-only, task 0.1 + recon 1.0, LR `1e-5` | 67.45 | -19.75 | 15.62 | -16.18 | 4.05 | -66.25 | 93.21 |
 | `lutllm_base_instruction_g8_all196_cheb_softhard_t05_recon01_dense_steqat1000_actonly_squad64_ppl64_retry` | soft-hard STE temp 0.5, recon 0.1 + dense | 64.84 | -22.36 | 12.50 | -19.30 | 37.80 | -32.50 | 297.71 |
 | `lutllm_base_instruction_g8_all196_fixedlabels_ka64_calib8192_k10_recononly_centersonly_lr3e5_steqat1500_actonly_squad64_ppl64` | fixed-label, reconstruction-only, centers-only LR `3e-5` | 61.46 | -25.74 | 7.81 | -23.99 | 3.51 | -66.79 | 152.58 |
 | `lutllm_lutllmpaper_all196_seq512_ka64_centersonly_lr1e4_recon01_steqat3000_squad64_ppl64_bigdata` | FineWeb/WikiQA approximation, `Ka=64`, centers-only, recon 0.1 | 53.39 | -33.81 | 9.38 | -22.43 | 6.99 | -63.31 | 397.58 |
 
-Interpretation: the fixed-label truncation repair plus dense QAT improves GLUE to `79.43` with `Ka=128`, the best all-196 first-step GLUE result so far. Increasing the codebook to `Ka=256` improves PPL substantially (`38.71`) and a conservative `Ka=256` loss mix recovers MMLU-Pro to `21.88`, but neither setting recovers SQuAD or reaches the paper's first-step GLUE/MMLU targets. The larger FineWeb/WikiQA approximation damages all downstream metrics, so the missing paper data/checkpoint recipe is not reproduced by the small public-data proxy. The result is still not a reproduction of Table III; it is a constrained reverse-engineering attempt around missing QAT/evaluation details.
+Interpretation: the fixed-label truncation repair plus dense QAT improves GLUE to `79.43` with `Ka=128`, the best all-196 first-step GLUE result so far. Increasing the codebook to `Ka=256` improves PPL substantially (`38.71`) and a conservative `Ka=256` loss mix recovers MMLU-Pro to `21.88`, but neither setting recovers SQuAD or reaches the paper's first-step GLUE/MMLU targets. The newest `Ka=256` dense+centroid run does not improve that tradeoff, and the two newest strict public-paper-configuration `c_a=64` dense+centroid runs also fail to close the gap. The larger FineWeb/WikiQA approximation damages all downstream metrics, so the missing paper data/checkpoint recipe is not reproduced by the small public-data proxy. The result is still not a reproduction of Table III; it is a constrained reverse-engineering attempt around missing QAT/evaluation details.
 
 ### Latest First-Step Act. Quant. Attempt
 
