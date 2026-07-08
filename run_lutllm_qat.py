@@ -17,6 +17,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from pq_lut_lm.activation_quant import (
     STEActivationQuantLinear,
     convert_ste_act_quant_to_lut,
+    fit_ste_output_corrections,
     replace_with_ste_act_quant,
     set_ste_reconstruction_loss_enabled,
     ste_reconstruction_loss,
@@ -441,6 +442,19 @@ def main() -> None:
     }
     model.eval()
     save_json(out_dir / "summary.json", summary)
+
+    if args.output_correction != "none":
+        print(f"Fitting STE activation output correction: {args.output_correction}", flush=True)
+        summary["act_output_correction"] = fit_ste_output_corrections(
+            model,
+            calib_batches,
+            target_regex=args.target_regex,
+            include_lm_head=args.include_lm_head,
+            max_linears=args.max_linears,
+            max_vectors_per_layer=args.calib_vectors_per_layer,
+            device=device,
+        )
+        save_json(out_dir / "summary.json", summary)
 
     if args.eval_act_quant:
         print("Evaluating +Act. Quant. on paper tasks", flush=True)

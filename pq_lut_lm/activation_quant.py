@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import time
 from dataclasses import dataclass
 from typing import Any, Iterable
@@ -37,6 +38,16 @@ class STEActivationQuantLinear(nn.Module):
         self.in_features = linear.in_features
         self.out_features = linear.out_features
         self.act_centers = nn.Parameter(act_centers.detach().clone().float())
+        self.register_buffer(
+            "correction_scale",
+            torch.ones((self.out_features,), device=linear.weight.device, dtype=torch.float32),
+            persistent=True,
+        )
+        self.register_buffer(
+            "correction_bias",
+            torch.zeros((self.out_features,), device=linear.weight.device, dtype=torch.float32),
+            persistent=True,
+        )
         self.reconstruction_loss_enabled = False
         self.last_reconstruction_loss: torch.Tensor | None = None
 
@@ -90,14 +101,56 @@ class STEActivationQuantLinear(nn.Module):
         self.last_reconstruction_loss = None
         quantized = self.quantize_activation(x).to(dtype=x.dtype)
         quantized_out = self.linear(quantized)
+        corrected_out = quantized_out.float().mul(self.correction_scale).add(self.correction_bias).to(dtype=x.dtype)
         if self.training and self.reconstruction_loss_enabled:
             with torch.no_grad():
                 dense_out = self.linear(x)
             self.last_reconstruction_loss = torch.nn.functional.mse_loss(
-                quantized_out.float(),
+                corrected_out.float(),
                 dense_out.float(),
             )
-        return quantized_out
+        return corrected_out
+
+    @torch.no_grad()
+    def fit_output_correction(self, calibration_inputs: torch.Tensor, batch_size: int = 256) -> None:
+        if self.config.output_correction not in {"bias", "affine"}:
+            raise ValueError(f"Unsupported output correction: {self.config.output_correction}")
+        device = self.act_centers.device
+        calib = calibration_inputs.to(device=device, dtype=self.linear.weight.dtype, non_blocking=True)
+        sum_orig = torch.zeros((self.out_features,), device=device, dtype=torch.float64)
+        sum_approx = torch.zeros_like(sum_orig)
+        sum_approx2 = torch.zeros_like(sum_orig)
+        sum_approx_orig = torch.zeros_like(sum_orig)
+        count = 0
+        for start in range(0, calib.shape[0], batch_size):
+            x = calib[start : start + batch_size]
+            orig = self.linear(x).float()
+            quantized = self.quantize_activation(x).to(dtype=x.dtype)
+            approx = self.linear(quantized).float()
+            count += approx.shape[0]
+            sum_orig += orig.double().sum(dim=0)
+            sum_approx += approx.double().sum(dim=0)
+            if self.config.output_correction == "affine":
+                approx_d = approx.double()
+                orig_d = orig.double()
+                sum_approx2 += (approx_d * approx_d).sum(dim=0)
+                sum_approx_orig += (approx_d * orig_d).sum(dim=0)
+        if count == 0:
+            return
+        orig_mean = sum_orig / count
+        approx_mean = sum_approx / count
+        if self.config.output_correction == "bias":
+            self.correction_scale.fill_(1.0)
+            self.correction_bias.copy_((orig_mean - approx_mean).float())
+            return
+        approx2_mean = sum_approx2 / count
+        approx_orig_mean = sum_approx_orig / count
+        var = (approx2_mean - approx_mean * approx_mean).clamp_min(1e-6)
+        cov = approx_orig_mean - approx_mean * orig_mean
+        scale = (cov / var).clamp(-8.0, 8.0)
+        bias = orig_mean - scale * approx_mean
+        self.correction_scale.copy_(scale.float())
+        self.correction_bias.copy_(bias.float())
 
     def hardware_stats(self) -> dict[str, Any]:
         m = self.in_features // self.config.subdim
@@ -115,7 +168,7 @@ class STEActivationQuantLinear(nn.Module):
             "distance": self.config.distance,
             "lut_quant_bits": 0,
             "lut_storage": "dense-weight",
-            "output_correction": "none",
+            "output_correction": self.config.output_correction,
             "act_train_mode": self.config.act_train_mode,
             "act_softmax_temperature": self.config.act_softmax_temperature,
             "act_ste_input_scale": self.config.act_ste_input_scale,
@@ -462,6 +515,60 @@ def replace_with_ste_act_quant(
         calibration_seconds=calibration_seconds,
         initialization_seconds=time.perf_counter() - start,
     )
+
+
+@torch.no_grad()
+def fit_ste_output_corrections(
+    model: nn.Module,
+    calibration_batches: Iterable[dict[str, torch.Tensor]],
+    target_regex: str = DEFAULT_TARGET_REGEX,
+    include_lm_head: bool = False,
+    max_linears: int | None = None,
+    max_vectors_per_layer: int = 1024,
+    device: torch.device | None = None,
+    batch_size: int = 256,
+) -> dict[str, Any]:
+    if device is None:
+        device = next(model.parameters()).device
+    pattern = re.compile(target_regex)
+    modules = dict(model.named_modules())
+    target_names: list[str] = []
+    for name, module in modules.items():
+        if not isinstance(module, STEActivationQuantLinear):
+            continue
+        if name == "lm_head" and not include_lm_head:
+            continue
+        if pattern.search(name) or (include_lm_head and name == "lm_head"):
+            target_names.append(name)
+            if max_linears is not None and len(target_names) >= max_linears:
+                break
+    if not target_names:
+        return {"modules": 0, "calibration_seconds": 0.0, "fit_seconds": 0.0}
+    calibration_inputs, calibration_seconds = collect_calibration_inputs(
+        model,
+        calibration_batches,
+        target_names,
+        max_vectors_per_layer=max_vectors_per_layer,
+        device=device,
+    )
+    if device.type == "cuda":
+        torch.cuda.synchronize(device)
+    start = time.perf_counter()
+    for idx, name in enumerate(target_names, start=1):
+        module = modules[name]
+        if not isinstance(module, STEActivationQuantLinear):
+            continue
+        module.fit_output_correction(calibration_inputs[name], batch_size=batch_size)
+        if idx == 1 or idx == len(target_names) or idx % 10 == 0:
+            print(f"fitted STE output correction {idx}/{len(target_names)}: {name}", flush=True)
+    if device.type == "cuda":
+        torch.cuda.synchronize(device)
+    return {
+        "modules": len(target_names),
+        "calibration_seconds": calibration_seconds,
+        "fit_seconds": time.perf_counter() - start,
+        "mode": modules[target_names[0]].config.output_correction,
+    }
 
 
 def replace_with_fitted_activation_lut(
