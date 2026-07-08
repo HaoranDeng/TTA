@@ -70,6 +70,18 @@ def main() -> None:
     load_seconds = time.perf_counter() - start
 
     print("Evaluating paper tasks", flush=True)
+    summary = {
+        "model_id": args.model_id,
+        "device": str(device),
+        "dtype": str(dtype),
+        "load_seconds": load_seconds,
+        "paper_samples": args.paper_samples,
+    }
+
+    def save_progress(partial: dict[str, Any]) -> None:
+        summary["results"] = partial
+        save_json(out_dir / "summary.json", summary)
+
     results = evaluate_paper_tasks(
         model,
         tokenizer,
@@ -80,15 +92,9 @@ def main() -> None:
         prompt_template=args.prompt_template,
         glue_shot_count=args.glue_shot_count,
         mmlu_shot_count=args.mmlu_shot_count,
+        progress_callback=save_progress,
     )
-    summary = {
-        "model_id": args.model_id,
-        "device": str(device),
-        "dtype": str(dtype),
-        "load_seconds": load_seconds,
-        "paper_samples": args.paper_samples,
-        "results": results,
-    }
+    summary["results"] = results
     save_json(out_dir / "summary.json", summary)
     print(json.dumps(summary, indent=2, sort_keys=True), flush=True)
 

@@ -43,36 +43,48 @@ class STEActivationQuantLinear(nn.Module):
     def quantize_activation(self, x: torch.Tensor) -> torch.Tensor:
         shape = x.shape
         flat = x.reshape(-1, self.in_features)
-        xv = flat.view(flat.shape[0], -1, self.config.subdim).float()
         centers = self.act_centers.float()
-        if self.config.distance == "chebyshev":
-            dist = (xv[:, :, None, :] - centers[None, :, :, :]).abs().amax(dim=3)
-        elif self.config.distance == "l2":
-            x_norm = (xv * xv).sum(dim=2, keepdim=True)
-            c_norm = (centers * centers).sum(dim=2).unsqueeze(0)
-            dot = torch.einsum("nms,mks->nmk", xv, centers)
-            dist = x_norm + c_norm - 2.0 * dot
+        m = centers.shape[0]
+        ka = centers.shape[1]
+        max_dist_elements = int(self.config.act_quant_max_dist_elements)
+        if max_dist_elements > 0:
+            row_chunk = max(1, min(flat.shape[0], max_dist_elements // max(m * ka, 1)))
         else:
-            raise ValueError(f"Unsupported distance metric: {self.config.distance}")
-        codes = dist.argmin(dim=2)
-        qv = centers[torch.arange(centers.shape[0], device=flat.device)[None, :], codes]
-        if self.training and self.config.act_train_mode != "hard":
-            temp = max(float(self.config.act_softmax_temperature), 1e-6)
-            probs = torch.softmax(-dist / temp, dim=2)
-            soft_qv = torch.einsum("nmk,mks->nms", probs, centers)
-            if self.config.act_train_mode == "soft":
-                qv = soft_qv
-            elif self.config.act_train_mode == "soft_hard":
-                qv = qv + (soft_qv - soft_qv.detach())
+            row_chunk = flat.shape[0]
+
+        chunks = []
+        center_index = torch.arange(m, device=flat.device)[None, :]
+        for start in range(0, flat.shape[0], row_chunk):
+            flat_chunk = flat[start : start + row_chunk]
+            xv = flat_chunk.view(flat_chunk.shape[0], -1, self.config.subdim).float()
+            if self.config.distance == "chebyshev":
+                dist = (xv[:, :, None, :] - centers[None, :, :, :]).abs().amax(dim=3)
+            elif self.config.distance == "l2":
+                x_norm = (xv * xv).sum(dim=2, keepdim=True)
+                c_norm = (centers * centers).sum(dim=2).unsqueeze(0)
+                dot = torch.einsum("nms,mks->nmk", xv, centers)
+                dist = x_norm + c_norm - 2.0 * dot
             else:
-                raise ValueError(f"Unsupported activation train mode: {self.config.act_train_mode}")
-        center_scale = float(self.config.act_ste_center_scale)
-        if center_scale != 1.0:
-            qv = qv.detach() + center_scale * (qv - qv.detach())
-        q = qv.reshape_as(flat)
-        # Forward value is quantized; gradients flow to both centers and upstream activations.
-        ste = q + float(self.config.act_ste_input_scale) * (flat - flat.detach())
-        return ste.reshape(shape)
+                raise ValueError(f"Unsupported distance metric: {self.config.distance}")
+            codes = dist.argmin(dim=2)
+            qv = centers[center_index, codes]
+            if self.training and self.config.act_train_mode != "hard":
+                temp = max(float(self.config.act_softmax_temperature), 1e-6)
+                probs = torch.softmax(-dist / temp, dim=2)
+                soft_qv = torch.einsum("nmk,mks->nms", probs, centers)
+                if self.config.act_train_mode == "soft":
+                    qv = soft_qv
+                elif self.config.act_train_mode == "soft_hard":
+                    qv = qv + (soft_qv - soft_qv.detach())
+                else:
+                    raise ValueError(f"Unsupported activation train mode: {self.config.act_train_mode}")
+            center_scale = float(self.config.act_ste_center_scale)
+            if center_scale != 1.0:
+                qv = qv.detach() + center_scale * (qv - qv.detach())
+            q = qv.reshape_as(flat_chunk)
+            # Forward value is quantized; gradients flow to both centers and upstream activations.
+            chunks.append(q + float(self.config.act_ste_input_scale) * (flat_chunk - flat_chunk.detach()))
+        return torch.cat(chunks, dim=0).reshape(shape)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         self.last_reconstruction_loss = None
@@ -108,6 +120,7 @@ class STEActivationQuantLinear(nn.Module):
             "act_softmax_temperature": self.config.act_softmax_temperature,
             "act_ste_input_scale": self.config.act_ste_input_scale,
             "act_ste_center_scale": self.config.act_ste_center_scale,
+            "act_quant_max_dist_elements": self.config.act_quant_max_dist_elements,
             "act_center_values": m * self.config.ka * self.config.subdim,
             "weight_center_values": 0,
             "base_lut_entries": m * self.config.ka * self.out_features,

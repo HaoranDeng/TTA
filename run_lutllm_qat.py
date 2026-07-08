@@ -87,6 +87,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--act-ste-input-scale-end", type=float, default=None)
     parser.add_argument("--act-ste-center-scale", type=float, default=1.0)
     parser.add_argument("--act-ste-center-scale-end", type=float, default=None)
+    parser.add_argument("--act-quant-max-dist-elements", type=int, default=0)
     parser.add_argument("--lut-storage", choices=["expanded", "compact"], default="expanded")
     parser.add_argument("--output-correction", choices=["none", "bias", "affine"], default="none")
     parser.add_argument("--eval-baseline", action="store_true")
@@ -328,6 +329,7 @@ def main() -> None:
         act_softmax_temperature=args.act_softmax_temperature,
         act_ste_input_scale=args.act_ste_input_scale,
         act_ste_center_scale=args.act_ste_center_scale,
+        act_quant_max_dist_elements=args.act_quant_max_dist_elements,
         output_correction=args.output_correction,
         seed=args.seed,
     )
@@ -442,6 +444,10 @@ def main() -> None:
 
     if args.eval_act_quant:
         print("Evaluating +Act. Quant. on paper tasks", flush=True)
+        def save_act_quant_progress(partial: dict[str, Any]) -> None:
+            summary["act_quant"] = public_eval(partial)
+            save_json(out_dir / "summary.json", summary)
+
         summary["act_quant"] = public_eval(
             evaluate_paper_tasks(
                 model,
@@ -453,6 +459,7 @@ def main() -> None:
                 prompt_template=args.prompt_template,
                 glue_shot_count=args.glue_shot_count,
                 mmlu_shot_count=args.mmlu_shot_count,
+                progress_callback=save_act_quant_progress,
             )
         )
         save_json(out_dir / "summary.json", summary)

@@ -5,7 +5,7 @@ import re
 import string
 import time
 from itertools import islice
-from typing import Any
+from typing import Any, Callable
 
 import torch
 from datasets import load_dataset
@@ -592,6 +592,7 @@ def evaluate_paper_tasks(
     prompt_template: str = "simple",
     glue_shot_count: int = 0,
     mmlu_shot_count: int = 0,
+    progress_callback: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     results: dict[str, Any] = {}
     for task in GLUE_TASKS:
@@ -607,6 +608,8 @@ def evaluate_paper_tasks(
             shot_count=glue_shot_count,
         )
         results[task] = {k: v for k, v in metric.items() if k != "predictions"}
+        if progress_callback is not None:
+            progress_callback(results)
     if include_squad:
         print("Evaluating squad_v2", flush=True)
         metric = evaluate_squad_v2(
@@ -618,6 +621,8 @@ def evaluate_paper_tasks(
             prompt_template=prompt_template,
         )
         results["squad_v2"] = {k: v for k, v in metric.items() if k != "predictions"}
+        if progress_callback is not None:
+            progress_callback(results)
     print("Evaluating mmlu_pro", flush=True)
     metric = evaluate_mmlu_pro(
         model,
@@ -629,4 +634,6 @@ def evaluate_paper_tasks(
         shot_count=mmlu_shot_count,
     )
     results["mmlu_pro"] = {k: v for k, v in metric.items() if k != "predictions"}
+    if progress_callback is not None:
+        progress_callback(results)
     return results
