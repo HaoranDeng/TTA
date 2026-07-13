@@ -27,6 +27,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--glue-shot-count", type=int, default=0)
     parser.add_argument("--mmlu-shot-count", type=int, default=0)
     parser.add_argument("--skip-squad", action="store_true")
+    parser.add_argument("--squad-no-answer-oracle", action="store_true")
     parser.add_argument("--seed", type=int, default=123)
     return parser.parse_args()
 
@@ -92,6 +93,7 @@ def main() -> None:
         prompt_template=args.prompt_template,
         glue_shot_count=args.glue_shot_count,
         mmlu_shot_count=args.mmlu_shot_count,
+        squad_no_answer_oracle=args.squad_no_answer_oracle,
         progress_callback=save_progress,
     )
     summary["results"] = results

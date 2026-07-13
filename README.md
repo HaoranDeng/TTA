@@ -33,6 +33,7 @@ Most recent scai7 reproduction finding:
 - The public paper artifact does not expose the exact benchmark harness or the customized checkpoint. The paper text says the FPGA prototype uses a customized Qwen 3 1.7B model and describes continuing training on FineWeb and WikiQA.
 - The arXiv v2 source explicitly states the public quantization configuration: `G=512`, vector length `v=2`, weight codebook size `c_w=16`, activation codebook size `c_a=64`, and INT8 lookup tables. The newest strict first-stage attempts below use that `c_a=64, v=2, G=512` setup where applicable.
 - FP16 is not yet aligned to the paper. The closest public-checkpoint protocol found so far is `Qwen/Qwen3-1.7B-Base` with instruction few-shot prompts, but it remains below the paper FP16 row on GLUE and far below it on this repo's current SQuAD generation protocol.
+- New SQuAD finding: most of the FP16 SQuAD gap comes from the SQuAD v2 no-answer decision protocol. On 64 validation examples, the SQuAD-repeat4 checkpoint has raw generative F1 `39.06`, but a diagnostic `No Answer` likelihood oracle threshold reaches F1 `68.23`, reducing the gap to paper FP16 SQuAD from `-33.74` to `-4.57`. This is an oracle/protocol diagnostic, not a held-out official score.
 - Earlier formal first-step attempt: `lutllm_base_instruction_g8_all196_paperlike_squad_ka64_steqat1000_actonly_ppl64_chunk1` uses all 196 transformer-block linears, `subdim=2`, `Ka=64`, Chebyshev activation assignment, instruction prompts, 8-shot GLUE, 0-shot MMLU-Pro, 64 rows/task, and SQuAD included. Same-run FP16 is GLUE `83.33`, MMLU-Pro `39.06`, SQuAD F1 `31.86`, WikiText PPL `16.45`. The `+ Act. Quant.` result is GLUE `64.06`, MMLU-Pro `12.50`, SQuAD F1 `25.71`, WikiText PPL `207.19`.
 - Gap to the paper on that earlier first-step run: FP16 is `-5.47` GLUE, `+5.96` MMLU-Pro, and `-40.94` SQuAD F1 versus paper FP16. `+ Act. Quant.` is `-23.14` GLUE, `-19.30` MMLU-Pro, and `-44.59` SQuAD F1 versus the paper `+ Act. Quant.` row.
 - The first reconstruction-loss attempt helped but did not close the gap. `lutllm_base_instruction_g8_all196_paperlike_squad_ka64_recon01_dense_steqat1000_actonly_ppl64_chunk1` trains activation centers plus all target dense linear weights with `reconstruction_loss_ratio=0.1`. It reaches GLUE `71.88`, MMLU-Pro `18.75`, SQuAD F1 `32.74`, WikiText PPL `242.19`, leaving gaps of `-15.33`, `-13.05`, and `-37.56` versus paper `+ Act. Quant.`.
@@ -67,15 +68,18 @@ July 4 continued first-step reproduction attempts, all with all 196 transformer-
 
 Current best first-step row is still not a reproduction: the closest all-196 Act Quant GLUE result is `lutllm_taskadapt_noanswer_continue3000_all196_ka512_km5_sample4096_chunk16m_dense1e8_lr5e6_recon1_task1_steqat3000_squad32_ppl64`, with GLUE `85.42`, MMLU-Pro `18.75`, and SQuADv2 F1 `38.54`. That 32/task diagnostic remains `-1.78`, `-13.05`, and `-31.76` below the paper `+ Act. Quant.` targets, but the 64/task confirmation of the same config drops to GLUE `82.29`, MMLU-Pro `20.31`, and SQuADv2 F1 `33.28` (`-4.91`, `-11.49`, `-37.02`). The July 5-8 attempts below improved the FP16 baseline GLUE to `85.16` and SQuAD to `39.06`; centers-only all-196 activation-QAT did not preserve that baseline, but enabling dense-weight QAT with a tiny dense LR (`1e-8`) recovers part of the GLUE gap. A seed-789 rerun of the best branch improves MMLU/SQuAD to `21.88`/`37.50` but lowers GLUE to `81.51`, so seed sensitivity exists but does not explain the paper gap. Shortening QAT to 1500 steps also lowers GLUE to `79.17`, so simple early stopping is not enough. Raising dense LR to `3e-8`, lowering the dense-QAT reconstruction ratio to `0.1`, setting `weight_decay=0`, and increasing QAT task samples to 2048 all hurt GLUE/MMLU, so this branch is sensitive to weight-update scale, loss balance, optimizer regularization, and data mix. The strict public `c_a=64` codebook size also fails from the improved checkpoint, reaching only GLUE `75.26`, MMLU-Pro `9.38`, and SQuAD F1 `29.53`. KMeans10, 8192 calibration, inferred adjustable STE gradients, SQuAD `No Answer` label repair, SQuAD-weighted task adaptation, post-QAT bias correction, and larger `Ka=512/1024` alone did not close the gap. Increasing to `Ka=1024` lowers WikiText PPL to `33.69`, but the benchmark row stays at GLUE `81.77`, MMLU-Pro `18.75`, and SQuADv2 F1 `38.54`, so the remaining gap is not just activation codebook capacity. July 8-12 checks on the best `Ka=512` dense-QAT branch show that disabling input STE gradients, scheduling input/center STE gradients, switching assignment to L2, freezing activation centers, adding affine output correction, and SQuAD-repeat-16 continued training all remain below the 64/task confirmation.
 
-SQuAD baseline prompt probe on `Qwen/Qwen3-1.7B-Base`, 64 SQuAD v2 validation examples, FP16/BF16 inference only:
+SQuAD baseline prompt/no-answer probes on `Qwen/Qwen3-1.7B-Base` or the task-adapted Qwen 3 1.7B checkpoint, 64 SQuAD v2 validation examples, FP16/BF16 inference only:
 
-| Prompt Probe | Best F1 | Gap vs Paper FP16 SQuAD |
+| Probe | F1 ↑ | Gap vs Paper FP16 SQuAD ↑ |
 |---|---:|---:|
 | Current instruction prompt, max 24 new tokens | 31.86 | -40.94 |
 | Best simple probe (`short_span`, max 16/24/32) | 34.41 | -38.39 |
 | Best simple probe (`qa_only`, max 16/24/32) | 34.40 | -38.40 |
+| No-answer continued checkpoint, current instruction prompt | 39.06 | -33.74 |
+| SQuAD-repeat4 checkpoint, formal evaluator raw generation | 39.06 | -33.74 |
+| SQuAD-repeat4 checkpoint, `No Answer` likelihood oracle threshold | 68.23 | -4.57 |
 
-Interpretation: the SQuAD gap is not explained by the repo's current generation length or a simple prompt variant. The public checkpoint/protocol remains far below the paper FP16 SQuAD baseline before quantization.
+Interpretation: the SQuAD gap is not explained by generation length, a simple prompt variant, or simple postprocessing. The largest missing evaluation detail is the SQuAD v2 no-answer decision. In the formal 64-sample evaluator, 38/64 examples are unanswerable but raw generation emits only 4 empty predictions; thresholding `No Answer` likelihood can recover most of that gap. This threshold is currently tuned on the same 64 examples, so it is reported as a protocol diagnostic rather than an official score. The runner now supports `--squad-no-answer-oracle` for future FP16/all-196 quantized reruns.
 
 Trained activation-LUT diagnostic:
 
@@ -171,6 +175,7 @@ Current FP16 baseline-alignment gap:
 | Run | Protocol | Samples | GLUE Avg | Gap vs Paper FP16 GLUE | MMLU-Pro | Gap vs Paper FP16 MMLU |
 |---|---|---:|---:|---:|---:|---:|
 | Paper FP16 | customized Qwen 3 1.7B | full paper eval | 88.80 | 0.00 | 33.10 | 0.00 |
+| `eval_taskadapt_noanswer_squadrepeat4_oracle_qwen3_1p7b_base_instruction_paperall_64` | task-adapted checkpoint, instruction 8-shot GLUE, 0-shot MMLU, SQuAD no-answer oracle recorded separately | 64/task | 84.38 | -4.42 | 37.50 | +4.40 |
 | `lutllm_base_instruction_g8_all196_paperlike_squad_ka64_steqat1000_actonly_ppl64_chunk1` FP16 | internal instruction 8-shot GLUE, 0-shot MMLU, SQuAD included | 64/task | 83.33 | -5.47 | 39.06 | +5.96 |
 | `lutllm_base_instruction_g8_all196_shufcalib_ka64_calib1024_k5_init_actonly_ppl256` FP16 | internal instruction 8-shot GLUE, 0-shot MMLU | 256/task | 82.88 | -5.92 | 29.69 | -3.41 |
 | `lutllm_base_instruction_g8_all196_shufcalib_steqat1000_int8_actonly_ppl128` FP16 | internal instruction 8-shot GLUE, 0-shot MMLU | 128/task | 83.07 | -5.73 | 33.59 | +0.49 |

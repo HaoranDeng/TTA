@@ -1,0 +1,15 @@
+{
+  "device": "cuda",
+  "dtype": "bfloat16",
+  "glue_shot_count": 8,
+  "mmlu_shot_count": 0,
+  "model_id": "results/taskadapt_noanswer_squadrepeat4_continue_qwen3_1p7b_base_instruction_paperall_4000_lr5e7/checkpoint_final",
+  "output_dir": "results/eval_taskadapt_noanswer_squadrepeat4_oracle_qwen3_1p7b_base_instruction_paperall_64",
+  "paper_samples": 64,
+  "prompt_style": "plain",
+  "prompt_template": "instruction",
+  "seed": 123,
+  "skip_squad": false,
+  "squad_no_answer_oracle": true,
+  "trust_remote_code": false
+}

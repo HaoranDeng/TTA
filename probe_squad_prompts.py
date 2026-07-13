@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import time
 from pathlib import Path
 from typing import Any
@@ -11,7 +12,7 @@ import torch
 from datasets import load_dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from pq_lut_lm.paper_eval import _squad_score, format_prompt_for_style
+from pq_lut_lm.paper_eval import _normalize_answer, _squad_score, format_prompt_for_style
 
 
 def parse_args() -> argparse.Namespace:
@@ -67,6 +68,38 @@ def prompt_variants(row: dict[str, Any]) -> dict[str, str]:
     }
 
 
+def postprocess_variants(text: str) -> dict[str, str]:
+    raw = text.strip()
+    first_line = raw.splitlines()[0].strip() if raw else ""
+    no_answer_empty = first_line
+    if no_answer_empty.lower().startswith("no answer"):
+        no_answer_empty = ""
+    prefix_stripped = re.sub(
+        r"^(?:the\s+answer\s+is|answer\s*:|answer\s+is|it\s+is)\s+",
+        "",
+        no_answer_empty,
+        flags=re.IGNORECASE,
+    ).strip()
+    first_sentence = prefix_stripped
+    for sep in [".", ";"]:
+        if sep in first_sentence:
+            first_sentence = first_sentence.split(sep, 1)[0].strip()
+            break
+    return {
+        "raw": raw,
+        "current": no_answer_empty,
+        "first_line": first_line,
+        "prefix_stripped": prefix_stripped,
+        "first_sentence": first_sentence,
+    }
+
+
+def exact_match(prediction: str, answers: dict[str, Any]) -> float:
+    golds = answers.get("text", []) or [""]
+    normalized_prediction = _normalize_answer(prediction)
+    return float(any(normalized_prediction == _normalize_answer(gold) for gold in golds))
+
+
 @torch.no_grad()
 def main() -> None:
     args = parse_args()
@@ -95,7 +128,11 @@ def main() -> None:
     }
     for max_new_tokens in max_new_values:
         for name in prompt_variants(rows[0]):
-            total_f1 = 0.0
+            post_totals = {
+                key: {"f1": 0.0, "em": 0.0, "empty_prediction_count": 0}
+                for key in ["raw", "current", "first_line", "prefix_stripped", "first_sentence"]
+            }
+            no_answer_gold_count = 0
             examples = []
             if device.type == "cuda":
                 torch.cuda.synchronize(device)
@@ -115,27 +152,53 @@ def main() -> None:
                     generated[0, ids.input_ids.shape[1] :],
                     skip_special_tokens=True,
                 ).strip()
-                if completion.lower().startswith("no answer"):
-                    completion = ""
-                f1 = _squad_score(completion, row["answers"])
-                total_f1 += f1
-                if len(examples) < 5:
-                    examples.append(
-                        {
-                            "prediction": completion,
-                            "f1": f1,
-                            "answers": row["answers"].get("text", [])[:3],
-                        }
-                    )
+                processed = postprocess_variants(completion)
+                if not row["answers"].get("text", []):
+                    no_answer_gold_count += 1
+                post_scores: dict[str, dict[str, float]] = {}
+                for post_name, pred in processed.items():
+                    f1 = _squad_score(pred, row["answers"])
+                    em = exact_match(pred, row["answers"])
+                    post_totals[post_name]["f1"] += f1
+                    post_totals[post_name]["em"] += em
+                    post_totals[post_name]["empty_prediction_count"] += int(pred == "")
+                    post_scores[post_name] = {"f1": f1, "em": em}
+                examples.append(
+                    {
+                        "id": row.get("id"),
+                        "question": row.get("question", ""),
+                        "raw_prediction": completion,
+                        "prediction": processed["current"],
+                        "postprocessed": processed,
+                        "scores": post_scores,
+                        "answers": row["answers"].get("text", [])[:3],
+                    }
+                )
             if device.type == "cuda":
                 torch.cuda.synchronize(device)
             key = f"{name}_max{max_new_tokens}"
+            postprocess = {}
+            for post_name, totals in post_totals.items():
+                postprocess[post_name] = {
+                    "f1": 100.0 * totals["f1"] / max(len(rows), 1),
+                    "em": 100.0 * totals["em"] / max(len(rows), 1),
+                    "empty_prediction_count": int(totals["empty_prediction_count"]),
+                }
             out["results"][key] = {
-                "f1": 100.0 * total_f1 / max(len(rows), 1),
+                "f1": postprocess["current"]["f1"],
+                "em": postprocess["current"]["em"],
+                "no_answer_gold_count": no_answer_gold_count,
+                "postprocess": postprocess,
                 "seconds": time.perf_counter() - start,
                 "examples": examples,
             }
-            print(key, f"{out['results'][key]['f1']:.2f}", flush=True)
+            best_post = max(postprocess.items(), key=lambda item: item[1]["f1"])
+            print(
+                key,
+                f"current={postprocess['current']['f1']:.2f}",
+                f"best={best_post[0]}:{best_post[1]['f1']:.2f}",
+                flush=True,
+            )
 
     path = Path(args.output)
     path.parent.mkdir(parents=True, exist_ok=True)

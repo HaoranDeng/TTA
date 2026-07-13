@@ -40,6 +40,7 @@ New files:
 - `run_act_lut_fit.py`: layerwise direct activation-LUT fitting, least-squares reconstruction of dense weights from trained tables, and final activation-weight VQ.
 - `run_w8a8_quant.py`: RTN/W8A8 fake-quantization runner with dynamic/static activation scales and SmoothQuant-style smoothing.
 - `probe_squad_prompts.py`: FP16/BF16 SQuAD v2 prompt probe used to test whether the SQuAD gap is a simple prompt/generation-length issue.
+- `probe_squad_noanswer_threshold.py`: diagnostic SQuAD v2 no-answer likelihood threshold probe.
 - `pq_lut_lm/paper_eval.py`: prompt-based GLUE/MMLU-Pro log-likelihood scoring and SQuADv2 short generation/F1.
 - `pq_lut_lm/activation_quant.py`: trainable activation VQ wrapper with STE, direct activation-LUT modules, and LUT-to-weight reconstruction.
 - `pq_lut_lm/w8a8_quant.py`: all-target-linear W8A8 wrapper used to test RTN/SmoothQuant-style activation quantization.
@@ -54,6 +55,7 @@ Current implementation additions for the first-stage reproduction:
 - `--task-loss-ratio` allows reconstruction-only ablations without changing the default task-loss behavior.
 - `--weight-decay` now records and controls AdamW weight decay explicitly. Dense+centroid QAT can be run with `0.0` or with the earlier implicit PyTorch default `0.01`.
 - `--train-source lutllm_paper` approximates the paper's FineWeb 512-token pretrain plus WikiQA finetune data mix.
+- `--squad-no-answer-oracle` adds a diagnostic SQuAD v2 `No Answer` likelihood threshold oracle to the paper evaluator. It is useful for reverse-engineering the hidden evaluation protocol but is not a held-out official score.
 - Supervised prompt/completion encoding now preserves completion labels under left truncation. This matters for long SQuAD/WikiQA prompts: the old path could mask nearly all answer tokens after truncation, weakening task-adaptation and QAT supervision.
 
 ## scai7 Runs
@@ -69,6 +71,7 @@ Current baseline-alignment status:
 | Run | Protocol | Samples | GLUE Avg | Gap vs Paper FP16 GLUE | MMLU-Pro | Gap vs Paper FP16 MMLU |
 |---|---|---:|---:|---:|---:|---:|
 | Paper FP16 | customized Qwen 3 1.7B | full paper eval | 88.80 | 0.00 | 33.10 | 0.00 |
+| `eval_taskadapt_noanswer_squadrepeat4_oracle_qwen3_1p7b_base_instruction_paperall_64` | task-adapted checkpoint, instruction 8-shot GLUE, 0-shot MMLU, SQuAD no-answer oracle recorded separately | 64/task | 84.38 | -4.42 | 37.50 | +4.40 |
 | `lutllm_base_instruction_g8_all196_shufcalib_ka64_calib1024_k5_init_actonly_ppl256` FP16 | internal instruction 8-shot GLUE, 0-shot MMLU | 256/task | 82.88 | -5.92 | 29.69 | -3.41 |
 | `lutllm_base_instruction_g8_all196_shufcalib_steqat1000_int8_actonly_ppl128` FP16 | internal instruction 8-shot GLUE, 0-shot MMLU | 128/task | 83.07 | -5.73 | 33.59 | +0.49 |
 | `baseline_prompt_grid_qwen3_1p7b_base_512_more_shots/instruction_g8_m0_plain` | internal instruction 8-shot GLUE, 0-shot MMLU | 512/task | 82.35 | -6.45 | 28.52 | -4.58 |
@@ -79,15 +82,18 @@ Current baseline-alignment status:
 
 Interpretation: standard public `lm_eval` prompts do not explain the paper's FP16 row; they make GLUE substantially worse. Simple GLUE-only continued training for 500 updates also failed to move toward the paper. The remaining FP16 mismatch is therefore likely due to the paper's customized checkpoint and/or an undisclosed task/evaluation protocol. All quantized all-196-linear results below remain useful diagnostics, but they are not a faithful reproduction until this FP16 row is matched.
 
-SQuAD v2 FP16/BF16 prompt probe on `Qwen/Qwen3-1.7B-Base`, 64 validation examples:
+SQuAD v2 FP16/BF16 prompt and no-answer probes on `Qwen/Qwen3-1.7B-Base` or the task-adapted Qwen 3 1.7B checkpoint, 64 validation examples:
 
-| Prompt Probe | Best F1 | Gap vs Paper FP16 SQuAD |
+| Probe | F1 ↑ | Gap vs Paper FP16 SQuAD ↑ |
 |---|---:|---:|
 | Current instruction prompt, max 24 new tokens | 31.86 | -40.94 |
 | Best simple probe (`short_span`, max 16/24/32) | 34.41 | -38.39 |
 | Best simple probe (`qa_only`, max 16/24/32) | 34.40 | -38.40 |
+| No-answer continued checkpoint, current instruction prompt | 39.06 | -33.74 |
+| SQuAD-repeat4 checkpoint, formal evaluator raw generation | 39.06 | -33.74 |
+| SQuAD-repeat4 checkpoint, `No Answer` likelihood oracle threshold | 68.23 | -4.57 |
 
-Interpretation: the SQuAD gap is not explained by a short generation length or a simple prompt variant. The public checkpoint/protocol is far below the paper FP16 SQuAD row before any quantization is applied.
+Interpretation: the SQuAD gap is not explained by a short generation length, a simple prompt variant, or simple postprocessing. The largest missing evaluation detail is the SQuAD v2 no-answer decision. In the formal 64-sample evaluator, 38/64 examples are unanswerable but raw generation emits only 4 empty predictions; thresholding `No Answer` likelihood can recover most of that gap. The threshold above is tuned on the same 64 examples, so it is reported as a protocol diagnostic rather than an official score. A future all-196 rerun should enable `--squad-no-answer-oracle` so quantized SQuAD is comparable under the same diagnostic protocol.
 
 Layerwise trained activation-LUT diagnostic:
 

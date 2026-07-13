@@ -1,0 +1,63 @@
+{
+  "device": "cuda",
+  "dtype": "torch.bfloat16",
+  "load_seconds": 6.9304231809219345,
+  "model_id": "results/taskadapt_noanswer_squadrepeat4_continue_qwen3_1p7b_base_instruction_paperall_4000_lr5e7/checkpoint_final",
+  "paper_samples": 64,
+  "results": {
+    "mmlu_pro": {
+      "accuracy": 0.375,
+      "correct": 24,
+      "seconds": 6.677720275009051,
+      "total": 64
+    },
+    "mnli": {
+      "accuracy": 0.828125,
+      "correct": 53,
+      "seconds": 3.158826981089078,
+      "total": 64
+    },
+    "mrpc": {
+      "accuracy": 0.75,
+      "correct": 48,
+      "seconds": 2.049368428066373,
+      "total": 64
+    },
+    "qnli": {
+      "accuracy": 0.8125,
+      "correct": 52,
+      "seconds": 1.8647144089918584,
+      "total": 64
+    },
+    "qqp": {
+      "accuracy": 0.859375,
+      "correct": 55,
+      "seconds": 1.6286087209591642,
+      "total": 64
+    },
+    "rte": {
+      "accuracy": 0.84375,
+      "correct": 54,
+      "seconds": 2.2147713649319485,
+      "total": 64
+    },
+    "squad_v2": {
+      "empty_prediction_count": 4,
+      "f1": 39.0625,
+      "no_answer_gold_count": 38,
+      "no_answer_threshold_oracle": {
+        "empty_count": 56,
+        "f1": 68.22916666666666,
+        "threshold": -11.221435546875
+      },
+      "seconds": 5.792468184954487,
+      "total": 64
+    },
+    "sst2": {
+      "accuracy": 0.96875,
+      "correct": 62,
+      "seconds": 1.4946725480258465,
+      "total": 64
+    }
+  }
+}

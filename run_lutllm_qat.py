@@ -63,6 +63,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--glue-shot-count", type=int, default=0)
     parser.add_argument("--mmlu-shot-count", type=int, default=0)
     parser.add_argument("--skip-squad", action="store_true")
+    parser.add_argument("--squad-no-answer-oracle", action="store_true")
     parser.add_argument("--train-include-squad", action="store_true")
     parser.add_argument("--squad-repeat", type=int, default=1)
     parser.add_argument("--target-regex", default=DEFAULT_TARGET_REGEX)
@@ -297,6 +298,7 @@ def main() -> None:
                 prompt_template=args.prompt_template,
                 glue_shot_count=args.glue_shot_count,
                 mmlu_shot_count=args.mmlu_shot_count,
+                squad_no_answer_oracle=args.squad_no_answer_oracle,
             )
         )
         save_json(out_dir / "summary.json", summary)
@@ -473,6 +475,7 @@ def main() -> None:
                 prompt_template=args.prompt_template,
                 glue_shot_count=args.glue_shot_count,
                 mmlu_shot_count=args.mmlu_shot_count,
+                squad_no_answer_oracle=args.squad_no_answer_oracle,
                 progress_callback=save_act_quant_progress,
             )
         )
@@ -523,6 +526,7 @@ def main() -> None:
                 prompt_template=args.prompt_template,
                 glue_shot_count=args.glue_shot_count,
                 mmlu_shot_count=args.mmlu_shot_count,
+                squad_no_answer_oracle=args.squad_no_answer_oracle,
             )
         )
         save_json(out_dir / "summary.json", summary)

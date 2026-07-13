@@ -1,0 +1,1282 @@
+{
+  "model_id": "results/taskadapt_noanswer_continue_qwen3_1p7b_base_instruction_paperall_3000_lr1e6/checkpoint_final",
+  "prompt_style": "plain",
+  "results": {
+    "current_instruction_max16": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 39.0625,
+      "seconds": 5.275397030985914
+    },
+    "current_instruction_max24": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 39.0625,
+      "seconds": 5.375126336002722
+    },
+    "current_instruction_max32": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 39.0625,
+      "seconds": 5.355067892000079
+    },
+    "current_instruction_max48": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 39.0625,
+      "seconds": 5.373573966091499
+    },
+    "current_instruction_max8": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 0.5714285714285715,
+          "prediction": "10th and 11"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 38.39285714285714,
+      "seconds": 10.4728868000675
+    },
+    "lighteval_style_max16": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 29.85261266511266,
+      "seconds": 7.174345578998327
+    },
+    "lighteval_style_max24": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 29.88926820728291,
+      "seconds": 8.245876924949698
+    },
+    "lighteval_style_max32": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 29.823564593301427,
+      "seconds": 9.119261679938063
+    },
+    "lighteval_style_max48": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 29.53531461854461,
+      "seconds": 10.415737104951404
+    },
+    "lighteval_style_max8": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 0.5714285714285715,
+          "prediction": "10th and 11"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 27.238343253968257,
+      "seconds": 5.443000648985617
+    },
+    "plain_context_question_max16": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "in the 10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "the first half of the 10th century"
+        }
+      ],
+      "f1": 32.29166666666667,
+      "seconds": 6.24608533794526
+    },
+    "plain_context_question_max24": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "in the 10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "the first half of the 10th century"
+        }
+      ],
+      "f1": 32.29166666666667,
+      "seconds": 6.6134865819476545
+    },
+    "plain_context_question_max32": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "in the 10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "the first half of the 10th century"
+        }
+      ],
+      "f1": 32.29166666666667,
+      "seconds": 6.915020273067057
+    },
+    "plain_context_question_max48": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "in the 10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "the first half of the 10th century"
+        }
+      ],
+      "f1": 32.29166666666667,
+      "seconds": 7.075532806920819
+    },
+    "plain_context_question_max8": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 0.7499999999999999,
+          "prediction": "in the 10th and"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 0.6666666666666665,
+          "prediction": "the first half of the 10"
+        }
+      ],
+      "f1": 31.380208333333332,
+      "seconds": 6.743889317032881
+    },
+    "qa_only_max16": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th"
+        }
+      ],
+      "f1": 34.11458333333333,
+      "seconds": 4.941940959077328
+    },
+    "qa_only_max24": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th"
+        }
+      ],
+      "f1": 34.11458333333333,
+      "seconds": 4.974030354060233
+    },
+    "qa_only_max32": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th"
+        }
+      ],
+      "f1": 34.11458333333333,
+      "seconds": 4.984599109971896
+    },
+    "qa_only_max48": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th"
+        }
+      ],
+      "f1": 34.11458333333333,
+      "seconds": 4.973093952983618
+    },
+    "qa_only_max8": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 0.5714285714285715,
+          "prediction": "10th and 11"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th"
+        }
+      ],
+      "f1": 33.444940476190474,
+      "seconds": 4.689228356000967
+    },
+    "short_span_max16": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 34.89583333333333,
+      "seconds": 4.804800295038149
+    },
+    "short_span_max24": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 34.89583333333333,
+      "seconds": 4.901964304037392
+    },
+    "short_span_max32": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 34.89583333333333,
+      "seconds": 4.923081928980537
+    },
+    "short_span_max48": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 1.0,
+          "prediction": "10th and 11th centuries"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 34.89583333333333,
+      "seconds": 4.894403814920224
+    },
+    "short_span_max8": {
+      "examples": [
+        {
+          "answers": [
+            "France",
+            "France",
+            "France"
+          ],
+          "f1": 1.0,
+          "prediction": "France"
+        },
+        {
+          "answers": [
+            "10th and 11th centuries",
+            "in the 10th and 11th centuries",
+            "10th and 11th centuries"
+          ],
+          "f1": 0.5714285714285715,
+          "prediction": "10th and 11"
+        },
+        {
+          "answers": [
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway",
+            "Denmark, Iceland and Norway"
+          ],
+          "f1": 1.0,
+          "prediction": "Denmark, Iceland and Norway"
+        },
+        {
+          "answers": [
+            "Rollo",
+            "Rollo",
+            "Rollo"
+          ],
+          "f1": 1.0,
+          "prediction": "Rollo"
+        },
+        {
+          "answers": [
+            "10th century",
+            "the first half of the 10th century",
+            "10th"
+          ],
+          "f1": 1.0,
+          "prediction": "10th century"
+        }
+      ],
+      "f1": 34.226190476190474,
+      "seconds": 4.507235805969685
+    }
+  },
+  "samples": 64
+}

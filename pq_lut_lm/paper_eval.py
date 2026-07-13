@@ -405,6 +405,27 @@ def _squad_score(prediction: str, answers: dict[str, Any]) -> float:
     return max(_f1(prediction, gold) for gold in golds)
 
 
+def _best_squad_no_answer_threshold(predictions: list[dict[str, Any]], score_name: str) -> dict[str, Any]:
+    scores = sorted({float(row[score_name]) for row in predictions if score_name in row})
+    if not scores:
+        return {"threshold": 0.0, "f1": 0.0, "empty_count": 0}
+    thresholds = [scores[0] - 1.0]
+    thresholds.extend((scores[i] + scores[i + 1]) / 2.0 for i in range(len(scores) - 1))
+    thresholds.append(scores[-1] + 1.0)
+    best = {"threshold": thresholds[0], "f1": -1.0, "empty_count": 0}
+    for threshold in thresholds:
+        total = 0.0
+        empty_count = 0
+        for row in predictions:
+            pred = "" if float(row[score_name]) >= threshold else row["prediction"]
+            empty_count += int(pred == "")
+            total += _squad_score(pred, {"text": row.get("answers", [])})
+        f1 = 100.0 * total / max(len(predictions), 1)
+        if f1 > best["f1"]:
+            best = {"threshold": threshold, "f1": f1, "empty_count": empty_count}
+    return best
+
+
 @torch.no_grad()
 def evaluate_squad_v2(
     model: torch.nn.Module,
@@ -414,6 +435,7 @@ def evaluate_squad_v2(
     max_new_tokens: int = 24,
     prompt_style: str = "plain",
     prompt_template: str = "simple",
+    no_answer_oracle: bool = False,
 ) -> dict[str, Any]:
     if prompt_template == "lm_eval":
         rows = _take(load_dataset("lighteval/squad_v2", split="validation"), max_samples)
@@ -456,15 +478,24 @@ def evaluate_squad_v2(
             completion = ""
         f1 = _squad_score(completion, row["answers"])
         total_f1 += f1
-        predictions.append({"prediction": completion, "f1": f1, "answers": row["answers"].get("text", [])[:3]})
+        item = {"prediction": completion, "f1": f1, "answers": row["answers"].get("text", [])[:3]}
+        if no_answer_oracle:
+            scores = score_completions(model, tokenizer, prompt, ["No Answer", " No Answer"], device)
+            item["no_answer_logp"] = max(scores)
+        predictions.append(item)
     if device.type == "cuda":
         torch.cuda.synchronize(device)
-    return {
+    result = {
         "f1": 100.0 * total_f1 / max(len(rows), 1),
         "total": len(rows),
+        "no_answer_gold_count": sum(1 for row in rows if not row["answers"].get("text", [])),
+        "empty_prediction_count": sum(1 for row in predictions if row["prediction"] == ""),
         "seconds": time.perf_counter() - start,
         "predictions": predictions,
     }
+    if no_answer_oracle:
+        result["no_answer_threshold_oracle"] = _best_squad_no_answer_threshold(predictions, "no_answer_logp")
+    return result
 
 
 def make_squad_supervised_examples(max_samples: int, prompt_template: str = "simple") -> list[tuple[str, str]]:
@@ -592,6 +623,7 @@ def evaluate_paper_tasks(
     prompt_template: str = "simple",
     glue_shot_count: int = 0,
     mmlu_shot_count: int = 0,
+    squad_no_answer_oracle: bool = False,
     progress_callback: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     results: dict[str, Any] = {}
@@ -619,6 +651,7 @@ def evaluate_paper_tasks(
             device,
             prompt_style=prompt_style,
             prompt_template=prompt_template,
+            no_answer_oracle=squad_no_answer_oracle,
         )
         results["squad_v2"] = {k: v for k, v in metric.items() if k != "predictions"}
         if progress_callback is not None:
