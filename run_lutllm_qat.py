@@ -92,6 +92,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--act-quant-max-dist-elements", type=int, default=0)
     parser.add_argument("--lut-storage", choices=["expanded", "compact"], default="expanded")
     parser.add_argument("--output-correction", choices=["none", "bias", "affine"], default="none")
+    parser.add_argument("--save-act-quant-state", action="store_true")
+    parser.add_argument("--load-act-quant-state", default=None)
     parser.add_argument("--eval-baseline", action="store_true")
     parser.add_argument("--eval-act-quant", action="store_true")
     parser.add_argument("--eval-final-lut", action="store_true")
@@ -207,6 +209,12 @@ def linear_schedule_value(start: float, end: float | None, step: int, steps: int
         return float(start)
     ratio = step / float(max(steps - 1, 1))
     return float(start) + (float(end) - float(start)) * ratio
+
+
+def save_model_state_cpu(model: torch.nn.Module, path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    state = {key: value.detach().cpu() for key, value in model.state_dict().items()}
+    torch.save(state, path)
 
 
 def main() -> None:
@@ -354,6 +362,10 @@ def main() -> None:
         "calibration_seconds": act_report.calibration_seconds,
         "initialization_seconds": act_report.initialization_seconds,
     })
+    if args.load_act_quant_state is not None:
+        print(f"Loading Act Quant model state: {args.load_act_quant_state}", flush=True)
+        state = torch.load(args.load_act_quant_state, map_location="cpu")
+        model.load_state_dict(state)
 
     center_params = trainable_act_center_parameters(model)
     dense_params = dense_linear_parameters_under_ste(model) if args.train_dense_linears else []
@@ -456,6 +468,13 @@ def main() -> None:
             max_vectors_per_layer=args.calib_vectors_per_layer,
             device=device,
         )
+        save_json(out_dir / "summary.json", summary)
+
+    if args.save_act_quant_state:
+        state_path = out_dir / "act_quant_model_state.pt"
+        print(f"Saving Act Quant model state: {state_path}", flush=True)
+        save_model_state_cpu(model, state_path)
+        summary["act_quant_state_path"] = str(state_path)
         save_json(out_dir / "summary.json", summary)
 
     if args.eval_act_quant:

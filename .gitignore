@@ -8,3 +8,5 @@ results/*/watcher.log
 results/*/watcher.pid
 results/*/checkpoint_final/
 results/*/checkpoint_step*/
+results/*/*.pt
+results/*/*.pth
