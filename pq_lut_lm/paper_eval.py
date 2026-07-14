@@ -426,6 +426,58 @@ def _best_squad_no_answer_threshold(predictions: list[dict[str, Any]], score_nam
     return best
 
 
+def _apply_squad_no_answer_threshold(
+    predictions: list[dict[str, Any]],
+    score_name: str,
+    threshold: float,
+) -> dict[str, Any]:
+    total = 0.0
+    empty_count = 0
+    for row in predictions:
+        pred = "" if float(row[score_name]) >= threshold else row["prediction"]
+        empty_count += int(pred == "")
+        total += _squad_score(pred, {"text": row.get("answers", [])})
+    return {
+        "threshold": threshold,
+        "f1": 100.0 * total / max(len(predictions), 1),
+        "empty_count": empty_count,
+        "total": len(predictions),
+    }
+
+
+def _load_squad_validation_rows(
+    prompt_template: str,
+    count: int,
+    offset: int = 0,
+) -> list[dict[str, Any]]:
+    if prompt_template == "lm_eval":
+        ds = load_dataset("lighteval/squad_v2", split="validation")
+    elif prompt_template in {"simple", "instruction"}:
+        ds = load_dataset("squad_v2", split="validation")
+    else:
+        raise ValueError(f"Unsupported SQuAD prompt template: {prompt_template}")
+    if count <= 0:
+        return list(ds.select(range(offset, len(ds))))
+    end = min(offset + count, len(ds))
+    return list(ds.select(range(offset, end)))
+
+
+def _squad_prompt(row: dict[str, Any], prompt_template: str) -> str:
+    if prompt_template == "lm_eval":
+        return (
+            f"Title: {row.get('title', '')}\n\n"
+            f"Background: {row['context']}\n\n"
+            f"Question: {row['question']}\n\n"
+            "Answer:"
+        )
+    return (
+        "Answer the question from the context. If the answer is not in the context, answer No Answer.\n"
+        f"Context: {row['context']}\n"
+        f"Question: {row['question']}\n"
+        "Answer:"
+    )
+
+
 @torch.no_grad()
 def evaluate_squad_v2(
     model: torch.nn.Module,
@@ -436,53 +488,41 @@ def evaluate_squad_v2(
     prompt_style: str = "plain",
     prompt_template: str = "simple",
     no_answer_oracle: bool = False,
+    no_answer_calibration_samples: int = 0,
 ) -> dict[str, Any]:
-    if prompt_template == "lm_eval":
-        rows = _take(load_dataset("lighteval/squad_v2", split="validation"), max_samples)
-    elif prompt_template in {"simple", "instruction"}:
-        rows = _take(load_dataset("squad_v2", split="validation"), max_samples)
-    else:
-        raise ValueError(f"Unsupported SQuAD prompt template: {prompt_template}")
-    total_f1 = 0.0
-    predictions = []
+    rows = _load_squad_validation_rows(prompt_template, max_samples)
+    need_no_answer_scores = no_answer_oracle or no_answer_calibration_samples > 0
+
+    def evaluate_rows(eval_rows: list[dict[str, Any]]) -> tuple[float, list[dict[str, Any]]]:
+        total = 0.0
+        items = []
+        for row in eval_rows:
+            prompt = format_prompt_for_style(tokenizer, _squad_prompt(row, prompt_template), prompt_style)
+            ids = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=2048).to(device)
+            out = model.generate(
+                **ids,
+                max_new_tokens=max_new_tokens,
+                do_sample=False,
+                pad_token_id=tokenizer.pad_token_id,
+                eos_token_id=tokenizer.eos_token_id,
+            )
+            completion = tokenizer.decode(out[0, ids.input_ids.shape[1] :], skip_special_tokens=True).strip()
+            if completion.lower().startswith("no answer"):
+                completion = ""
+            f1 = _squad_score(completion, row["answers"])
+            total += f1
+            item = {"prediction": completion, "f1": f1, "answers": row["answers"].get("text", [])}
+            if need_no_answer_scores:
+                scores = score_completions(model, tokenizer, prompt, ["No Answer", " No Answer"], device)
+                item["no_answer_logp"] = max(scores)
+            items.append(item)
+        return total, items
+
     if device.type == "cuda":
         torch.cuda.synchronize(device)
     start = time.perf_counter()
     model.eval()
-    for row in rows:
-        if prompt_template == "lm_eval":
-            prompt = (
-                f"Title: {row.get('title', '')}\n\n"
-                f"Background: {row['context']}\n\n"
-                f"Question: {row['question']}\n\n"
-                "Answer:"
-            )
-        else:
-            prompt = (
-                "Answer the question from the context. If the answer is not in the context, answer No Answer.\n"
-                f"Context: {row['context']}\n"
-                f"Question: {row['question']}\n"
-                "Answer:"
-            )
-        prompt = format_prompt_for_style(tokenizer, prompt, prompt_style)
-        ids = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=2048).to(device)
-        out = model.generate(
-            **ids,
-            max_new_tokens=max_new_tokens,
-            do_sample=False,
-            pad_token_id=tokenizer.pad_token_id,
-            eos_token_id=tokenizer.eos_token_id,
-        )
-        completion = tokenizer.decode(out[0, ids.input_ids.shape[1] :], skip_special_tokens=True).strip()
-        if completion.lower().startswith("no answer"):
-            completion = ""
-        f1 = _squad_score(completion, row["answers"])
-        total_f1 += f1
-        item = {"prediction": completion, "f1": f1, "answers": row["answers"].get("text", [])[:3]}
-        if no_answer_oracle:
-            scores = score_completions(model, tokenizer, prompt, ["No Answer", " No Answer"], device)
-            item["no_answer_logp"] = max(scores)
-        predictions.append(item)
+    total_f1, predictions = evaluate_rows(rows)
     if device.type == "cuda":
         torch.cuda.synchronize(device)
     result = {
@@ -495,6 +535,33 @@ def evaluate_squad_v2(
     }
     if no_answer_oracle:
         result["no_answer_threshold_oracle"] = _best_squad_no_answer_threshold(predictions, "no_answer_logp")
+    if no_answer_calibration_samples > 0:
+        calibration_offset = len(rows)
+        calibration_rows = _load_squad_validation_rows(
+            prompt_template,
+            no_answer_calibration_samples,
+            offset=calibration_offset,
+        )
+        calibration_total, calibration_predictions = evaluate_rows(calibration_rows)
+        calibration_oracle = _best_squad_no_answer_threshold(calibration_predictions, "no_answer_logp")
+        applied = _apply_squad_no_answer_threshold(
+            predictions,
+            "no_answer_logp",
+            float(calibration_oracle["threshold"]),
+        )
+        result["no_answer_calibrated_threshold"] = {
+            "score_name": "no_answer_logp",
+            "calibration_samples": len(calibration_rows),
+            "calibration_offset": calibration_offset,
+            "calibration_raw_f1": 100.0 * calibration_total / max(len(calibration_rows), 1),
+            "calibration_oracle_f1": calibration_oracle["f1"],
+            "calibration_oracle_empty_count": calibration_oracle["empty_count"],
+            "eval_samples": len(rows),
+            "eval_raw_f1": result["f1"],
+            "eval_calibrated_f1": applied["f1"],
+            "eval_calibrated_empty_count": applied["empty_count"],
+            "threshold": applied["threshold"],
+        }
     return result
 
 
@@ -624,24 +691,27 @@ def evaluate_paper_tasks(
     glue_shot_count: int = 0,
     mmlu_shot_count: int = 0,
     squad_no_answer_oracle: bool = False,
+    squad_no_answer_calibration_samples: int = 0,
+    only_squad: bool = False,
     progress_callback: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     results: dict[str, Any] = {}
-    for task in GLUE_TASKS:
-        print(f"Evaluating {task}", flush=True)
-        metric = evaluate_glue_task(
-            model,
-            tokenizer,
-            task,
-            max_samples_per_task,
-            device,
-            prompt_style=prompt_style,
-            prompt_template=prompt_template,
-            shot_count=glue_shot_count,
-        )
-        results[task] = {k: v for k, v in metric.items() if k != "predictions"}
-        if progress_callback is not None:
-            progress_callback(results)
+    if not only_squad:
+        for task in GLUE_TASKS:
+            print(f"Evaluating {task}", flush=True)
+            metric = evaluate_glue_task(
+                model,
+                tokenizer,
+                task,
+                max_samples_per_task,
+                device,
+                prompt_style=prompt_style,
+                prompt_template=prompt_template,
+                shot_count=glue_shot_count,
+            )
+            results[task] = {k: v for k, v in metric.items() if k != "predictions"}
+            if progress_callback is not None:
+                progress_callback(results)
     if include_squad:
         print("Evaluating squad_v2", flush=True)
         metric = evaluate_squad_v2(
@@ -652,10 +722,13 @@ def evaluate_paper_tasks(
             prompt_style=prompt_style,
             prompt_template=prompt_template,
             no_answer_oracle=squad_no_answer_oracle,
+            no_answer_calibration_samples=squad_no_answer_calibration_samples,
         )
         results["squad_v2"] = {k: v for k, v in metric.items() if k != "predictions"}
         if progress_callback is not None:
             progress_callback(results)
+    if only_squad:
+        return results
     print("Evaluating mmlu_pro", flush=True)
     metric = evaluate_mmlu_pro(
         model,

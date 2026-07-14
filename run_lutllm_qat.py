@@ -64,6 +64,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mmlu-shot-count", type=int, default=0)
     parser.add_argument("--skip-squad", action="store_true")
     parser.add_argument("--squad-no-answer-oracle", action="store_true")
+    parser.add_argument("--squad-no-answer-calibration-samples", type=int, default=0)
+    parser.add_argument("--eval-only-squad", action="store_true")
     parser.add_argument("--train-include-squad", action="store_true")
     parser.add_argument("--squad-repeat", type=int, default=1)
     parser.add_argument("--target-regex", default=DEFAULT_TARGET_REGEX)
@@ -307,6 +309,8 @@ def main() -> None:
                 glue_shot_count=args.glue_shot_count,
                 mmlu_shot_count=args.mmlu_shot_count,
                 squad_no_answer_oracle=args.squad_no_answer_oracle,
+                squad_no_answer_calibration_samples=args.squad_no_answer_calibration_samples,
+                only_squad=args.eval_only_squad,
             )
         )
         save_json(out_dir / "summary.json", summary)
@@ -495,6 +499,8 @@ def main() -> None:
                 glue_shot_count=args.glue_shot_count,
                 mmlu_shot_count=args.mmlu_shot_count,
                 squad_no_answer_oracle=args.squad_no_answer_oracle,
+                squad_no_answer_calibration_samples=args.squad_no_answer_calibration_samples,
+                only_squad=args.eval_only_squad,
                 progress_callback=save_act_quant_progress,
             )
         )
@@ -546,6 +552,8 @@ def main() -> None:
                 glue_shot_count=args.glue_shot_count,
                 mmlu_shot_count=args.mmlu_shot_count,
                 squad_no_answer_oracle=args.squad_no_answer_oracle,
+                squad_no_answer_calibration_samples=args.squad_no_answer_calibration_samples,
+                only_squad=args.eval_only_squad,
             )
         )
         save_json(out_dir / "summary.json", summary)
