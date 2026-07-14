@@ -54,6 +54,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--weight-decay", type=float, default=0.0)
     parser.add_argument("--task-loss-ratio", type=float, default=1.0)
     parser.add_argument("--reconstruction-loss-ratio", type=float, default=0.0)
+    parser.add_argument("--reconstruction-target", choices=["current", "original"], default="current")
     parser.add_argument("--paper-samples", type=int, default=16)
     parser.add_argument("--eval-ppl", action="store_true")
     parser.add_argument("--ppl-tokens", type=int, default=4096)
@@ -345,6 +346,7 @@ def main() -> None:
         act_ste_input_scale=args.act_ste_input_scale,
         act_ste_center_scale=args.act_ste_center_scale,
         act_quant_max_dist_elements=args.act_quant_max_dist_elements,
+        reconstruction_target=args.reconstruction_target,
         output_correction=args.output_correction,
         seed=args.seed,
     )
@@ -447,6 +449,7 @@ def main() -> None:
         "reconstruction_losses": reconstruction_losses,
         "task_loss_ratio": args.task_loss_ratio,
         "reconstruction_loss_ratio": args.reconstruction_loss_ratio,
+        "reconstruction_target": args.reconstruction_target,
         "weight_decay": args.weight_decay,
         "train_dense_linears": args.train_dense_linears,
         "center_param_count": center_param_count,

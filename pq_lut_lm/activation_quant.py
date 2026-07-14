@@ -50,6 +50,22 @@ class STEActivationQuantLinear(nn.Module):
         )
         self.reconstruction_loss_enabled = False
         self.last_reconstruction_loss: torch.Tensor | None = None
+        if config.reconstruction_target == "original":
+            self.register_buffer(
+                "reconstruction_weight",
+                linear.weight.detach().clone(),
+                persistent=False,
+            )
+            if linear.bias is None:
+                self.reconstruction_bias = None
+            else:
+                self.register_buffer(
+                    "reconstruction_bias",
+                    linear.bias.detach().clone(),
+                    persistent=False,
+                )
+        elif config.reconstruction_target != "current":
+            raise ValueError(f"Unsupported reconstruction_target: {config.reconstruction_target}")
 
     def quantize_activation(self, x: torch.Tensor) -> torch.Tensor:
         shape = x.shape
@@ -104,7 +120,14 @@ class STEActivationQuantLinear(nn.Module):
         corrected_out = quantized_out.float().mul(self.correction_scale).add(self.correction_bias).to(dtype=x.dtype)
         if self.training and self.reconstruction_loss_enabled:
             with torch.no_grad():
-                dense_out = self.linear(x)
+                if self.config.reconstruction_target == "original":
+                    dense_out = torch.nn.functional.linear(
+                        x,
+                        self.reconstruction_weight.to(dtype=x.dtype),
+                        None if self.reconstruction_bias is None else self.reconstruction_bias.to(dtype=x.dtype),
+                    )
+                else:
+                    dense_out = self.linear(x)
             self.last_reconstruction_loss = torch.nn.functional.mse_loss(
                 corrected_out.float(),
                 dense_out.float(),
@@ -174,6 +197,7 @@ class STEActivationQuantLinear(nn.Module):
             "act_ste_input_scale": self.config.act_ste_input_scale,
             "act_ste_center_scale": self.config.act_ste_center_scale,
             "act_quant_max_dist_elements": self.config.act_quant_max_dist_elements,
+            "reconstruction_target": self.config.reconstruction_target,
             "act_center_values": m * self.config.ka * self.config.subdim,
             "weight_center_values": 0,
             "base_lut_entries": m * self.config.ka * self.out_features,
