@@ -1,0 +1,17 @@
+{
+  "device": "cuda",
+  "dtype": "bfloat16",
+  "eval_only_squad": false,
+  "glue_shot_count": 8,
+  "mmlu_shot_count": 0,
+  "model_id": "results/taskadapt_posttrain_noanswer_continue_qwen3_1p7b_instruction_paperall_3000_lr1e6/checkpoint_final",
+  "output_dir": "results/eval_taskadapt_posttrain_noanswer_continue_qwen3_1p7b_instruction_paperall_3000_lr1e6_g8_squad64",
+  "paper_samples": 64,
+  "prompt_style": "plain",
+  "prompt_template": "instruction",
+  "seed": 123,
+  "skip_squad": false,
+  "squad_no_answer_calibration_samples": 0,
+  "squad_no_answer_oracle": true,
+  "trust_remote_code": true
+}

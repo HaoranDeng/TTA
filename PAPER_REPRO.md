@@ -643,6 +643,33 @@ The `alpha=0.3` scale range is approximately `0.58` to `96.06`; the `alpha=0.7` 
 
 Interpretation: milder `alpha=0.3` smoothing is better than strong `alpha=0.7` and modestly improves this centers-only branch, especially MMLU-Pro and PPL. It still does not close the reproduction gap: GLUE remains `-4.91`, MMLU-Pro remains `-9.93`, and raw SQuAD remains `-31.76` behind the paper `+ Act. Quant.` row. The same-slice SQuAD oracle narrows the SQuAD gap to `-6.76`, again pointing to no-answer protocol mismatch, but that oracle is not paper-equivalent. A likely next test is early stopping or adding saved intermediate states, because both smoothing runs show reconstruction loss rising in the final third of QAT.
 
+### Official Post-Training Checkpoint Probe
+
+The user requested switching from `Qwen/Qwen3-1.7B-Base` to the official post-training checkpoint `Qwen/Qwen3-1.7B`. The runner uses `enable_thinking=False` when `prompt_style=chat`. Direct post-training evaluation is worse than the current Base+task-adapted branch under this paper-eval harness, and continuing paper-task adaptation from the post-training checkpoint has not closed the FP16 gap.
+
+64 examples/task:
+
+| Run | Prompt | GLUE Avg ↑ | Gap vs Paper FP16 GLUE ↑ | MMLU-Pro ↑ | Gap vs Paper FP16 MMLU ↑ | SQuADv2 F1 ↑ | Gap vs Paper FP16 SQuAD ↑ | Same-Slice SQuAD Oracle F1 ↑ |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| Paper FP16 target | - | 88.80 | 0.00 | 33.10 | 0.00 | 72.80 | 0.00 | - |
+| Base+task-adapted current best | plain instruction, GLUE 8-shot | 85.16 | -3.64 | 37.50 | +4.40 | 39.06 | -33.74 | 68.23 |
+| `eval_qwen3_1p7b_posttrain_plain_instruction_g8_squad64` | plain instruction, GLUE 8-shot | 79.17 | -9.63 | 25.00 | -8.10 | 10.46 | -62.34 | 60.24 |
+| `eval_qwen3_1p7b_posttrain_chat_instruction_g8_squad64` | chat instruction, GLUE 8-shot | 64.84 | -23.96 | 23.44 | -9.66 | 21.25 | -51.55 | 61.98 |
+| `eval_taskadapt_posttrain_qwen3_1p7b_instruction_paperall_1000_lr2e6_g8_squad64` | post-training + 1000 paper-task updates | 79.95 | -8.85 | 26.56 | -6.54 | 9.70 | -63.10 | 59.58 |
+| `eval_taskadapt_posttrain_noanswer_continue_qwen3_1p7b_instruction_paperall_3000_lr1e6_g8_squad64` | post-training + 3000 paper-task updates | 80.47 | -8.33 | 26.56 | -6.54 | 14.32 | -58.48 | 59.58 |
+
+Prompt grid without SQuAD for direct `Qwen/Qwen3-1.7B`, 64 examples/task:
+
+| Run | Prompt | GLUE Avg ↑ | MMLU-Pro ↑ |
+|---|---|---:|---:|
+| `eval_qwen3_1p7b_posttrain_plain_simple_g0_glue64` | plain simple, 0-shot GLUE | 53.91 | 20.31 |
+| `eval_qwen3_1p7b_posttrain_plain_lmeval_g0_glue64` | plain lm_eval, 0-shot GLUE | 55.21 | 17.19 |
+| `eval_qwen3_1p7b_posttrain_plain_lmeval_g8_glue64` | plain lm_eval, GLUE 8-shot | 58.33 | 17.19 |
+| `eval_qwen3_1p7b_posttrain_chat_simple_g0_glue64` | chat simple, 0-shot GLUE | 57.81 | 15.62 |
+| `eval_qwen3_1p7b_posttrain_chat_lmeval_g0_glue64` | chat lm_eval, 0-shot GLUE | 71.61 | 23.44 |
+
+Interpretation: in this harness, the official post-training checkpoint is not a better FP16 starting point than the Base-derived checkpoint. The best post-training adaptation result is still `-8.33` GLUE and `-58.48` raw SQuAD F1 behind paper FP16, while the Base+task-adapted branch is `-3.64` GLUE and `-33.74` raw SQuAD F1. Quantizing the post-training branch now would make the reproduction less meaningful, so this branch is recorded as a baseline-alignment negative result rather than an all-196 quantization target.
+
 ### Historical 7-Linear Debug Runs
 
 The following runs quantize only the first 7 target linears. They are retained for debugging/profiling history only and should not be interpreted as formal LUT-LLM reproduction results.

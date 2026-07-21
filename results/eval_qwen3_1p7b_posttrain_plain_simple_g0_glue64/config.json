@@ -1,0 +1,17 @@
+{
+  "device": "cuda",
+  "dtype": "bfloat16",
+  "eval_only_squad": false,
+  "glue_shot_count": 0,
+  "mmlu_shot_count": 0,
+  "model_id": "Qwen/Qwen3-1.7B",
+  "output_dir": "results/eval_qwen3_1p7b_posttrain_plain_simple_g0_glue64",
+  "paper_samples": 64,
+  "prompt_style": "plain",
+  "prompt_template": "simple",
+  "seed": 123,
+  "skip_squad": true,
+  "squad_no_answer_calibration_samples": 0,
+  "squad_no_answer_oracle": false,
+  "trust_remote_code": true
+}

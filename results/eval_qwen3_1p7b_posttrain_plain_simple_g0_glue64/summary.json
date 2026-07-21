@@ -1,0 +1,51 @@
+{
+  "device": "cuda",
+  "dtype": "torch.bfloat16",
+  "load_seconds": 8.615917223040015,
+  "model_id": "Qwen/Qwen3-1.7B",
+  "paper_samples": 64,
+  "results": {
+    "mmlu_pro": {
+      "accuracy": 0.203125,
+      "correct": 13,
+      "seconds": 1.813244906021282,
+      "total": 64
+    },
+    "mnli": {
+      "accuracy": 0.328125,
+      "correct": 21,
+      "seconds": 2.3312724160496145,
+      "total": 64
+    },
+    "mrpc": {
+      "accuracy": 0.671875,
+      "correct": 43,
+      "seconds": 0.9628352918662131,
+      "total": 64
+    },
+    "qnli": {
+      "accuracy": 0.53125,
+      "correct": 34,
+      "seconds": 0.8993823039345443,
+      "total": 64
+    },
+    "qqp": {
+      "accuracy": 0.34375,
+      "correct": 22,
+      "seconds": 0.8012624529656023,
+      "total": 64
+    },
+    "rte": {
+      "accuracy": 0.5,
+      "correct": 32,
+      "seconds": 1.0824314749334008,
+      "total": 64
+    },
+    "sst2": {
+      "accuracy": 0.859375,
+      "correct": 55,
+      "seconds": 0.9979772600345314,
+      "total": 64
+    }
+  }
+}

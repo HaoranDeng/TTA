@@ -1,0 +1,22 @@
+{
+  "batch_size": 1,
+  "device": "cuda",
+  "dtype": "bfloat16",
+  "grad_accum_steps": 8,
+  "lr": 1e-06,
+  "max_length": 512,
+  "model_id": "results/taskadapt_posttrain_qwen3_1p7b_instruction_paperall_1000_lr2e6/checkpoint_final",
+  "output_dir": "results/taskadapt_posttrain_noanswer_continue_qwen3_1p7b_instruction_paperall_3000_lr1e6",
+  "prompt_style": "plain",
+  "prompt_template": "instruction",
+  "save_every": 1000,
+  "seed": 123,
+  "skip_mmlu": false,
+  "skip_squad": false,
+  "squad_repeat": 1,
+  "steps": 2000,
+  "train_samples_per_task": 4096,
+  "trust_remote_code": true,
+  "warmup_steps": 50,
+  "weight_decay": 0.0
+}

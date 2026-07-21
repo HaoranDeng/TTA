@@ -1,0 +1,22 @@
+{
+  "batch_size": 1,
+  "device": "cuda",
+  "dtype": "bfloat16",
+  "grad_accum_steps": 8,
+  "lr": 2e-06,
+  "max_length": 512,
+  "model_id": "Qwen/Qwen3-1.7B",
+  "output_dir": "results/taskadapt_posttrain_qwen3_1p7b_instruction_paperall_1000_lr2e6",
+  "prompt_style": "plain",
+  "prompt_template": "instruction",
+  "save_every": 500,
+  "seed": 123,
+  "skip_mmlu": false,
+  "skip_squad": false,
+  "squad_repeat": 1,
+  "steps": 1000,
+  "train_samples_per_task": 2048,
+  "trust_remote_code": true,
+  "warmup_steps": 50,
+  "weight_decay": 0.0
+}
