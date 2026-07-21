@@ -33,6 +33,9 @@ class PQConfig:
     act_ste_center_scale: float = 1.0
     act_quant_max_dist_elements: int = 0
     reconstruction_target: str = "current"
+    act_smooth_alpha: float = -1.0
+    act_smooth_min_scale: float = 1e-5
+    act_smooth_max_scale: float = 1e5
     output_correction: str = "none"
     seed: int = 123
 

@@ -93,6 +93,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--act-ste-center-scale", type=float, default=1.0)
     parser.add_argument("--act-ste-center-scale-end", type=float, default=None)
     parser.add_argument("--act-quant-max-dist-elements", type=int, default=0)
+    parser.add_argument("--act-smooth-alpha", type=float, default=-1.0)
+    parser.add_argument("--act-smooth-min-scale", type=float, default=1e-5)
+    parser.add_argument("--act-smooth-max-scale", type=float, default=1e5)
     parser.add_argument("--lut-storage", choices=["expanded", "compact"], default="expanded")
     parser.add_argument("--output-correction", choices=["none", "bias", "affine"], default="none")
     parser.add_argument("--save-act-quant-state", action="store_true")
@@ -347,6 +350,9 @@ def main() -> None:
         act_ste_center_scale=args.act_ste_center_scale,
         act_quant_max_dist_elements=args.act_quant_max_dist_elements,
         reconstruction_target=args.reconstruction_target,
+        act_smooth_alpha=args.act_smooth_alpha,
+        act_smooth_min_scale=args.act_smooth_min_scale,
+        act_smooth_max_scale=args.act_smooth_max_scale,
         output_correction=args.output_correction,
         seed=args.seed,
     )
@@ -460,6 +466,7 @@ def main() -> None:
         "act_ste_input_scale_end": args.act_ste_input_scale_end,
         "act_ste_center_scale_start": args.act_ste_center_scale,
         "act_ste_center_scale_end": args.act_ste_center_scale_end,
+        "act_smooth_alpha": args.act_smooth_alpha,
     }
     model.eval()
     save_json(out_dir / "summary.json", summary)

@@ -28,6 +28,7 @@ class STEActivationQuantLinear(nn.Module):
         act_centers: torch.Tensor,
         config: PQConfig,
         source_name: str,
+        input_smooth_scale: torch.Tensor | None = None,
     ) -> None:
         super().__init__()
         if linear.in_features % config.subdim != 0:
@@ -50,6 +51,13 @@ class STEActivationQuantLinear(nn.Module):
         )
         self.reconstruction_loss_enabled = False
         self.last_reconstruction_loss: torch.Tensor | None = None
+        if input_smooth_scale is None:
+            self.input_smooth_scale = None
+        else:
+            smooth = input_smooth_scale.detach().clone().float().to(device=linear.weight.device)
+            if smooth.numel() != linear.in_features:
+                raise ValueError(f"{source_name}: smooth scale must have {linear.in_features} values")
+            self.register_buffer("input_smooth_scale", smooth, persistent=True)
         if config.reconstruction_target == "original":
             self.register_buffer(
                 "reconstruction_weight",
@@ -66,6 +74,15 @@ class STEActivationQuantLinear(nn.Module):
                 )
         elif config.reconstruction_target != "current":
             raise ValueError(f"Unsupported reconstruction_target: {config.reconstruction_target}")
+        if input_smooth_scale is not None:
+            with torch.no_grad():
+                self.linear.weight.mul_(self.input_smooth_scale.to(dtype=self.linear.weight.dtype).view(1, -1))
+
+    def smooth_input(self, x: torch.Tensor) -> torch.Tensor:
+        if self.input_smooth_scale is None:
+            return x
+        scale = self.input_smooth_scale.to(device=x.device, dtype=torch.float32)
+        return (x.float() / scale.view(*([1] * (x.dim() - 1)), -1)).to(dtype=x.dtype)
 
     def quantize_activation(self, x: torch.Tensor) -> torch.Tensor:
         shape = x.shape
@@ -115,7 +132,8 @@ class STEActivationQuantLinear(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         self.last_reconstruction_loss = None
-        quantized = self.quantize_activation(x).to(dtype=x.dtype)
+        linear_input = self.smooth_input(x)
+        quantized = self.quantize_activation(linear_input).to(dtype=x.dtype)
         quantized_out = self.linear(quantized)
         corrected_out = quantized_out.float().mul(self.correction_scale).add(self.correction_bias).to(dtype=x.dtype)
         if self.training and self.reconstruction_loss_enabled:
@@ -127,7 +145,7 @@ class STEActivationQuantLinear(nn.Module):
                         None if self.reconstruction_bias is None else self.reconstruction_bias.to(dtype=x.dtype),
                     )
                 else:
-                    dense_out = self.linear(x)
+                    dense_out = self.linear(linear_input)
             self.last_reconstruction_loss = torch.nn.functional.mse_loss(
                 corrected_out.float(),
                 dense_out.float(),
@@ -147,8 +165,9 @@ class STEActivationQuantLinear(nn.Module):
         count = 0
         for start in range(0, calib.shape[0], batch_size):
             x = calib[start : start + batch_size]
-            orig = self.linear(x).float()
-            quantized = self.quantize_activation(x).to(dtype=x.dtype)
+            linear_input = self.smooth_input(x)
+            orig = self.linear(linear_input).float()
+            quantized = self.quantize_activation(linear_input).to(dtype=x.dtype)
             approx = self.linear(quantized).float()
             count += approx.shape[0]
             sum_orig += orig.double().sum(dim=0)
@@ -198,6 +217,10 @@ class STEActivationQuantLinear(nn.Module):
             "act_ste_center_scale": self.config.act_ste_center_scale,
             "act_quant_max_dist_elements": self.config.act_quant_max_dist_elements,
             "reconstruction_target": self.config.reconstruction_target,
+            "act_smooth_alpha": self.config.act_smooth_alpha,
+            "act_smooth_scale_count": 0 if self.input_smooth_scale is None else self.input_smooth_scale.numel(),
+            "act_smooth_scale_min": 0.0 if self.input_smooth_scale is None else float(self.input_smooth_scale.amin().item()),
+            "act_smooth_scale_max": 0.0 if self.input_smooth_scale is None else float(self.input_smooth_scale.amax().item()),
             "act_center_values": m * self.config.ka * self.config.subdim,
             "weight_center_values": 0,
             "base_lut_entries": m * self.config.ka * self.out_features,
@@ -475,6 +498,23 @@ def reconstruct_linear_from_activation_lut(
     return linear
 
 
+@torch.no_grad()
+def _smoothquant_input_scale(
+    linear: nn.Linear,
+    calibration_inputs: torch.Tensor,
+    config: PQConfig,
+) -> torch.Tensor | None:
+    alpha = float(config.act_smooth_alpha)
+    if alpha < 0.0:
+        return None
+    if alpha > 1.0:
+        raise ValueError("--act-smooth-alpha must be in [0, 1], or negative to disable")
+    act_absmax = calibration_inputs.float().abs().amax(dim=0).clamp_min(config.act_smooth_min_scale)
+    weight_absmax = linear.weight.detach().float().abs().amax(dim=0).clamp_min(config.act_smooth_min_scale)
+    scale = act_absmax.pow(alpha) / weight_absmax.pow(1.0 - alpha)
+    return scale.clamp(config.act_smooth_min_scale, config.act_smooth_max_scale).float()
+
+
 @dataclass
 class ActQuantReport:
     module_stats: list[dict[str, Any]]
@@ -515,8 +555,13 @@ def replace_with_ste_act_quant(
         if not isinstance(old, nn.Linear):
             raise TypeError(f"{name} is no longer nn.Linear")
         calib = calibration_inputs[name].to(device=device, dtype=old.weight.dtype)
+        smooth_scale = _smoothquant_input_scale(old, calib, config)
+        if smooth_scale is not None:
+            calib_for_centers = (calib.float() / smooth_scale.to(device=device).view(1, -1)).to(dtype=calib.dtype)
+        else:
+            calib_for_centers = calib
         centers = kmeans_padded_batched(
-            calib,
+            calib_for_centers,
             config.ka,
             config.kmeans_iters,
             config.seed + 1009 * idx,
@@ -525,7 +570,7 @@ def replace_with_ste_act_quant(
             config.distance,
             config.subdim,
         )
-        wrapped = STEActivationQuantLinear(old, centers, config, name)
+        wrapped = STEActivationQuantLinear(old, centers, config, name, input_smooth_scale=smooth_scale)
         _set_submodule(model, name, wrapped)
         module_stats.append(wrapped.hardware_stats())
         if idx == 1 or idx == len(target_names) or idx % 10 == 0:

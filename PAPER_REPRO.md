@@ -619,6 +619,25 @@ Findings:
 
 Next implementation target: replace the current one-pass code reassignment with a closer GPTQ/GPTVQ-style weight quantizer that updates codes and/or centers under a second-order or blockwise reconstruction objective. The one-pass diagnostic shows that simple coordinate reassignment is not enough.
 
+### Task-Adapted SmoothQuant-Style Activation Scaling Probe
+
+This probe tests one missing-detail hypothesis for the paper's first `+ Act. Quant.` stage: the authors may have used an activation-outlier smoothing or equivalent rescaling step before vector-quantizing activations. The implementation applies a SmoothQuant-style per-input-channel transform before the activation codebook: the activation vector is quantized in `x / s` space, and the dense linear weight is multiplied by `s`, so the unquantized linear remains mathematically equivalent to the original dense layer. All rows below quantize all 196 transformer-block target linears; `lm_head` is excluded.
+
+| Run | Samples | GLUE Avg ↑ | Gap vs Paper Act GLUE ↑ | MMLU-Pro ↑ | Gap vs Paper Act MMLU ↑ | SQuADv2 F1 ↑ | Gap vs Paper Act SQuAD ↑ | Same-Slice SQuAD Oracle F1 ↑ | WikiText PPL ↓ |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Paper `+ Act. Quant.` target | - | 87.20 | 0.00 | 31.80 | 0.00 | 70.30 | 0.00 | - | - |
+| `lutllm_smoothalpha07_taskadapt_squadrepeat4_4000_all196_ka512_km5_sample4096_chunk16m_centersonly_lr5e6_recon1_task1_steqat3000_squad32_ppl64` | 32/task | 80.21 | -6.99 | 12.50 | -19.30 | 34.38 | -35.93 | 60.42 | 75.77 |
+
+Per-task GLUE for the SmoothQuant-style `alpha=0.7` row: MNLI `81.25`, MRPC `68.75`, QNLI `84.38`, QQP `75.00`, RTE `81.25`, SST-2 `90.62`.
+
+Hardware-facing aggregate for the same all-196 `Ka=512`, `subdim=2` row:
+
+| Quantized Linears | Activation Center Values | Weight Center Values | Lookups / Token | Activation Code Bits / Token | Centroid-Distance Vectors / Token | Expanded FP16 Act-LUT | Smooth Scale Values |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 196 | 264,241,152 | 0 | 704,643,072 | 2,322,432 | 132,120,576 | 688,128.0 MiB | 516,096 |
+
+Interpretation: strong `alpha=0.7` smoothing does not close the reproduction gap. Training ended with total loss `3.65`, task loss `0.83`, and reconstruction loss `2.82`, so the rescaling likely makes the center-only activation-VQ problem harder in this scaffold. The next parameter to test is a more conservative `alpha=0.3` or `0.5`, ideally with saved Act Quant state so evaluation can be repeated without retraining.
+
 ### Historical 7-Linear Debug Runs
 
 The following runs quantize only the first 7 target linears. They are retained for debugging/profiling history only and should not be interpreted as formal LUT-LLM reproduction results.
