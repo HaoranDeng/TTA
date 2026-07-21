@@ -626,7 +626,10 @@ This probe tests one missing-detail hypothesis for the paper's first `+ Act. Qua
 | Run | Samples | GLUE Avg ↑ | Gap vs Paper Act GLUE ↑ | MMLU-Pro ↑ | Gap vs Paper Act MMLU ↑ | SQuADv2 F1 ↑ | Gap vs Paper Act SQuAD ↑ | Same-Slice SQuAD Oracle F1 ↑ | WikiText PPL ↓ |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | Paper `+ Act. Quant.` target | - | 87.20 | 0.00 | 31.80 | 0.00 | 70.30 | 0.00 | - | - |
+| `lutllm_smoothalpha03_taskadapt_squadrepeat4_4000_all196_ka512_km5_sample4096_chunk16m_centersonly_lr5e6_recon1_task1_steqat3000_squad32_ppl64` | 32/task | 82.29 | -4.91 | 21.88 | -9.93 | 38.54 | -31.76 | 63.54 | 50.38 |
 | `lutllm_smoothalpha07_taskadapt_squadrepeat4_4000_all196_ka512_km5_sample4096_chunk16m_centersonly_lr5e6_recon1_task1_steqat3000_squad32_ppl64` | 32/task | 80.21 | -6.99 | 12.50 | -19.30 | 34.38 | -35.93 | 60.42 | 75.77 |
+
+Per-task GLUE for the SmoothQuant-style `alpha=0.3` row: MNLI `81.25`, MRPC `71.88`, QNLI `81.25`, QQP `87.50`, RTE `78.12`, SST-2 `93.75`.
 
 Per-task GLUE for the SmoothQuant-style `alpha=0.7` row: MNLI `81.25`, MRPC `68.75`, QNLI `84.38`, QQP `75.00`, RTE `81.25`, SST-2 `90.62`.
 
@@ -636,7 +639,9 @@ Hardware-facing aggregate for the same all-196 `Ka=512`, `subdim=2` row:
 |---:|---:|---:|---:|---:|---:|---:|---:|
 | 196 | 264,241,152 | 0 | 704,643,072 | 2,322,432 | 132,120,576 | 688,128.0 MiB | 516,096 |
 
-Interpretation: strong `alpha=0.7` smoothing does not close the reproduction gap. Training ended with total loss `3.65`, task loss `0.83`, and reconstruction loss `2.82`, so the rescaling likely makes the center-only activation-VQ problem harder in this scaffold. The next parameter to test is a more conservative `alpha=0.3` or `0.5`, ideally with saved Act Quant state so evaluation can be repeated without retraining.
+The `alpha=0.3` scale range is approximately `0.58` to `96.06`; the `alpha=0.7` scale range is approximately `0.0034` to `914.76`. Training `alpha=0.3` ended with total loss `2.99`, task loss `0.98`, and reconstruction loss `2.01`; training `alpha=0.7` ended with total loss `3.65`, task loss `0.83`, and reconstruction loss `2.82`.
+
+Interpretation: milder `alpha=0.3` smoothing is better than strong `alpha=0.7` and modestly improves this centers-only branch, especially MMLU-Pro and PPL. It still does not close the reproduction gap: GLUE remains `-4.91`, MMLU-Pro remains `-9.93`, and raw SQuAD remains `-31.76` behind the paper `+ Act. Quant.` row. The same-slice SQuAD oracle narrows the SQuAD gap to `-6.76`, again pointing to no-answer protocol mismatch, but that oracle is not paper-equivalent. A likely next test is early stopping or adding saved intermediate states, because both smoothing runs show reconstruction loss rising in the final third of QAT.
 
 ### Historical 7-Linear Debug Runs
 
