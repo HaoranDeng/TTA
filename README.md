@@ -42,5 +42,18 @@ Counts are reported alongside the on-chip memory the method needs (tables, codeb
 indices and scales) and its accuracy, so that every result can be read as an accuracy–memory–
 operation trade-off. Wall-clock timings on GPUs are supplementary and do not replace these counts.
 
-Current experimental results are in [RESULTS.md](RESULTS.md). Code will be added as it is
-consolidated.
+## Results
+
+Qwen3-0.6B, all 196 decoder linears, counts per generated token. Perplexity on WikiText-2 (256-token
+contexts). INT8 per-token activations throughout.
+
+| Method | Lookups | Additions | Multiplications | On-chip memory | PPL |
+|---|---:|---:|---:|---:|---:|
+| FP16 dense | 0 | 440 M | 440 M | 840 MiB | 42.51 |
+| W8A8 dense | 0 | 440 M | 441 M | 420 MiB | 43.90 |
+| Bit-plane table, g=4, INT16 | 881 M | 881 M | 0.9 M | 3 361 MiB | 43.90 |
+| Bit-plane table, g=5, INT8 | 705 M | 705 M | 706 M | 3 028 MiB | 43.69 |
+| Bit-plane table, g=8, full | 440 M | 440 M | 0.9 M | 13 440 MiB | 43.90 |
+| Bit-plane table, g=8, top-64 entries | 236 M | 733 M | 0.9 M | 6 720 MiB | 43.90 |
+| Joint activation–weight VQ, v=2 (PTQ) | 220 M | 233 M | 0.3 M | 574 MiB | 1.2 × 10^7 |
+| Joint activation–weight VQ, v=4 (PTQ) | 110 M | 123 M | 0.3 M | 312 MiB | 5.1 × 10^8 |
