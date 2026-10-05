@@ -28,4 +28,18 @@ on. The main design questions are how to form the tables (bit-plane partial sums
 codebooks, or hybrids), how large they must be to preserve accuracy, and how many lookups and
 additions each token costs under a given on-chip memory budget.
 
+## Reporting efficiency
+
+Unless stated otherwise, the efficiency of any method in this project is reported as three operation
+counts, measured per generated token over the whole model:
+
+- **Lookups**: number of table reads.
+- **Additions**: number of integer or floating-point additions, including accumulation of partial
+  sums.
+- **Multiplications**: number of multiplications, including any scaling or dequantisation steps.
+
+Counts are reported alongside the on-chip memory the method needs (tables, codebooks, weight
+indices and scales) and its accuracy, so that every result can be read as an accuracy–memory–
+operation trade-off. Wall-clock timings on GPUs are supplementary and do not replace these counts.
+
 Code and results will be added as the project progresses.
