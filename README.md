@@ -42,4 +42,5 @@ Counts are reported alongside the on-chip memory the method needs (tables, codeb
 indices and scales) and its accuracy, so that every result can be read as an accuracy–memory–
 operation trade-off. Wall-clock timings on GPUs are supplementary and do not replace these counts.
 
-Code and results will be added as the project progresses.
+Current experimental results are in [RESULTS.md](RESULTS.md). Code will be added as it is
+consolidated.
