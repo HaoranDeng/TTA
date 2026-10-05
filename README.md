@@ -57,3 +57,12 @@ contexts). INT8 per-token activations throughout.
 | Bit-plane table, g=8, top-64 entries | 236 M | 733 M | 0.9 M | 6 720 MiB | 43.90 |
 | Joint activation–weight VQ, v=2 (PTQ) | 220 M | 233 M | 0.3 M | 574 MiB | 1.2 × 10^7 |
 | Joint activation–weight VQ, v=4 (PTQ) | 110 M | 123 M | 0.3 M | 312 MiB | 5.1 × 10^8 |
+
+## Cluster usage limits
+
+- Per user, use at most **2 GPUs total across scai3–5** and **2 GPUs total across scai6–7**, counting all projects and jobs.
+- Before exceeding either limit, post the **reason, GPU count and server(s), and duration** in `#scai-servers`. Unannounced excess jobs may be killed without warning; exceptions are handled case by case.
+- Connect through VPN. Check CPU/GPU usage with `htop` and `nvidia-smi` before launching; never use a GPU occupied by another user.
+- Select GPUs explicitly with `CUDA_VISIBLE_DEVICES` and limit CPU threads, e.g. `OMP_NUM_THREADS=4`. Run CPU-heavy jobs on scai1–5, not scai6–7.
+- Consolidate jobs that each use **less than 50% of GPU memory** onto one GPU, accounting for peak memory needs.
+- Monitor running jobs regularly and release memory when finished, including Jupyter kernels.
