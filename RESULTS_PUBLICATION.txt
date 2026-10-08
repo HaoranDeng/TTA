@@ -1,0 +1,10 @@
+TTA result publication — 2026-10-08
+
+The README links completed results for rounds 18–21 and the preliminary numerical checks for round 22.
+Original result/protocol/verification files are copied byte-for-byte. Absolute filesystem paths in JSON are historical experiment provenance, not public download links. Hashes referencing omitted files identify the retained experiment archive; this is a result publication, not a self-contained reproduction package.
+
+Excluded: model checkpoints and packed banks, raw datasets and token tensors, full per-question/per-layer evidence archives, caches, credentials, execution logs and machine/process snapshots. Round 21's retained full evidence archive has SHA256 681529d02d13509637863280e1afefefc7a0176a988111a358f0dbf897877c93 (174822902 bytes).
+
+Round 21: complete PPL for all ten models; full MMLU for six new models; four explicitly reused historical MMLU records. Round 22: nine numerically checked banks; no new holdout PPL/MMLU.
+
+Manifest SHA256 values below describe exact published file bytes; the manifest and this index are excluded from that manifest to avoid self-reference.

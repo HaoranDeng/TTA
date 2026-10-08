@@ -1,0 +1,79 @@
+Qwen3-0.6B — Round18 overfitting and MMLU audit
+
+All model/checkpoint choices were frozen on the fresh monitor before MMLU TEST. Training and initial evaluation used scai4:2. Large final quantized evaluators were split across scai4:2 and5 after one process occupied32GiB including allocator cache; maximum concurrency was two GPUs. The smaller FP16 controls were consolidated serially on GPU2. See MMLU18_SCHEDULING_UPDATE.json.
+Do not attribute NLL-adapted versus unadapted FP16 gains to quantization. Matched controls tune original FP16 weights through the same number of bounded group gains, then merge them offline.
+MMLU: 57 subjects, all14042 test questions,5-shot first5 dev examples,raw A/B/C/D continuation likelihood,no chat template,no generated reasoning,micro accuracy. This is not Qwen advertised thinking-mode evaluation.
+PPL: WikiText2 raw,2048-token nonoverlapping contexts,298862 scored TEST tokens. This TEST has been reused in prior rounds. New monitor and final audit each32x2048 use token-disjoint historical TRAIN windows with2048-token buffers from fitting windows; they are not document-disjoint and do not establish pretraining decontamination.
+Training: same128x512 windows and256-update maximum,Adam lr0.01,4-window accumulation,2% bounds from immutable pre-adaptation scales. Select from0/64/128/256 separately for every trajectory using fresh monitor NLL. Teacher KL strength1,temperature1 fixed before results. MMLU scores did not select checkpoints. All ten adapted trajectories selected update256; early stopping did not trigger.
+
+| Method | Lookups | Additions | Multiplications | On-chip memory | PPL | MMLU | E_ref (mJ/token) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| FP16 dense / unadapted (s0) | 0 | 440,000,000 | 440,000,000 | 840.000 MiB | 20.955240 | 47.358% (6650/14042) | 0.748000 |
+| FP16 g128 / NLL (s256) | 0 | 440,000,000 | 440,000,000 | 840.000 MiB | 15.424360 | 47.465% (6665/14042) | 0.748000 |
+| FP16 g128 / NLL + KL(1) (s256) | 0 | 440,000,000 | 440,000,000 | 840.000 MiB | 16.561121 | 47.572% (6680/14042) | 0.748000 |
+| FP16 g64 / NLL (s256) | 0 | 440,000,000 | 440,000,000 | 840.000 MiB | 15.336974 | 47.465% (6665/14042) | 0.748000 |
+| FP16 g64 / NLL + KL(1) (s256) | 0 | 440,000,000 | 440,000,000 | 840.000 MiB | 16.456379 | 47.507% (6671/14042) | 0.748000 |
+| LUT-LLM shape/PTQ resource baseline | 220,200,960 | 233,000,000 | 300,000 | 574 MiB | Unmeasured | Unmeasured | 0.930354 |
+| PQ / pure PTQ (s0) | 220,200,960 | 220,086,272 | 4,071,620 | 561.737 MiB | 20.998280 | 46.810% (6573/14042) | 0.930091 |
+| PQ / NLL (s256) | 220,200,960 | 220,086,272 | 4,071,620 | 561.737 MiB | 15.707199 | 46.909% (6587/14042) | 0.930091 |
+| PQ / NLL + KL(1) (s256) | 220,200,960 | 220,086,272 | 4,071,620 | 561.737 MiB | 16.781400 | 47.094% (6613/14042) | 0.930091 |
+| RQ / pure PTQ (s0) | 220,200,960 | 220,315,648 | 7,512,260 | 512.144 MiB | 20.961429 | 47.109% (6615/14042) | 0.934656 |
+| RQ / NLL (s256) | 220,200,960 | 220,315,648 | 7,512,260 | 512.144 MiB | 15.551077 | 47.002% (6600/14042) | 0.934656 |
+| RQ / NLL + KL(1) (s256) | 220,200,960 | 220,315,648 | 7,512,260 | 512.144 MiB | 16.604509 | 47.144% (6620/14042) | 0.934656 |
+| IB / pure PTQ (s0) | 220,200,960 | 220,315,648 | 7,512,260 | 569.145 MiB | 20.934607 | 47.522% (6673/14042) | 0.934656 |
+| IB / NLL (s256) | 220,200,960 | 220,315,648 | 7,512,260 | 569.145 MiB | 15.452445 | 47.251% (6635/14042) | 0.934656 |
+| IB / NLL + KL(1) (s256) | 220,200,960 | 220,315,648 | 7,512,260 | 569.145 MiB | 16.532575 | 47.614% (6686/14042) | 0.934656 |
+
+Fresh monitor and final audit:
+| Method | Selected update | Monitor PPL | Final audit PPL |
+|---|---:|---:|---:|
+| FP16 dense / unadapted | 0 | 23.050411 | 21.462199 |
+| FP16 g128 / NLL | 256 | 16.930783 | 15.783826 |
+| FP16 g128 / NLL + KL(1) | 256 | 18.175895 | 16.947065 |
+| FP16 g64 / NLL | 256 | 16.829585 | 15.686987 |
+| FP16 g64 / NLL + KL(1) | 256 | 18.046470 | 16.817586 |
+| PQ / pure PTQ | 0 | 23.056422 | 21.508110 |
+| PQ / NLL | 256 | 17.224383 | 16.062623 |
+| PQ / NLL + KL(1) | 256 | 18.407168 | 17.169556 |
+| RQ / pure PTQ | 0 | 23.074607 | 21.511391 |
+| RQ / NLL | 256 | 17.108056 | 15.891604 |
+| RQ / NLL + KL(1) | 256 | 18.252949 | 16.994918 |
+| IB / pure PTQ | 0 | 23.009407 | 21.414510 |
+| IB / NLL | 256 | 16.965226 | 15.819979 |
+| IB / NLL + KL(1) | 256 | 18.137600 | 16.919094 |
+
+Paired MMLU differences (percentage points; positive means first method is better):
+- pq_kl1 vs pq_nll: +0.185 pp; approximate paired95% CI [-0.233, +0.603].
+- pq_kl1 vs pq_ptq: +0.285 pp; approximate paired95% CI [-0.172, +0.742].
+- pq_kl1 vs fp16: -0.263 pp; approximate paired95% CI [-0.803, +0.276].
+- pq_ptq vs fp16: -0.548 pp; approximate paired95% CI [-1.024, -0.073].
+- pq_kl1 vs fp16_g128_kl1: -0.477 pp; approximate paired95% CI [-0.928, -0.026].
+- pq_nll vs fp16_g128_nll: -0.555 pp; approximate paired95% CI [-1.001, -0.110].
+- pq regularized PPL vs matched regularized FP16: TEST +1.330%; fresh audit +1.313%.
+- pq unregularized NLL PPL vs matched NLL FP16: TEST +1.834%.
+- rq_kl1 vs rq_nll: +0.142 pp; approximate paired95% CI [-0.275, +0.560].
+- rq_kl1 vs rq_ptq: +0.036 pp; approximate paired95% CI [-0.457, +0.529].
+- rq_kl1 vs fp16: -0.214 pp; approximate paired95% CI [-0.761, +0.334].
+- rq_ptq vs fp16: -0.249 pp; approximate paired95% CI [-0.702, +0.203].
+- rq_kl1 vs fp16_g64_kl1: -0.363 pp; approximate paired95% CI [-0.808, +0.082].
+- rq_nll vs fp16_g64_nll: -0.463 pp; approximate paired95% CI [-0.903, -0.023].
+- rq regularized PPL vs matched regularized FP16: TEST +0.900%; fresh audit +1.054%.
+- rq unregularized NLL PPL vs matched NLL FP16: TEST +1.396%.
+- ib_kl1 vs ib_nll: +0.363 pp; approximate paired95% CI [-0.061, +0.787].
+- ib_kl1 vs ib_ptq: +0.093 pp; approximate paired95% CI [-0.387, +0.572].
+- ib_kl1 vs fp16: +0.256 pp; approximate paired95% CI [-0.227, +0.740].
+- ib_ptq vs fp16: +0.164 pp; approximate paired95% CI [-0.220, +0.548].
+- ib_kl1 vs fp16_g64_kl1: +0.107 pp; approximate paired95% CI [-0.281, +0.495].
+- ib_nll vs fp16_g64_nll: -0.214 pp; approximate paired95% CI [-0.617, +0.189].
+- ib regularized PPL vs matched regularized FP16: TEST +0.463%; fresh audit +0.604%.
+- ib unregularized NLL PPL vs matched NLL FP16: TEST +0.753%.
+
+Counts cover196 decoder linears per generated token. Embeddings,LM head,QK/AV,norms and nonlinearities excluded equally. Dense counts/memory are historical rounded baselines. Quantized rows include resident compressed weights,tables,scales and peak linear scratch;287k reciprocals/token are separate. No change in deployed storage or arithmetic from scale-only training.
+PQ: W8A9,g128,K480,12bit indices,INT32 tables. RQ: W7A9,g64,27x32 residual centers fused offline into630 centers,13bit indices,INT16 tables. IB: W7A9,g64,K858,lambda0.8,covariance-compensated assignments,13bit indices,INT16 tables. FP16 scales,FP32 accumulation.
+E_ref=(3.8*lookup+0.4*add+1.3*mul)/1e9. Uniform7nm logical reference proxy,NOT measured FPGA energy.286916 reciprocals cost an optional0.000372991mJ/token at the multiplication coefficient. Index/scale reads and bit/address logic are separate from dot-table lookups. LUT-LLM is a resource baseline,not a reproduction of paper QAT accuracy.
+Quantized full PPL/MMLU use the independent deployed-arithmetic reference. All196 packed-layer outputs and actual8x256 packed short PPL were verified before each quantized final PPL. PPL uses the original frozen evaluator with TF32 enabled only around exactly representable integer group dots and FP32 sums below2**24. The separate amended MMLU backend fuses those integer group dots (exact FP16 integer operands,FP32 accumulation) with the original FP32 scale/reduction tree; compiler FP fusion is disabled. All196 layer outputs and24 validation score fixtures per model must be exactly equal to the original FP32 reference. Full original FP16 MMLU is reused; completed original partial PQ/RQ subjects must match the fused backend score-for-score. Original evaluator files and every selected model remain unchanged,with hashes recorded in MMLU18_BACKEND_AMENDMENT.json and overfit18_mmlu_index.json. Other matmuls and all training retain their original precision.
+MMLU uses full context,at most8 questions/4096 padded tokens per batch,same deterministic batching for every model,no shared-prefix reuse,config.use_cache=True to match HFLM,FP32 log-softmax; last-position LM head scoring is checked against installed HFLM with matched batches on24 MMLU validation fixtures per model. FP16 controls use the same scorer with zero fused quantized modules and retain native dense FP16 linears. No test question was truncated. Rejected prefix-cache,use_cache=False and mismatched-batch checks are retained in logs.
+
+Limitations: one training seed,one fixed KL strength; selected checkpoints share a monitor; monitor/audit are same-corpus,token-disjoint rather than document-disjoint. A higher MMLU result on this fixed benchmark is evidence of retention,not proof that all overfitting is eliminated. Future tuning after viewing these MMLU scores needs a new final audit.
+Protocol sources: https://github.com/EleutherAI/lm-evaluation-harness/tree/main/lm_eval/tasks/mmlu/default ; https://huggingface.co/datasets/cais/mmlu
+Full evidence: overfit18_plan.json,overfit18_frozen.json,overfit18_training/,overfit18_audit/,overfit18_mmlu_index.json,mmlu18_results/,mmlu18_checks/,mmlu18_fast_results/,mmlu18_fast_checks/,MMLU18_BACKEND_AMENDMENT.json.

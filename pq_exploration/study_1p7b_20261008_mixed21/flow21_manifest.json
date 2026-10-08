@@ -1,0 +1,43 @@
+{
+  "created_utc": "2026-10-08T06:49:06.583706+00:00",
+  "protocol_sha256": "66b36b04527106fccbec1d63f775ea263355e93bd561a0d7f68723a9f2185555",
+  "files": {
+    "../study_1p7b_20261007_a100/center_symmetry.py": "65fae2bf838472a10d5437fc7d15bb73f0feb2a7758c5b70b8ea7c2e94a5a321",
+    "../study_1p7b_20261007_a100/cost_model.py": "3e9f6d14ab13c17163beb65fc96ceabda6b2424b3927090ad60c6cf876b2a522",
+    "../study_1p7b_20261007_a100/covariance_compensation11.py": "103f7bf7e4829fdc296b4c25d0dab91a1410af7f06a7698b059328fe4e6e21b4",
+    "../study_1p7b_20261007_a100/deployment_eval11.py": "d2f33ac75a3dbbef696093f3cb6a58e9f9683c9ce3e80d227786802394dc4d23",
+    "../study_1p7b_20261007_a100/fit_covariance11.py": "69ba43f26d339a13fa1fb8efb2726d3aa3492841a8315c04a67d8ae6cc1fb5c8",
+    "../study_1p7b_20261007_a100/fused_reference19.py": "0a1118ca6689131bdaf8d4eb660281b6838cdd8566c422a359a1c43a7608d2c8",
+    "../study_1p7b_20261007_a100/gpu_guard.py": "5a38785f7cc0c93b05e9b86799b858cd48a01563e4284eae04ace927ff9c2c0f",
+    "../study_1p7b_20261007_a100/grouped_reference.py": "f06bfe30b88e66905dcca8c7dba1c752e9ed00595a69180eebb7f3524e01ccf8",
+    "../study_1p7b_20261007_a100/integer_dot19.py": "1cff72381c0fc00c92e1c5a7d6dc6e3b3aa7f3658b7d64447475540cb09cfbd6",
+    "../study_1p7b_20261007_a100/nearest11.py": "1671863c1e5706e04d5c002af1640f47f753516e9f54526997bf3b73499d5bdf",
+    "../study_1p7b_20261007_a100/packed_bank11.py": "8a23585e6416901cc2311721fd4f97337aebfcdec77e75dd702c43613c99eb48",
+    "../study_1p7b_20261007_a100/packed_kernel.py": "865edf4a2ccc833fe1ac02c89c2f7965f28848e85e269bdfa1812b659c2ee424",
+    "../study_1p7b_20261007_a100/precision.py": "daf8fea1f804f233ed9c5e82272a959f27bf000a224522b3069d3f6d41a39f63",
+    "../study_1p7b_20261007_a100/prepare.py": "9f6f2cbf7dd40cbc3051aa52b0d91c62696c3f18bfaa17d48686541481b52a52",
+    "../study_1p7b_20261007_a100/quantizers.py": "adb0476496c94e7041b67f59eb07ce6ef003245e5306b6a48c3dccac7bff9be0",
+    "../study_1p7b_20261007_a100/run_experiment.py": "fc065f6d056e767fdb10fc5a4a53c38eabe08a7002db80122b5e1bf6b8273e69",
+    "../study_1p7b_20261007_a100/scale_distill12.py": "e752a92605fb4af33f0d024de953ee2d537a1b60ec67a210ff68eae096c0e8b2",
+    "../study_1p7b_20261007_a100/symmetry_pq.py": "91e7e4ebe41f4f21e23bcf71d02f5ab442055a1d78122799fe7cf664b2a800e8",
+    "common21.py": "b3980e68a8436a85f7fb53eda3d88ef0a8f108a6b34a14385585bb00364236af",
+    "eval21.py": "b5ef2fdc29dc88d52fbf0c70c1f2cf1e39ae8e3dd45ac8cb2a2bb5568ff96b02",
+    "finish21.py": "2231535cd7cbd260702b946510cafeb9061be30312667f77caf6c21520684c60",
+    "freeze21.py": "cab1d051680e3c57654f45bb067987f68aff79914c0f6c22ea57fd5145381b36",
+    "mixed21_deployment.py": "904a125650b58ad2cae09e20f3740b3a4de5c4e22f6f8c117df30ede85ee5cc7",
+    "mmlu21.py": "4788a411c5487bf2cfb12c955e07d1d4089718ab3766a175a967199cd2fd82cf",
+    "register21.py": "78a4b28ee270b1263b6bd127869c9384c88f2343eed39af74dee83bd5863b91d",
+    "resource21_feasibility.py": "91a9d444e490680d65e7d92b1e699ee3440eb06cec89818a95ce06c8ae29f6eb",
+    "run21.py": "c4db61b50ab5a0579423922984abf7ea5202c6961b689fb60a490fcd3d096c21",
+    "scorer21.py": "1f59bd7f4fcf15d7da84d572feccee3ee063f2d448f7671f4ba54b9a9906781e"
+  },
+  "environment": {
+    "torch": "2.6.0+cu126",
+    "transformers": "4.57.3",
+    "triton": "3.6.0",
+    "lm_eval": "0.4.12",
+    "datasets": "4.4.0",
+    "huggingface_hub": "0.35.3"
+  },
+  "scope": "Numerical/scoring/selection sources frozen before all new21 accuracy; operational corrections require retained evidence and explicit amendment."
+}

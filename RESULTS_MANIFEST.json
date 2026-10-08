@@ -1,0 +1,124 @@
+{
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 30991,
+      "sha256": "28d4333bfdea81bfc918b0853c6c5946a3a610bfb26a23a70434387970be6409"
+    },
+    {
+      "path": "pq_exploration/study_1p7b_20261007_a100/REPORT19_ZH.txt",
+      "bytes": 8600,
+      "sha256": "8002286841309f8efb902744a6e49de3b02d3fbc1a7adf67dc8f432cf35e946f"
+    },
+    {
+      "path": "pq_exploration/study_1p7b_20261007_a100/overfit19_frozen.json",
+      "bytes": 26106,
+      "sha256": "14c9a7552062bd35bbbd52d0b75e1b420142b10966c00d109e6704bdf3154234"
+    },
+    {
+      "path": "pq_exploration/study_1p7b_20261007_a100/round19_integrity_audit.json",
+      "bytes": 379,
+      "sha256": "f414b2f10dfdd1e51fd67c97b2034ef2b3d9b3934e946ebfba27f49253a3f34d"
+    },
+    {
+      "path": "pq_exploration/study_1p7b_20261007_a100/round19_summary.json",
+      "bytes": 28215,
+      "sha256": "c40a2af863b4c611601cd164627277bbb2cf8a5f2a6501a975a2e9479d752e4c"
+    },
+    {
+      "path": "pq_exploration/study_1p7b_20261008_mixed21/REPORT21_ZH.txt",
+      "bytes": 4076,
+      "sha256": "bd64bdb3b49025cb769548e96d62ea16adf1f5b7c0d9ed338713cff69213e87d"
+    },
+    {
+      "path": "pq_exploration/study_1p7b_20261008_mixed21/accuracy21_comparison.svg",
+      "bytes": 125816,
+      "sha256": "707a9a2234875383ad2e8ebcb2318e84b31faa630b3e5d8d0ea6bcbc487263c9"
+    },
+    {
+      "path": "pq_exploration/study_1p7b_20261008_mixed21/flow21_manifest.json",
+      "bytes": 3562,
+      "sha256": "0e650c868da1edf9c4330f2f9a5352c8faa411148d36981dc35cf2fcd6bda195"
+    },
+    {
+      "path": "pq_exploration/study_1p7b_20261008_mixed21/local_import21_evidence.json",
+      "bytes": 482,
+      "sha256": "70af08e0c67c7ed0435eeff4d6009a7d2f3135d15052601880e5ba00f0f39364"
+    },
+    {
+      "path": "pq_exploration/study_1p7b_20261008_mixed21/overfit21_frozen.json",
+      "bytes": 140351,
+      "sha256": "efa5f5700ab099273355f437f74ffdc125a94e9e1b4aeee8a68d696865d6c476"
+    },
+    {
+      "path": "pq_exploration/study_1p7b_20261008_mixed21/protocol21.json",
+      "bytes": 111661,
+      "sha256": "66b36b04527106fccbec1d63f775ea263355e93bd561a0d7f68723a9f2185555"
+    },
+    {
+      "path": "pq_exploration/study_1p7b_20261008_mixed21/round21_summary.json",
+      "bytes": 137091,
+      "sha256": "c2cc6f1da6a58e83f4f9e148561a930926d0c7d762bc0414a600350777b10df8"
+    },
+    {
+      "path": "pq_exploration/study_1p7b_20261008_ops20/REPORT20_ZH.txt",
+      "bytes": 4155,
+      "sha256": "b72e4125456c0150ea21e49e9f9f53be07a74227f5b79307eea373e920bf18cb"
+    },
+    {
+      "path": "pq_exploration/study_1p7b_20261008_ops20/local_import20_evidence.json",
+      "bytes": 458,
+      "sha256": "0ce85812b9beb0f1d12b62627c288deb5c1abc602113a439b4ed6da6f53c9ca1"
+    },
+    {
+      "path": "pq_exploration/study_1p7b_20261008_ops20/overfit20_frozen.json",
+      "bytes": 29994,
+      "sha256": "b740d06bb1e4dfe8bb682a1c513968ad972588b3d14f95d5118b9015ea5440b2"
+    },
+    {
+      "path": "pq_exploration/study_1p7b_20261008_ops20/round20_summary.json",
+      "bytes": 30557,
+      "sha256": "4bc02c06499364abca9c21b3373581a418d26bf2b5178d6a8e5db153de7c073e"
+    },
+    {
+      "path": "pq_exploration/study_1p7b_20261008_types22/REPORT22_PRELIMINARY_ZH.txt",
+      "bytes": 2955,
+      "sha256": "e80430332a8236396a3f6935cce77364daf4e0074e1f64bfba3841effdf8ea0c"
+    },
+    {
+      "path": "pq_exploration/study_1p7b_20261008_types22/local_shared_maps22_gpu_verified.json",
+      "bytes": 4090,
+      "sha256": "b6e411d45bf05c888580ff547f9f5aa2b93be7be575ba3cb2400cb0f1608713f"
+    },
+    {
+      "path": "pq_exploration/study_1p7b_20261008_types22/shared_maps22_cpu.json",
+      "bytes": 83286,
+      "sha256": "d3a1733d1cae335554d4179b1539484dd03cba5c6ba9be031e948caf78a97e91"
+    },
+    {
+      "path": "pq_exploration/study_20261006/PHASE18_REPORT.txt",
+      "bytes": 9459,
+      "sha256": "60b00713f68fafcedafc99edb54285b316385677ba2c0284c1af69d0e3966d92"
+    },
+    {
+      "path": "pq_exploration/study_20261006/PHASE18_REPORT_ZH.txt",
+      "bytes": 8196,
+      "sha256": "7cedfa7668645c7150cd10e2f2fec995fbb372e04a83ca208c72d82e25b49759"
+    },
+    {
+      "path": "pq_exploration/study_20261006/overfit18_frozen.json",
+      "bytes": 25930,
+      "sha256": "5d31905ebc315c265f3b4aa052065f831f1960ac6a979d805788775b334011bf"
+    },
+    {
+      "path": "pq_exploration/study_20261006/round18_integrity_audit.json",
+      "bytes": 4258,
+      "sha256": "0e9b560e95b59d6cae82fe486483d02d13eeb3d77f2c1355e610737a83e4f0fb"
+    },
+    {
+      "path": "pq_exploration/study_20261006/round18_summary.json",
+      "bytes": 28931,
+      "sha256": "9a3d876694f1259ab3f699c5700bad02541bafeb07e1f1bb7338ca07511aebd2"
+    }
+  ]
+}

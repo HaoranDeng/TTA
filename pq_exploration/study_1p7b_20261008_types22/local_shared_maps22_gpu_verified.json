@@ -1,0 +1,113 @@
+{
+  "completed": true,
+  "created_utc": "2026-10-08T20:06:14.789007+00:00",
+  "driver_sha256": "b467fea6277cb3e4b4c6a4742c1e05bc050dfd1b35a4fa86d2b5362dc9bdf5ed",
+  "checker_sha256": "33afbe410bd20cfd56d7d63f64a45f652b0abe0a7c2b7ad3d9d7f331fe0fede6",
+  "verified_banks": 9,
+  "verified_gpu_layers": 1764,
+  "proofs": [
+    {
+      "family": "pq",
+      "mode": "global_control",
+      "bank_sha256": "38a18e03bbb68d2b134d91b2980047adc6aa2c0be91cf237b52024837db6bc3b",
+      "proof_sha256": "2f813968ec8506cb810da3fba5526ede486f0650eac81befd6f057a1d44438a6",
+      "exact_layers": 196,
+      "shared_tables": 1,
+      "calibration_8x256_exact": true,
+      "gpu": "1",
+      "seconds": 106.36172485351562
+    },
+    {
+      "family": "pq",
+      "mode": "projection_maps",
+      "bank_sha256": "b73c60494944804fff988389ca9b29204c9d553ee9338c5b9fb3b4840e724021",
+      "proof_sha256": "766a468637465abad8c769f3679445cb7d0158fc491b943bc16e093b05f4068c",
+      "exact_layers": 196,
+      "shared_tables": 1,
+      "calibration_8x256_exact": true,
+      "gpu": "4",
+      "seconds": 114.48704862594604
+    },
+    {
+      "family": "rq",
+      "mode": "global_control",
+      "bank_sha256": "75adb3106de3adca8dd1a94fbc4c1e4f0bd42cb879a8564e36ee149557d52af5",
+      "proof_sha256": "c984fd45895343cc036a108e67bf1ca3253e2201c8c23a6cb33f7446dcbefe9f",
+      "exact_layers": 196,
+      "shared_tables": 1,
+      "calibration_8x256_exact": true,
+      "gpu": "4",
+      "seconds": 102.67421317100525
+    },
+    {
+      "family": "pq",
+      "mode": "layer_maps",
+      "bank_sha256": "e0cdb652aa61c59828a190ff1eb177c9b54e1df98626fb5bfa3d987fe17e76fd",
+      "proof_sha256": "1678cc393d9b6ff8c1fdd65792e6f31e6597a992b473656ed79a21ae2f1e9bb5",
+      "exact_layers": 196,
+      "shared_tables": 1,
+      "calibration_8x256_exact": true,
+      "gpu": "1",
+      "seconds": 102.54565978050232
+    },
+    {
+      "family": "rq",
+      "mode": "projection_maps",
+      "bank_sha256": "62b3d36547faf51f38870ad476571486f9ebb7e4133923aad5a68e8fa49bb151",
+      "proof_sha256": "a74d678fd40b4e2899d69aab8b5658815d999364a82eaf0592ea50ceb05bc96b",
+      "exact_layers": 196,
+      "shared_tables": 1,
+      "calibration_8x256_exact": true,
+      "gpu": "4",
+      "seconds": 103.78127646446228
+    },
+    {
+      "family": "rq",
+      "mode": "layer_maps",
+      "bank_sha256": "416b6fe620db3b7f931a82004a420b94d532e4a0d24a23d5e95df9556ed31457",
+      "proof_sha256": "6973fa0f143f7c4887c58f5d982928ee754decd48f2d2f7a048565754eb744aa",
+      "exact_layers": 196,
+      "shared_tables": 1,
+      "calibration_8x256_exact": true,
+      "gpu": "1",
+      "seconds": 103.42029285430908
+    },
+    {
+      "family": "ib",
+      "mode": "global_control",
+      "bank_sha256": "b066f06fe2dce8a29f2f3daf66ceabf11e4cb44eb5fed5d6f7165d6f2ba30941",
+      "proof_sha256": "c945b95b887ad28918b258362687555800adc778037565b6ee89afd8158d15b0",
+      "exact_layers": 196,
+      "shared_tables": 1,
+      "calibration_8x256_exact": true,
+      "gpu": "4",
+      "seconds": 108.59146571159363
+    },
+    {
+      "family": "ib",
+      "mode": "projection_maps",
+      "bank_sha256": "0ede5c4f5a9331a2f42751fcbd243c569bb23103c7d15d34bb95355a78d464e6",
+      "proof_sha256": "fcf049ed7ef5d0a8f7837da8fca83cec0c7ec21ea77dc487f96bbc25902a898f",
+      "exact_layers": 196,
+      "shared_tables": 1,
+      "calibration_8x256_exact": true,
+      "gpu": "1",
+      "seconds": 93.24007821083069
+    },
+    {
+      "family": "ib",
+      "mode": "layer_maps",
+      "bank_sha256": "ebee501826cd140153c3ec5757d7f1985cf1aa4a410659e456f219e84cd613d6",
+      "proof_sha256": "331c7913be53f01e37c3a8452c5b735913e5a5dd61f71a3941ef8a5b4cae2bfe",
+      "exact_layers": 196,
+      "shared_tables": 1,
+      "calibration_8x256_exact": true,
+      "gpu": "4",
+      "seconds": 71.6846194267273
+    }
+  ],
+  "maximum_study_gpus": 2,
+  "cpu_threads_per_worker": 4,
+  "no_holdout_accuracy_evaluated": true,
+  "all_numerical_checks_exact": true
+}

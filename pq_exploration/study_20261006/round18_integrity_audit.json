@@ -1,0 +1,150 @@
+{
+  "completed": true,
+  "created_utc": "2026-10-07T21:10:24.518114+00:00",
+  "models": 14,
+  "scored_questions": 196588,
+  "rows": {
+    "fp16": {
+      "questions": 14042,
+      "correct": 6650,
+      "mmlu": 0.47357926221335994,
+      "max_hflm_error": 4.76837158203125e-07,
+      "cross_engine_questions": 0,
+      "audit_tokens": 65504,
+      "test_tokens": 298862,
+      "backend": "mmlu18.py"
+    },
+    "pq_ptq": {
+      "questions": 14042,
+      "correct": 6573,
+      "mmlu": 0.46809571286141577,
+      "max_hflm_error": 2.384185791015625e-07,
+      "cross_engine_questions": 5852,
+      "audit_tokens": 65504,
+      "test_tokens": 298862,
+      "backend": "mmlu18_fast.py"
+    },
+    "rq_ptq": {
+      "questions": 14042,
+      "correct": 6615,
+      "mmlu": 0.471086739780658,
+      "max_hflm_error": 4.76837158203125e-07,
+      "cross_engine_questions": 1571,
+      "audit_tokens": 65504,
+      "test_tokens": 298862,
+      "backend": "mmlu18_fast.py"
+    },
+    "ib_ptq": {
+      "questions": 14042,
+      "correct": 6673,
+      "mmlu": 0.47521720552627833,
+      "max_hflm_error": 4.76837158203125e-07,
+      "cross_engine_questions": 0,
+      "audit_tokens": 65504,
+      "test_tokens": 298862,
+      "backend": "mmlu18_fast.py"
+    },
+    "pq_kl1": {
+      "questions": 14042,
+      "correct": 6613,
+      "mmlu": 0.47094430992736075,
+      "max_hflm_error": 2.384185791015625e-07,
+      "cross_engine_questions": 0,
+      "audit_tokens": 65504,
+      "test_tokens": 298862,
+      "backend": "mmlu18_fast.py"
+    },
+    "rq_kl1": {
+      "questions": 14042,
+      "correct": 6620,
+      "mmlu": 0.4714428144139012,
+      "max_hflm_error": 3.5762786865234375e-07,
+      "cross_engine_questions": 0,
+      "audit_tokens": 65504,
+      "test_tokens": 298862,
+      "backend": "mmlu18_fast.py"
+    },
+    "ib_kl1": {
+      "questions": 14042,
+      "correct": 6686,
+      "mmlu": 0.47614299957271045,
+      "max_hflm_error": 4.76837158203125e-07,
+      "cross_engine_questions": 0,
+      "audit_tokens": 65504,
+      "test_tokens": 298862,
+      "backend": "mmlu18_fast.py"
+    },
+    "fp16_g128_nll": {
+      "questions": 14042,
+      "correct": 6665,
+      "mmlu": 0.4746474861130893,
+      "max_hflm_error": 2.980232238769531e-07,
+      "cross_engine_questions": 0,
+      "audit_tokens": 65504,
+      "test_tokens": 298862,
+      "backend": "mmlu18_fast.py"
+    },
+    "fp16_g128_kl1": {
+      "questions": 14042,
+      "correct": 6680,
+      "mmlu": 0.4757157100128187,
+      "max_hflm_error": 4.76837158203125e-07,
+      "cross_engine_questions": 0,
+      "audit_tokens": 65504,
+      "test_tokens": 298862,
+      "backend": "mmlu18_fast.py"
+    },
+    "fp16_g64_nll": {
+      "questions": 14042,
+      "correct": 6665,
+      "mmlu": 0.4746474861130893,
+      "max_hflm_error": 4.76837158203125e-07,
+      "cross_engine_questions": 0,
+      "audit_tokens": 65504,
+      "test_tokens": 298862,
+      "backend": "mmlu18_fast.py"
+    },
+    "fp16_g64_kl1": {
+      "questions": 14042,
+      "correct": 6671,
+      "mmlu": 0.47507477567298106,
+      "max_hflm_error": 4.76837158203125e-07,
+      "cross_engine_questions": 0,
+      "audit_tokens": 65504,
+      "test_tokens": 298862,
+      "backend": "mmlu18_fast.py"
+    },
+    "pq_nll": {
+      "questions": 14042,
+      "correct": 6587,
+      "mmlu": 0.4690927218344965,
+      "max_hflm_error": 2.384185791015625e-07,
+      "cross_engine_questions": 0,
+      "audit_tokens": 65504,
+      "test_tokens": 298862,
+      "backend": "mmlu18_fast.py"
+    },
+    "rq_nll": {
+      "questions": 14042,
+      "correct": 6600,
+      "mmlu": 0.47001851588092863,
+      "max_hflm_error": 2.384185791015625e-07,
+      "cross_engine_questions": 0,
+      "audit_tokens": 65504,
+      "test_tokens": 298862,
+      "backend": "mmlu18_fast.py"
+    },
+    "ib_nll": {
+      "questions": 14042,
+      "correct": 6635,
+      "mmlu": 0.47251103831363056,
+      "max_hflm_error": 4.76837158203125e-07,
+      "cross_engine_questions": 0,
+      "audit_tokens": 65504,
+      "test_tokens": 298862,
+      "backend": "mmlu18_fast.py"
+    }
+  },
+  "source_sha256": "6af4fce5c1c91d83fd446bff6595c94f682a6d2c44162aac0c5621a926f44de4",
+  "frozen_sha256": "5d31905ebc315c265f3b4aa052065f831f1960ac6a979d805788775b334011bf"
+}

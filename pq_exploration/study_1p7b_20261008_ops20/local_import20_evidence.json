@@ -1,0 +1,17 @@
+{
+  "completed": true,
+  "phase": "evidence",
+  "sha256": "2d66a5edb8b96b7274dc15426bd01cd4fd4dd0e5474499b169485efa2ccdd9a0",
+  "verified_files": 411,
+  "preserved_local_files": [
+    "STATUS20.json",
+    "artifact20_validation.json"
+  ],
+  "details": {
+    "final_models": 4,
+    "scored_decisions": 56168,
+    "screened_banks": 17,
+    "answers_bound_to_immutable_requests": true
+  },
+  "created_utc": "2026-10-08T06:35:38.347796+00:00"
+}

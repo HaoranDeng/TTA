@@ -1,0 +1,7 @@
+{
+  "completed": true,
+  "models": 14,
+  "scored_questions": 196588,
+  "audit": "Every saved score vector checked for finite values; argmax, answers, subject totals, overall totals and PPL window aggregates recomputed. All model selections/hash provenance and numerical fixtures checked.",
+  "summary_sha256": "c40a2af863b4c611601cd164627277bbb2cf8a5f2a6501a975a2e9479d752e4c"
+}

@@ -1,0 +1,834 @@
+{
+  "completed": true,
+  "model": "Qwen/Qwen3-1.7B",
+  "revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+  "created_utc": "2026-10-08T04:53:04.201853+00:00",
+  "plan_sha256": "12ee4177ac8fb6550cbeac4f667e1d25d39121dcbf4c2c0326958949b69357ff",
+  "frozen_sha256": "14c9a7552062bd35bbbd52d0b75e1b420142b10966c00d109e6704bdf3154234",
+  "rows": {
+    "fp16": {
+      "entry": {
+        "name": "fp16",
+        "kind": "fp16"
+      },
+      "selected_step": 0,
+      "monitor_ppl": 18.179171909100585,
+      "audit_ppl": 18.333525453284754,
+      "test_ppl": 16.669953714070274,
+      "mmlu": 0.603475288420453,
+      "mmlu_correct": 8474,
+      "mmlu_total": 14042,
+      "resources": {
+        "lookups": 0,
+        "additions": 1408712704,
+        "multiplications": 1409286144,
+        "memory_MiB": 2688.0,
+        "reciprocals": 0,
+        "score_mJ": 2.3955570688
+      }
+    },
+    "pq_ptq": {
+      "entry": {
+        "name": "pq_ptq",
+        "kind": "quant_bank",
+        "path": "bases19/pq.pt",
+        "sha256": "c2bafae0bf487e97a872dd86308f3c97750227d8adcabd1b3c12a80397198259"
+      },
+      "selected_step": 0,
+      "monitor_ppl": 17.924953128651293,
+      "audit_ppl": 18.126507649777345,
+      "test_ppl": 16.458401271182023,
+      "mmlu": 0.5908702464036462,
+      "mmlu_correct": 8297,
+      "mmlu_total": 14042,
+      "resources": {
+        "lookups": 704643072,
+        "additions": 704987136,
+        "multiplications": 12099780,
+        "reciprocals": 516292,
+        "arithmetic_including_reciprocals": 717603208,
+        "memory_bytes": 1331135428,
+        "memory_MiB": 1269.469669342041,
+        "memory_breakdown": {
+          "tables": 251658240,
+          "indices": 1056964608,
+          "scales": 22020096,
+          "centers": 1920,
+          "scratch": 421892,
+          "guards_and_headroom": 67104,
+          "table_dispatch": 1568
+        },
+        "index_bits": 12,
+        "table_copies": 1,
+        "group": 128,
+        "weight_bits": 8,
+        "act_bits": 9,
+        "table_entry_bytes": 4,
+        "all_reads_pessimistic": 3549938448,
+        "score_mJ": 2.975368242,
+        "score_including_reciprocal_proxy_mJ": 2.9760394216,
+        "gates": {
+          "lookup": true,
+          "arithmetic": true,
+          "memory": true
+        },
+        "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+        "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+      }
+    },
+    "rq_ptq": {
+      "entry": {
+        "name": "rq_ptq",
+        "kind": "quant_bank",
+        "path": "bases19/rq.pt",
+        "sha256": "a97c30e272ac405d5010325864b2975e641352858ff47d8e974b1993e5e880e8"
+      },
+      "selected_step": 0,
+      "monitor_ppl": 18.31308086224876,
+      "audit_ppl": 18.47838275418604,
+      "test_ppl": 16.750783723863243,
+      "mmlu": 0.5949294972226179,
+      "mmlu_correct": 8354,
+      "mmlu_total": 14042,
+      "resources": {
+        "lookups": 704643072,
+        "additions": 705904640,
+        "multiplications": 23109828,
+        "reciprocals": 516292,
+        "arithmetic_including_reciprocals": 729530760,
+        "memory_bytes": 1352238812,
+        "memory_MiB": 1289.5954246520996,
+        "memory_breakdown": {
+          "tables": 162267136,
+          "indices": 1145044992,
+          "scales": 44040192,
+          "centers": 2476,
+          "scratch": 815108,
+          "guards_and_headroom": 67104,
+          "table_dispatch": 1568,
+          "residual_component_centers": 236
+        },
+        "index_bits": 13,
+        "table_copies": 1,
+        "group": 64,
+        "weight_bits": 7,
+        "act_bits": 9,
+        "table_entry_bytes": 2,
+        "all_reads_pessimistic": 3571958544,
+        "score_mJ": 2.990048306,
+        "score_including_reciprocal_proxy_mJ": 2.9907194855999997,
+        "gates": {
+          "lookup": true,
+          "arithmetic": false,
+          "memory": true
+        },
+        "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+        "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+      }
+    },
+    "ib_ptq": {
+      "entry": {
+        "name": "ib_ptq",
+        "kind": "quant_bank",
+        "path": "bases19/ib.pt",
+        "sha256": "d7aa62d85a335a92baf06d135e499c4c219ea6f7852d7853eb6ee9189fa40d61"
+      },
+      "selected_step": 0,
+      "monitor_ppl": 18.151829321815534,
+      "audit_ppl": 18.28634285350609,
+      "test_ppl": 16.588306279865822,
+      "mmlu": 0.5961401509756445,
+      "mmlu_correct": 8371,
+      "mmlu_total": 14042,
+      "resources": {
+        "lookups": 704643072,
+        "additions": 705904640,
+        "multiplications": 23109828,
+        "reciprocals": 516292,
+        "arithmetic_including_reciprocals": 729530760,
+        "memory_bytes": 1413581208,
+        "memory_MiB": 1348.096092224121,
+        "memory_breakdown": {
+          "tables": 223608832,
+          "indices": 1145044992,
+          "scales": 44040192,
+          "centers": 3412,
+          "scratch": 815108,
+          "guards_and_headroom": 67104,
+          "table_dispatch": 1568
+        },
+        "index_bits": 13,
+        "table_copies": 1,
+        "group": 64,
+        "weight_bits": 7,
+        "act_bits": 9,
+        "table_entry_bytes": 2,
+        "all_reads_pessimistic": 3571958544,
+        "score_mJ": 2.990048306,
+        "score_including_reciprocal_proxy_mJ": 2.9907194855999997,
+        "gates": {
+          "lookup": true,
+          "arithmetic": false,
+          "memory": true
+        },
+        "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+        "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+      }
+    },
+    "pq_nll": {
+      "entry": {
+        "name": "pq_nll",
+        "kind": "quant_scales",
+        "path": "overfit19_scales/pq_nll_s256.pt",
+        "sha256": "b821bb1eca45e9a35cbda31e40be58f8bf1bb5750d467d0110fe2cac754d7cf5"
+      },
+      "selected_step": 256,
+      "monitor_ppl": 11.405721302780936,
+      "audit_ppl": 12.057107647333167,
+      "test_ppl": 10.755841068056803,
+      "mmlu": 0.5974220196553197,
+      "mmlu_correct": 8389,
+      "mmlu_total": 14042,
+      "resources": {
+        "lookups": 704643072,
+        "additions": 704987136,
+        "multiplications": 12099780,
+        "reciprocals": 516292,
+        "arithmetic_including_reciprocals": 717603208,
+        "memory_bytes": 1331135428,
+        "memory_MiB": 1269.469669342041,
+        "memory_breakdown": {
+          "tables": 251658240,
+          "indices": 1056964608,
+          "scales": 22020096,
+          "centers": 1920,
+          "scratch": 421892,
+          "guards_and_headroom": 67104,
+          "table_dispatch": 1568
+        },
+        "index_bits": 12,
+        "table_copies": 1,
+        "group": 128,
+        "weight_bits": 8,
+        "act_bits": 9,
+        "table_entry_bytes": 4,
+        "all_reads_pessimistic": 3549938448,
+        "score_mJ": 2.975368242,
+        "score_including_reciprocal_proxy_mJ": 2.9760394216,
+        "gates": {
+          "lookup": true,
+          "arithmetic": true,
+          "memory": true
+        },
+        "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+        "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+      }
+    },
+    "pq_kl1": {
+      "entry": {
+        "name": "pq_kl1",
+        "kind": "quant_scales",
+        "path": "overfit19_scales/pq_kl1_s256.pt",
+        "sha256": "06967f9476b9a733284b316ed60b940f1921336796a52ca803e5f7a836eddaa2"
+      },
+      "selected_step": 256,
+      "monitor_ppl": 12.354887510391727,
+      "audit_ppl": 12.964468361122867,
+      "test_ppl": 11.61226309477252,
+      "mmlu": 0.5925794046432132,
+      "mmlu_correct": 8321,
+      "mmlu_total": 14042,
+      "resources": {
+        "lookups": 704643072,
+        "additions": 704987136,
+        "multiplications": 12099780,
+        "reciprocals": 516292,
+        "arithmetic_including_reciprocals": 717603208,
+        "memory_bytes": 1331135428,
+        "memory_MiB": 1269.469669342041,
+        "memory_breakdown": {
+          "tables": 251658240,
+          "indices": 1056964608,
+          "scales": 22020096,
+          "centers": 1920,
+          "scratch": 421892,
+          "guards_and_headroom": 67104,
+          "table_dispatch": 1568
+        },
+        "index_bits": 12,
+        "table_copies": 1,
+        "group": 128,
+        "weight_bits": 8,
+        "act_bits": 9,
+        "table_entry_bytes": 4,
+        "all_reads_pessimistic": 3549938448,
+        "score_mJ": 2.975368242,
+        "score_including_reciprocal_proxy_mJ": 2.9760394216,
+        "gates": {
+          "lookup": true,
+          "arithmetic": true,
+          "memory": true
+        },
+        "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+        "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+      }
+    },
+    "rq_nll": {
+      "entry": {
+        "name": "rq_nll",
+        "kind": "quant_scales",
+        "path": "overfit19_scales/rq_nll_s128.pt",
+        "sha256": "ab352686e83b9d83b5cce246c622c048e6762044a37478a33003f28d35f57e67"
+      },
+      "selected_step": 128,
+      "monitor_ppl": 11.43140485092262,
+      "audit_ppl": 12.048047563702067,
+      "test_ppl": 10.764416076253681,
+      "mmlu": 0.5994872525281298,
+      "mmlu_correct": 8418,
+      "mmlu_total": 14042,
+      "resources": {
+        "lookups": 704643072,
+        "additions": 705904640,
+        "multiplications": 23109828,
+        "reciprocals": 516292,
+        "arithmetic_including_reciprocals": 729530760,
+        "memory_bytes": 1352238812,
+        "memory_MiB": 1289.5954246520996,
+        "memory_breakdown": {
+          "tables": 162267136,
+          "indices": 1145044992,
+          "scales": 44040192,
+          "centers": 2476,
+          "scratch": 815108,
+          "guards_and_headroom": 67104,
+          "table_dispatch": 1568,
+          "residual_component_centers": 236
+        },
+        "index_bits": 13,
+        "table_copies": 1,
+        "group": 64,
+        "weight_bits": 7,
+        "act_bits": 9,
+        "table_entry_bytes": 2,
+        "all_reads_pessimistic": 3571958544,
+        "score_mJ": 2.990048306,
+        "score_including_reciprocal_proxy_mJ": 2.9907194855999997,
+        "gates": {
+          "lookup": true,
+          "arithmetic": false,
+          "memory": true
+        },
+        "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+        "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+      }
+    },
+    "rq_kl1": {
+      "entry": {
+        "name": "rq_kl1",
+        "kind": "quant_scales",
+        "path": "overfit19_scales/rq_kl1_s128.pt",
+        "sha256": "5302c9d3b45880686f145c3cb1dc4ac48d7911ced55d2903f10048824391925f"
+      },
+      "selected_step": 128,
+      "monitor_ppl": 12.282986152315793,
+      "audit_ppl": 12.899651978455784,
+      "test_ppl": 11.55148752426624,
+      "mmlu": 0.598134168921806,
+      "mmlu_correct": 8399,
+      "mmlu_total": 14042,
+      "resources": {
+        "lookups": 704643072,
+        "additions": 705904640,
+        "multiplications": 23109828,
+        "reciprocals": 516292,
+        "arithmetic_including_reciprocals": 729530760,
+        "memory_bytes": 1352238812,
+        "memory_MiB": 1289.5954246520996,
+        "memory_breakdown": {
+          "tables": 162267136,
+          "indices": 1145044992,
+          "scales": 44040192,
+          "centers": 2476,
+          "scratch": 815108,
+          "guards_and_headroom": 67104,
+          "table_dispatch": 1568,
+          "residual_component_centers": 236
+        },
+        "index_bits": 13,
+        "table_copies": 1,
+        "group": 64,
+        "weight_bits": 7,
+        "act_bits": 9,
+        "table_entry_bytes": 2,
+        "all_reads_pessimistic": 3571958544,
+        "score_mJ": 2.990048306,
+        "score_including_reciprocal_proxy_mJ": 2.9907194855999997,
+        "gates": {
+          "lookup": true,
+          "arithmetic": false,
+          "memory": true
+        },
+        "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+        "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+      }
+    },
+    "ib_nll": {
+      "entry": {
+        "name": "ib_nll",
+        "kind": "quant_scales",
+        "path": "overfit19_scales/ib_nll_s128.pt",
+        "sha256": "57634228de6176c37f30566efc53dd870cc9f8389fb8c77a6cecef1fd28aea25"
+      },
+      "selected_step": 128,
+      "monitor_ppl": 11.379031616793815,
+      "audit_ppl": 12.002770965524537,
+      "test_ppl": 10.719364548369729,
+      "mmlu": 0.598703888334995,
+      "mmlu_correct": 8407,
+      "mmlu_total": 14042,
+      "resources": {
+        "lookups": 704643072,
+        "additions": 705904640,
+        "multiplications": 23109828,
+        "reciprocals": 516292,
+        "arithmetic_including_reciprocals": 729530760,
+        "memory_bytes": 1413581208,
+        "memory_MiB": 1348.096092224121,
+        "memory_breakdown": {
+          "tables": 223608832,
+          "indices": 1145044992,
+          "scales": 44040192,
+          "centers": 3412,
+          "scratch": 815108,
+          "guards_and_headroom": 67104,
+          "table_dispatch": 1568
+        },
+        "index_bits": 13,
+        "table_copies": 1,
+        "group": 64,
+        "weight_bits": 7,
+        "act_bits": 9,
+        "table_entry_bytes": 2,
+        "all_reads_pessimistic": 3571958544,
+        "score_mJ": 2.990048306,
+        "score_including_reciprocal_proxy_mJ": 2.9907194855999997,
+        "gates": {
+          "lookup": true,
+          "arithmetic": false,
+          "memory": true
+        },
+        "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+        "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+      }
+    },
+    "ib_kl1": {
+      "entry": {
+        "name": "ib_kl1",
+        "kind": "quant_scales",
+        "path": "overfit19_scales/ib_kl1_s128.pt",
+        "sha256": "c303462d5f883513fffdeaa6512db6e876d670086b155558de91213de6700dd6"
+      },
+      "selected_step": 128,
+      "monitor_ppl": 12.238518007007132,
+      "audit_ppl": 12.856976487037873,
+      "test_ppl": 11.517881285108972,
+      "mmlu": 0.5979205241418601,
+      "mmlu_correct": 8396,
+      "mmlu_total": 14042,
+      "resources": {
+        "lookups": 704643072,
+        "additions": 705904640,
+        "multiplications": 23109828,
+        "reciprocals": 516292,
+        "arithmetic_including_reciprocals": 729530760,
+        "memory_bytes": 1413581208,
+        "memory_MiB": 1348.096092224121,
+        "memory_breakdown": {
+          "tables": 223608832,
+          "indices": 1145044992,
+          "scales": 44040192,
+          "centers": 3412,
+          "scratch": 815108,
+          "guards_and_headroom": 67104,
+          "table_dispatch": 1568
+        },
+        "index_bits": 13,
+        "table_copies": 1,
+        "group": 64,
+        "weight_bits": 7,
+        "act_bits": 9,
+        "table_entry_bytes": 2,
+        "all_reads_pessimistic": 3571958544,
+        "score_mJ": 2.990048306,
+        "score_including_reciprocal_proxy_mJ": 2.9907194855999997,
+        "gates": {
+          "lookup": true,
+          "arithmetic": false,
+          "memory": true
+        },
+        "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+        "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+      }
+    },
+    "fp16_g128_nll": {
+      "entry": {
+        "name": "fp16_g128_nll",
+        "kind": "fp16_gain",
+        "path": "overfit19_scales/fp16_g128_nll_s256.pt",
+        "sha256": "14d56094401d7f0008a4eccbdcb93423882d3e304273efb9a1013a872c78a08e"
+      },
+      "selected_step": 256,
+      "monitor_ppl": 11.331120989588422,
+      "audit_ppl": 11.927915452891963,
+      "test_ppl": 10.665211429108918,
+      "mmlu": 0.5994160376014813,
+      "mmlu_correct": 8417,
+      "mmlu_total": 14042,
+      "resources": {
+        "lookups": 0,
+        "additions": 1408712704,
+        "multiplications": 1409286144,
+        "memory_MiB": 2688.0,
+        "reciprocals": 0,
+        "score_mJ": 2.3955570688
+      }
+    },
+    "fp16_g128_kl1": {
+      "entry": {
+        "name": "fp16_g128_kl1",
+        "kind": "fp16_gain",
+        "path": "overfit19_scales/fp16_g128_kl1_s128.pt",
+        "sha256": "d78760a2091d9f2a3b95112b5eb8653de1f903b2ce8e473458a082b05d7a34b9"
+      },
+      "selected_step": 128,
+      "monitor_ppl": 12.33095239716473,
+      "audit_ppl": 12.9421326164346,
+      "test_ppl": 11.592167165812695,
+      "mmlu": 0.6037601481270475,
+      "mmlu_correct": 8478,
+      "mmlu_total": 14042,
+      "resources": {
+        "lookups": 0,
+        "additions": 1408712704,
+        "multiplications": 1409286144,
+        "memory_MiB": 2688.0,
+        "reciprocals": 0,
+        "score_mJ": 2.3955570688
+      }
+    },
+    "fp16_g64_nll": {
+      "entry": {
+        "name": "fp16_g64_nll",
+        "kind": "fp16_gain",
+        "path": "overfit19_scales/fp16_g64_nll_s128.pt",
+        "sha256": "d5a17e5fc791fcde33a0627c53661bf62912657b9ad9c3611b2ae4b5c748728b"
+      },
+      "selected_step": 128,
+      "monitor_ppl": 11.31233832765036,
+      "audit_ppl": 11.911491900464402,
+      "test_ppl": 10.651896365913782,
+      "mmlu": 0.6041162227602905,
+      "mmlu_correct": 8483,
+      "mmlu_total": 14042,
+      "resources": {
+        "lookups": 0,
+        "additions": 1408712704,
+        "multiplications": 1409286144,
+        "memory_MiB": 2688.0,
+        "reciprocals": 0,
+        "score_mJ": 2.3955570688
+      }
+    },
+    "fp16_g64_kl1": {
+      "entry": {
+        "name": "fp16_g64_kl1",
+        "kind": "fp16_gain",
+        "path": "overfit19_scales/fp16_g64_kl1_s128.pt",
+        "sha256": "e37e71cb83c5d1eea996bebee9b901929678c37eb70bbc08b94e4f368bbd2404"
+      },
+      "selected_step": 128,
+      "monitor_ppl": 12.241976242288382,
+      "audit_ppl": 12.852549116558365,
+      "test_ppl": 11.513326984862772,
+      "mmlu": 0.602122204814129,
+      "mmlu_correct": 8455,
+      "mmlu_total": 14042,
+      "resources": {
+        "lookups": 0,
+        "additions": 1408712704,
+        "multiplications": 1409286144,
+        "memory_MiB": 2688.0,
+        "reciprocals": 0,
+        "score_mJ": 2.3955570688
+      }
+    }
+  },
+  "comparisons": {
+    "pq": {
+      "kl_vs_nll": {
+        "mmlu": {
+          "a": "pq_kl1",
+          "b": "pq_nll",
+          "delta_percentage_points": -0.48426150121065376,
+          "approximate_paired_95pct_ci": [
+            -0.8784957838450725,
+            -0.09002721857623497
+          ],
+          "a_only_correct": 365,
+          "b_only_correct": 433
+        },
+        "test_ppl_delta_pct": 7.962390121765162,
+        "audit_ppl_delta_pct": 7.525525526765886
+      },
+      "ptq_vs_fp16": {
+        "mmlu": {
+          "a": "pq_ptq",
+          "b": "fp16",
+          "delta_percentage_points": -1.2605042016806722,
+          "approximate_paired_95pct_ci": [
+            -1.6985401279174577,
+            -0.822468275443887
+          ],
+          "a_only_correct": 405,
+          "b_only_correct": 582
+        },
+        "test_ppl_delta_pct": -1.2690643688451964,
+        "audit_ppl_delta_pct": -1.1291761861890959
+      },
+      "nll_vs_matched": {
+        "mmlu": {
+          "a": "pq_nll",
+          "b": "fp16_g128_nll",
+          "delta_percentage_points": -0.19940179461615154,
+          "approximate_paired_95pct_ci": [
+            -0.6517008388375416,
+            0.25289724960523857
+          ],
+          "a_only_correct": 511,
+          "b_only_correct": 539
+        },
+        "test_ppl_delta_pct": 0.8497687978367363,
+        "audit_ppl_delta_pct": 1.0831078988733145
+      },
+      "kl_vs_matched": {
+        "mmlu": {
+          "a": "pq_kl1",
+          "b": "fp16_g128_kl1",
+          "delta_percentage_points": -1.1180743483834212,
+          "approximate_paired_95pct_ci": [
+            -1.5571045696741086,
+            -0.6790441270927338
+          ],
+          "a_only_correct": 417,
+          "b_only_correct": 574
+        },
+        "test_ppl_delta_pct": 0.17335782578333792,
+        "audit_ppl_delta_pct": 0.17258163975157892
+      }
+    },
+    "rq": {
+      "kl_vs_nll": {
+        "mmlu": {
+          "a": "rq_kl1",
+          "b": "rq_nll",
+          "delta_percentage_points": -0.13530836063238855,
+          "approximate_paired_95pct_ci": [
+            -0.515786282225422,
+            0.2451695609606449
+          ],
+          "a_only_correct": 362,
+          "b_only_correct": 381
+        },
+        "test_ppl_delta_pct": 7.311789533561774,
+        "audit_ppl_delta_pct": 7.068401832338389
+      },
+      "ptq_vs_fp16": {
+        "mmlu": {
+          "a": "rq_ptq",
+          "b": "fp16",
+          "delta_percentage_points": -0.8545791197835066,
+          "approximate_paired_95pct_ci": [
+            -1.2926607696351051,
+            -0.41649746993190817
+          ],
+          "a_only_correct": 433,
+          "b_only_correct": 553
+        },
+        "test_ppl_delta_pct": 0.4848844284717213,
+        "audit_ppl_delta_pct": 0.7901224522822714
+      },
+      "nll_vs_matched": {
+        "mmlu": {
+          "a": "rq_nll",
+          "b": "fp16_g64_nll",
+          "delta_percentage_points": -0.4628970232160661,
+          "approximate_paired_95pct_ci": [
+            -0.8941934178786706,
+            -0.03160062855346166
+          ],
+          "a_only_correct": 445,
+          "b_only_correct": 510
+        },
+        "test_ppl_delta_pct": 1.0563350081020717,
+        "audit_ppl_delta_pct": 1.1464194777510706
+      },
+      "kl_vs_matched": {
+        "mmlu": {
+          "a": "rq_kl1",
+          "b": "fp16_g64_kl1",
+          "delta_percentage_points": -0.3988035892323031,
+          "approximate_paired_95pct_ci": [
+            -0.8276257156636343,
+            0.0300185371990282
+          ],
+          "a_only_correct": 444,
+          "b_only_correct": 500
+        },
+        "test_ppl_delta_pct": 0.33144667439428677,
+        "audit_ppl_delta_pct": 0.3664865348519619
+      }
+    },
+    "ib": {
+      "kl_vs_nll": {
+        "mmlu": {
+          "a": "ib_kl1",
+          "b": "ib_nll",
+          "delta_percentage_points": -0.0783364193134881,
+          "approximate_paired_95pct_ci": [
+            -0.4644106715290731,
+            0.307737832902097
+          ],
+          "a_only_correct": 377,
+          "b_only_correct": 388
+        },
+        "test_ppl_delta_pct": 7.449291729337504,
+        "audit_ppl_delta_pct": 7.116735993437384
+      },
+      "ptq_vs_fp16": {
+        "mmlu": {
+          "a": "ib_ptq",
+          "b": "fp16",
+          "delta_percentage_points": -0.7335137444808432,
+          "approximate_paired_95pct_ci": [
+            -1.1298610815703316,
+            -0.3371664073913547
+          ],
+          "a_only_correct": 352,
+          "b_only_correct": 455
+        },
+        "test_ppl_delta_pct": -0.4897880078427397,
+        "audit_ppl_delta_pct": -0.2573569382434915
+      },
+      "nll_vs_matched": {
+        "mmlu": {
+          "a": "ib_nll",
+          "b": "fp16_g64_nll",
+          "delta_percentage_points": -0.5412334425295542,
+          "approximate_paired_95pct_ci": [
+            -0.9299726038254146,
+            -0.1524942812336939
+          ],
+          "a_only_correct": 350,
+          "b_only_correct": 426
+        },
+        "test_ppl_delta_pct": 0.633391277367723,
+        "audit_ppl_delta_pct": 0.7663109358834852
+      },
+      "kl_vs_matched": {
+        "mmlu": {
+          "a": "ib_kl1",
+          "b": "fp16_g64_kl1",
+          "delta_percentage_points": -0.42016806722689076,
+          "approximate_paired_95pct_ci": [
+            -0.7980195261935682,
+            -0.0423166082602133
+          ],
+          "a_only_correct": 337,
+          "b_only_correct": 396
+        },
+        "test_ppl_delta_pct": 0.039556769752024934,
+        "audit_ppl_delta_pct": 0.0344474114773341
+      }
+    }
+  },
+  "lut_llm": {
+    "lookups": 704643072,
+    "additions": 726663168,
+    "multiplications": 573440,
+    "memory_MiB": 1764.0,
+    "score_mJ": 2.9690544128
+  },
+  "sources": {
+    "fp16": {
+      "audit_sha256": "f16748675b78e8f1f7c9f8f6c5ae350b26b6aa164a76a29ee1fe5a6e74616461",
+      "mmlu_sha256": "124428c8b8f6b0271a2382a4ed5f1153435538e25a47c748d1eb455f44d2ff81",
+      "backend": "native_fp16_dense"
+    },
+    "pq_ptq": {
+      "audit_sha256": "12186824ca475fd8993596dc7b4e278f1ccd55a43cbe416224540fbcfbdd7d83",
+      "mmlu_sha256": "65a168d5e66d5132faed4212e31ca3fa36432b82e05adaaefbac58c66a4386fe",
+      "backend": "exact_fused_integer_and_FP32_tree"
+    },
+    "rq_ptq": {
+      "audit_sha256": "058aa806fba3a6f0bffc550cb7d3c26c8b246eae33620a51eb0beef8a1c1a9f3",
+      "mmlu_sha256": "dfb9e7c294b770f5efb3b35a6f979bf9db006fb51274a08ec8a48e00a14bb4c5",
+      "backend": "exact_fused_integer_and_FP32_tree"
+    },
+    "ib_ptq": {
+      "audit_sha256": "8b6e9d8c122493c60519e1b6099f1a3fc76aafcf5d12b9d5e3abc4fefbb2c954",
+      "mmlu_sha256": "fecb4fe3fb52f99728b03a3d1bc6bb7576c98b4d8ba4a81cfb2e033e248a3168",
+      "backend": "exact_fused_integer_and_FP32_tree"
+    },
+    "pq_nll": {
+      "audit_sha256": "d84a40ad0cd14f8e8ba9b67f07e3e362f9643984dcde1df078a2a1e75382d5b6",
+      "mmlu_sha256": "1ba15f5b2c3dacc31e7ee590a259c46ae82ca5d8c8f45b7d42e53ececae0d7c6",
+      "backend": "exact_fused_integer_and_FP32_tree"
+    },
+    "pq_kl1": {
+      "audit_sha256": "d92ae5e47025ef357c81063f0f5427490361a032edac78582afad5bc6232d6bf",
+      "mmlu_sha256": "5415393d371a157f0d9b7d020d9ef0c5b655458a3288dae7f04ddf76b508102d",
+      "backend": "exact_fused_integer_and_FP32_tree"
+    },
+    "rq_nll": {
+      "audit_sha256": "a2148b922c55bde630ab48f37ba1baf4b85dfba7426c1cf1ea89f23a56a3ddea",
+      "mmlu_sha256": "db7593ba3cd4dbf6081f13736a48ebb99e5f5a6ce8a3e86299130beb69c69ec9",
+      "backend": "exact_fused_integer_and_FP32_tree"
+    },
+    "rq_kl1": {
+      "audit_sha256": "a3e52a1f8977c6820caeb7f8e435663ffecf4117b2ff6d750a019e6cd28e6254",
+      "mmlu_sha256": "036de9280565fa8634214b6f3f90466dbb80fff59e8b1f7c1d64620bc25182fb",
+      "backend": "exact_fused_integer_and_FP32_tree"
+    },
+    "ib_nll": {
+      "audit_sha256": "eaf5792ba3673003ad3aceafa6750ad3dc399c8d6bd332acf34a791ec3e99034",
+      "mmlu_sha256": "beac2483c564b5a2320d6f160b7f0d9903da7a382b9b399b61fbb87022ce3c76",
+      "backend": "exact_fused_integer_and_FP32_tree"
+    },
+    "ib_kl1": {
+      "audit_sha256": "f560db98cd75178c8b4cde21137da755ef64ef9051d5eb6e9b2b852243c0046a",
+      "mmlu_sha256": "ece00d939d6432027da796fb364e1b765d96259ec6d59b90a9dbfaa19247cf82",
+      "backend": "exact_fused_integer_and_FP32_tree"
+    },
+    "fp16_g128_nll": {
+      "audit_sha256": "eaf362158fd3e874a8f93318e1bc291bd99bebe59c3db7aaa8dd0b71d066f436",
+      "mmlu_sha256": "b3509659002d020048f8425ddc3f0e9d64e0873ec79bb59bcd7656618e606311",
+      "backend": "native_fp16_dense"
+    },
+    "fp16_g128_kl1": {
+      "audit_sha256": "5ec51c392bead9bc9bfb2d5f0242e6bb55d8513bb588aecfc8d0e6699f19c6e8",
+      "mmlu_sha256": "686972c722574be57a64f03f0d4b8e5fdf3156bced407ef661ef8b77bed52c39",
+      "backend": "native_fp16_dense"
+    },
+    "fp16_g64_nll": {
+      "audit_sha256": "a1070f39ee90a675f12c2fff2c1817e6001eccf99fdc3777c0b52ad3012364f7",
+      "mmlu_sha256": "0eb04dfd1852dbe6241b5e6dd350b441eb01b56cbfc97f7d9515f0425daf6859",
+      "backend": "native_fp16_dense"
+    },
+    "fp16_g64_kl1": {
+      "audit_sha256": "1745525e3476b8733bb0389660b0f5c668a6ae1e668a1b59daa371cc38b8d40c",
+      "mmlu_sha256": "c45895e68d2bbfb511e2c54b4bde759e67e72633098bdc9c3347f070f1cb8873",
+      "backend": "native_fp16_dense"
+    }
+  }
+}

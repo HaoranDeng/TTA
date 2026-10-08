@@ -1,0 +1,15 @@
+{
+  "completed": true,
+  "created_utc": "2026-10-08T19:53:12.808948+00:00",
+  "archive_sha256": "681529d02d13509637863280e1afefefc7a0176a988111a358f0dbf897877c93",
+  "verified_files": 574,
+  "preserved_local_files": [
+    "resource21_feasibility.json"
+  ],
+  "final_models": 10,
+  "actual_bank_hashes": 9,
+  "new_scored_decisions": 84252,
+  "reused_scored_decisions": 56168,
+  "all_accuracy_complete": true,
+  "aggregate_comparisons_independently_recomputed": true
+}

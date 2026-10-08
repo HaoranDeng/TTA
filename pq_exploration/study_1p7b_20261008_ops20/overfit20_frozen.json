@@ -1,0 +1,766 @@
+{
+  "frozen": true,
+  "created_utc": "2026-10-08T05:17:54.150266+00:00",
+  "protocol_sha256": "137afeab73536e7742a40ad04c91bf4ad5fee9c69c9e74f67c1f288c9dc10b53",
+  "flow_sha256": "d219ea538a6cd8a3c7dacbc544aca343f9a99db1c68b2ccbbd560002f25408e0",
+  "selected": {
+    "pq": {
+      "name": "pq_k480",
+      "kind": "quant_bank",
+      "path": "bases20/pq_k480.pt",
+      "sha256": "84cc57b3eac04cac1b960460e73eef67eaa5ddea3490e0bde7c7930a87d708a2"
+    },
+    "rq": {
+      "name": "rq_32x32_conditional",
+      "kind": "quant_bank",
+      "path": "bases20/rq_32x32_conditional.pt",
+      "sha256": "53837c1d30412b68336e287d6009d26cbfb29bee63071336bdc31130e4251e30"
+    },
+    "ib": {
+      "name": "ib_k768_l0.8",
+      "kind": "quant_bank",
+      "path": "bases20/ib_k768_l0.8.pt",
+      "sha256": "a053c88b168d7613bc755b308e0f468e274496afbc65929d89e040d1ca489d8a"
+    }
+  },
+  "ranking": {
+    "pq": [
+      {
+        "name": "pq_k480",
+        "monitor_ppl": 16.7837307364898,
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1331135428,
+          "memory_MiB": 1269.469669342041,
+          "memory_breakdown": {
+            "tables": 251658240,
+            "indices": 1056964608,
+            "scales": 22020096,
+            "centers": 1920,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568
+          },
+          "index_bits": 12,
+          "table_copies": 1,
+          "group": 128,
+          "weight_bits": 8,
+          "act_bits": 9,
+          "table_entry_bytes": 4,
+          "all_reads_pessimistic": 3549938448,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+          "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+        }
+      },
+      {
+        "name": "pq_k768",
+        "monitor_ppl": 16.828090699956416,
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1570211908,
+          "memory_MiB": 1497.4707679748535,
+          "memory_breakdown": {
+            "tables": 402653184,
+            "indices": 1145044992,
+            "scales": 22020096,
+            "centers": 3072,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568
+          },
+          "index_bits": 13,
+          "table_copies": 1,
+          "group": 128,
+          "weight_bits": 8,
+          "act_bits": 9,
+          "table_entry_bytes": 4,
+          "all_reads_pessimistic": 3549938448,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+          "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+        }
+      },
+      {
+        "name": "pq_k1024",
+        "monitor_ppl": 16.98034054857985,
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1704430660,
+          "memory_MiB": 1625.4717445373535,
+          "memory_breakdown": {
+            "tables": 536870912,
+            "indices": 1145044992,
+            "scales": 22020096,
+            "centers": 4096,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568
+          },
+          "index_bits": 13,
+          "table_copies": 1,
+          "group": 128,
+          "weight_bits": 8,
+          "act_bits": 9,
+          "table_entry_bytes": 4,
+          "all_reads_pessimistic": 3549938448,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+          "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+        }
+      },
+      {
+        "name": "pq_k1120",
+        "monitor_ppl": 17.129236215116304,
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1842843076,
+          "memory_MiB": 1757.472110748291,
+          "memory_breakdown": {
+            "tables": 587202560,
+            "indices": 1233125376,
+            "scales": 22020096,
+            "centers": 4480,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568
+          },
+          "index_bits": 14,
+          "table_copies": 1,
+          "group": 128,
+          "weight_bits": 8,
+          "act_bits": 9,
+          "table_entry_bytes": 4,
+          "all_reads_pessimistic": 3549938448,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+          "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+        }
+      }
+    ],
+    "rq": [
+      {
+        "name": "rq_32x32_conditional",
+        "monitor_ppl": 16.956424315024567,
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1685036080,
+          "memory_MiB": 1606.9756317138672,
+          "memory_breakdown": {
+            "tables": 517472256,
+            "indices": 1145044992,
+            "scales": 22020096,
+            "centers": 3948,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568,
+            "residual_component_centers": 4224
+          },
+          "index_bits": 13,
+          "table_copies": 1,
+          "group": 128,
+          "weight_bits": 8,
+          "act_bits": 9,
+          "table_entry_bytes": 4,
+          "all_reads_pessimistic": 3549938448,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+          "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+        }
+      },
+      {
+        "name": "rq_24x32",
+        "monitor_ppl": 17.023702258613987,
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1536133152,
+          "memory_MiB": 1464.9707336425781,
+          "memory_breakdown": {
+            "tables": 368574464,
+            "indices": 1145044992,
+            "scales": 22020096,
+            "centers": 2812,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568,
+            "residual_component_centers": 224
+          },
+          "index_bits": 13,
+          "table_copies": 1,
+          "group": 128,
+          "weight_bits": 8,
+          "act_bits": 9,
+          "table_entry_bytes": 4,
+          "all_reads_pessimistic": 3549938448,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+          "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+        }
+      },
+      {
+        "name": "rq_15x32",
+        "monitor_ppl": 17.059810742508606,
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1323271236,
+          "memory_MiB": 1261.9697914123535,
+          "memory_breakdown": {
+            "tables": 243793920,
+            "indices": 1056964608,
+            "scales": 22020096,
+            "centers": 1860,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568,
+            "residual_component_centers": 188
+          },
+          "index_bits": 12,
+          "table_copies": 1,
+          "group": 128,
+          "weight_bits": 8,
+          "act_bits": 9,
+          "table_entry_bytes": 4,
+          "all_reads_pessimistic": 3549938448,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+          "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+        }
+      },
+      {
+        "name": "rq_32x32",
+        "monitor_ppl": 17.15599166787731,
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1637321540,
+          "memory_MiB": 1561.4715003967285,
+          "memory_breakdown": {
+            "tables": 469762048,
+            "indices": 1145044992,
+            "scales": 22020096,
+            "centers": 3584,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568,
+            "residual_component_centers": 256
+          },
+          "index_bits": 13,
+          "table_copies": 1,
+          "group": 128,
+          "weight_bits": 8,
+          "act_bits": 9,
+          "table_entry_bytes": 4,
+          "all_reads_pessimistic": 3549938448,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+          "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+        }
+      },
+      {
+        "name": "rq_32x35",
+        "monitor_ppl": 17.21975134218837,
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1682934956,
+          "memory_MiB": 1604.9718437194824,
+          "memory_breakdown": {
+            "tables": 515375104,
+            "indices": 1145044992,
+            "scales": 22020096,
+            "centers": 3932,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568,
+            "residual_component_centers": 268
+          },
+          "index_bits": 13,
+          "table_copies": 1,
+          "group": 128,
+          "weight_bits": 8,
+          "act_bits": 9,
+          "table_entry_bytes": 4,
+          "all_reads_pessimistic": 3549938448,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+          "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+        }
+      },
+      {
+        "name": "rq_32x24",
+        "monitor_ppl": 17.235151776276364,
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1532987400,
+          "memory_MiB": 1461.9707107543945,
+          "memory_breakdown": {
+            "tables": 365428736,
+            "indices": 1145044992,
+            "scales": 22020096,
+            "centers": 2788,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568,
+            "residual_component_centers": 224
+          },
+          "index_bits": 13,
+          "table_copies": 1,
+          "group": 128,
+          "weight_bits": 8,
+          "act_bits": 9,
+          "table_entry_bytes": 4,
+          "all_reads_pessimistic": 3549938448,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+          "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+        }
+      }
+    ],
+    "ib": [
+      {
+        "name": "ib_k768_l0.8",
+        "monitor_ppl": 16.94601644873679,
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1570211908,
+          "memory_MiB": 1497.4707679748535,
+          "memory_breakdown": {
+            "tables": 402653184,
+            "indices": 1145044992,
+            "scales": 22020096,
+            "centers": 3072,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568
+          },
+          "index_bits": 13,
+          "table_copies": 1,
+          "group": 128,
+          "weight_bits": 8,
+          "act_bits": 9,
+          "table_entry_bytes": 4,
+          "all_reads_pessimistic": 3549938448,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+          "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+        }
+      },
+      {
+        "name": "ib_k1024_l0.8",
+        "monitor_ppl": 16.966634318418006,
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1703906368,
+          "memory_MiB": 1624.9717407226562,
+          "memory_breakdown": {
+            "tables": 536346624,
+            "indices": 1145044992,
+            "scales": 22020096,
+            "centers": 4092,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568
+          },
+          "index_bits": 13,
+          "table_copies": 1,
+          "group": 128,
+          "weight_bits": 8,
+          "act_bits": 9,
+          "table_entry_bytes": 4,
+          "all_reads_pessimistic": 3549938448,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+          "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+        }
+      },
+      {
+        "name": "ib_k1024_l0",
+        "monitor_ppl": 16.967440097230998,
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1704430660,
+          "memory_MiB": 1625.4717445373535,
+          "memory_breakdown": {
+            "tables": 536870912,
+            "indices": 1145044992,
+            "scales": 22020096,
+            "centers": 4096,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568
+          },
+          "index_bits": 13,
+          "table_copies": 1,
+          "group": 128,
+          "weight_bits": 8,
+          "act_bits": 9,
+          "table_entry_bytes": 4,
+          "all_reads_pessimistic": 3549938448,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+          "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+        }
+      },
+      {
+        "name": "ib_k1120_l0.8",
+        "monitor_ppl": 16.9949830017182,
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1842318784,
+          "memory_MiB": 1756.9721069335938,
+          "memory_breakdown": {
+            "tables": 586678272,
+            "indices": 1233125376,
+            "scales": 22020096,
+            "centers": 4476,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568
+          },
+          "index_bits": 14,
+          "table_copies": 1,
+          "group": 128,
+          "weight_bits": 8,
+          "act_bits": 9,
+          "table_entry_bytes": 4,
+          "all_reads_pessimistic": 3549938448,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+          "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+        }
+      },
+      {
+        "name": "ib_k1024_l0.4",
+        "monitor_ppl": 16.995785439323065,
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1704430660,
+          "memory_MiB": 1625.4717445373535,
+          "memory_breakdown": {
+            "tables": 536870912,
+            "indices": 1145044992,
+            "scales": 22020096,
+            "centers": 4096,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568
+          },
+          "index_bits": 13,
+          "table_copies": 1,
+          "group": 128,
+          "weight_bits": 8,
+          "act_bits": 9,
+          "table_entry_bytes": 4,
+          "all_reads_pessimistic": 3549938448,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+          "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+        }
+      },
+      {
+        "name": "ib_k1024_l1.6",
+        "monitor_ppl": 17.009234502096994,
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1696041988,
+          "memory_MiB": 1617.4716835021973,
+          "memory_breakdown": {
+            "tables": 528482304,
+            "indices": 1145044992,
+            "scales": 22020096,
+            "centers": 4032,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568
+          },
+          "index_bits": 13,
+          "table_copies": 1,
+          "group": 128,
+          "weight_bits": 8,
+          "act_bits": 9,
+          "table_entry_bytes": 4,
+          "all_reads_pessimistic": 3549938448,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+          "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+        }
+      },
+      {
+        "name": "ib_k480_l0.8",
+        "monitor_ppl": 17.047479055385487,
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1331135428,
+          "memory_MiB": 1269.469669342041,
+          "memory_breakdown": {
+            "tables": 251658240,
+            "indices": 1056964608,
+            "scales": 22020096,
+            "centers": 1920,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568
+          },
+          "index_bits": 12,
+          "table_copies": 1,
+          "group": 128,
+          "weight_bits": 8,
+          "act_bits": 9,
+          "table_entry_bytes": 4,
+          "all_reads_pessimistic": 3549938448,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "scope": "196 decoder linears, one decode token, resident compressed representation plus scratch",
+          "score_caveat": "Uniform 7nm reference coefficients; not FPGA energy. All metadata reads and bit/address operations separate."
+        }
+      }
+    ]
+  },
+  "evaluation_entries": [
+    {
+      "name": "fp16",
+      "kind": "fp16"
+    },
+    {
+      "name": "pq_k480",
+      "kind": "quant_bank",
+      "path": "bases20/pq_k480.pt",
+      "sha256": "84cc57b3eac04cac1b960460e73eef67eaa5ddea3490e0bde7c7930a87d708a2"
+    },
+    {
+      "name": "rq_32x32_conditional",
+      "kind": "quant_bank",
+      "path": "bases20/rq_32x32_conditional.pt",
+      "sha256": "53837c1d30412b68336e287d6009d26cbfb29bee63071336bdc31130e4251e30"
+    },
+    {
+      "name": "ib_k768_l0.8",
+      "kind": "quant_bank",
+      "path": "bases20/ib_k768_l0.8.pt",
+      "sha256": "a053c88b168d7613bc755b308e0f468e274496afbc65929d89e040d1ca489d8a"
+    }
+  ],
+  "evaluation_source_sha256": {
+    "fit20.py": "28593dba07308f2a0418754b2e842ac7a25c509c9bf09ec0d4b8f5d406ad5c87",
+    "lib19/center_symmetry.py": "65fae2bf838472a10d5437fc7d15bb73f0feb2a7758c5b70b8ea7c2e94a5a321",
+    "lib19/cost_model.py": "3e9f6d14ab13c17163beb65fc96ceabda6b2424b3927090ad60c6cf876b2a522",
+    "lib19/covariance_compensation11.py": "103f7bf7e4829fdc296b4c25d0dab91a1410af7f06a7698b059328fe4e6e21b4",
+    "lib19/deployment_eval11.py": "d2f33ac75a3dbbef696093f3cb6a58e9f9683c9ce3e80d227786802394dc4d23",
+    "lib19/distill_state12.py": "175ce3ca20993659baaa2aa376176ec737e556ebb5de06f322adb1f9cd12310f",
+    "lib19/fit19.py": "bb17a22c49623811f0a22a6a176813eabfd15f31a367d85e081852de6769cb82",
+    "lib19/fit_covariance11.py": "69ba43f26d339a13fa1fb8efb2726d3aa3492841a8315c04a67d8ae6cc1fb5c8",
+    "lib19/fused_reference19.py": "0a1118ca6689131bdaf8d4eb660281b6838cdd8566c422a359a1c43a7608d2c8",
+    "lib19/gpu_guard.py": "5a38785f7cc0c93b05e9b86799b858cd48a01563e4284eae04ace927ff9c2c0f",
+    "lib19/grouped_reference.py": "f06bfe30b88e66905dcca8c7dba1c752e9ed00595a69180eebb7f3524e01ccf8",
+    "lib19/integer_dot19.py": "1cff72381c0fc00c92e1c5a7d6dc6e3b3aa7f3658b7d64447475540cb09cfbd6",
+    "lib19/mmlu19_fast.py": "1646f5aaed9cbf526799f36b4771f34c8384f98d01b3130a686c0418a2d87e4b",
+    "lib19/nearest11.py": "1671863c1e5706e04d5c002af1640f47f753516e9f54526997bf3b73499d5bdf",
+    "lib19/overfit19.py": "97014ed0054cf5a7ae0729e1a9482514f8494fbc10f031e8d9e658ad75579996",
+    "lib19/packed_bank11.py": "8a23585e6416901cc2311721fd4f97337aebfcdec77e75dd702c43613c99eb48",
+    "lib19/packed_kernel.py": "865edf4a2ccc833fe1ac02c89c2f7965f28848e85e269bdfa1812b659c2ee424",
+    "lib19/precision.py": "daf8fea1f804f233ed9c5e82272a959f27bf000a224522b3069d3f6d41a39f63",
+    "lib19/prepare.py": "9f6f2cbf7dd40cbc3051aa52b0d91c62696c3f18bfaa17d48686541481b52a52",
+    "lib19/prepare19.py": "51f6152f28611f5c49efb1ef6fd3accf5615df98e608bb72c32795ea68e37304",
+    "lib19/quantizers.py": "adb0476496c94e7041b67f59eb07ce6ef003245e5306b6a48c3dccac7bff9be0",
+    "lib19/run_experiment.py": "fc065f6d056e767fdb10fc5a4a53c38eabe08a7002db80122b5e1bf6b8273e69",
+    "lib19/scale_distill12.py": "e752a92605fb4af33f0d024de953ee2d537a1b60ec67a210ff68eae096c0e8b2",
+    "lib19/symmetry_pq.py": "91e7e4ebe41f4f21e23bcf71d02f5ab442055a1d78122799fe7cf664b2a800e8",
+    "common20.py": "1b3cd59769d40566265bc4b7a2d2bace1074bfc20933148288585f4e2de92352",
+    "eval20.py": "25332bcf0075f9be8bd3c1f205bf24b5b802f6e47fdfa4e09e68c06bbcc589dc",
+    "freeze20.py": "9e9e18621ee1158cf88ceb937eaa160d0db2f63f7e266db8692013320b8a82a6",
+    "mmlu20_fast.py": "f1b74817b882c576ef3de0f20b845abec9f2f617f6a8a28568c760ddeffa285b",
+    "make_backend20.py": "856980472ce3117083c3a6112a4f1bbaa0664c6152e77ecbec2f5bb2a26faf0b",
+    "candidate20.py": "84cebf9c1bffe0f8657521387b5382527ee93425b69c2f43390077dbcf67d956"
+  },
+  "monitor_sha256": {
+    "fp16": "de946ed54f8f622b378eff1d4af6e731964a97ed3c687b7101366467c266d170",
+    "pq_k480": "816df47c81217ff9109c20e440a980b39f2a0f66fd4654fa47b305efe917ff4b",
+    "pq_k768": "8ac4b7cb50a184eff30de37197081d1d6cae805ceac94e1b09224a3e5ed99267",
+    "pq_k1024": "b890a88228d743a4c6d6bd8c9baa1e148356340cc23587672fa97f030dad3f47",
+    "pq_k1120": "79a183b6eb7c2d7b1a32dfe30520973e7c42a2944cfac6e083d54c392f94a5c1",
+    "rq_15x32": "2b798d304f696b67e5412e4f2ea27971ae717f37f308c9aafca083f1f67036cb",
+    "rq_24x32": "ab92470d2d8f6c7a455c84f04973d8be0d2ced0e73a202bd8e7802f39860fa93",
+    "rq_32x32": "9b66e32d7a58a09b5a2cbb60d88045d22f554f9e9095e0b80e5bdb3a17aef827",
+    "rq_32x35": "c3883c9dee89d7094702defea6d5eac742a2622cf20385fc8adf56ba708a329f",
+    "rq_32x24": "eb46047bbb42cbc41d2213e95c7c855dc4b1a2acbb19f0bb97258eab615ec777",
+    "rq_32x32_conditional": "5eb38ab55016db33f599f082ad63508ff66f3d0d1e9eb813762356691d713407",
+    "ib_k480_l0.8": "225ae0bdbb13472da11156bad28938bd672bfef952e8d6b75cbf716e644e3813",
+    "ib_k768_l0.8": "2118516a0631d73fd720c75e7757e2937e0ab3dd25f0c938eb0cfde17dea0c08",
+    "ib_k1024_l0.8": "9c3b5f9cc315ef2e6f8c941076997176f943743ec988e0116c4f63bea89d79e4",
+    "ib_k1120_l0.8": "93fedb9775993745585ee370bca646580e15042be4d3c7f1df086f43190dceb0",
+    "ib_k1024_l0": "2c5e67950dc871eb9f1f6469c83930fdf49b11084f325f6c4712516be061bf8f",
+    "ib_k1024_l0.4": "3173c111064b5da476c169dce16aa8848ab55bbb7bbbd1392231fc202743c6a6",
+    "ib_k1024_l1.6": "bc2f53e871f49d24a4e368768ef451a5bddc642f831aa6f014de3c0b31558ea2"
+  },
+  "mmlu_request_manifest_sha256": "6ac708b7b53c5d35fbee882352ee83f6490fc64339313426f353b714f4e4d6d1",
+  "test_used_for_selection": false,
+  "mmlu_used_for_selection": false,
+  "selection": "Fit every listed candidate on TRAIN statistics; score all17 on all32 new monitor windows. Freeze lowest monitor NLL per family; ties use fewer bytes then candidate name. No TEST/MMLU selection. Require every resource gate including reciprocals before accuracy screening."
+}

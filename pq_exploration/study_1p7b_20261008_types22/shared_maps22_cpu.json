@@ -1,0 +1,2151 @@
+{
+  "completed": true,
+  "created_utc": "2026-10-08T07:50:51.682745+00:00",
+  "kind": "TRAIN-only shared-table conditional-mapping CPU experiment; no accuracy registration",
+  "intent_sha256": "762670ca0bbd818fd82f96e81bf74dfe4e2c6d7c29df73f89fcbfd35a5ea4dcb",
+  "source_sha256": {
+    "/home/denghaoran/pq_exploration_20261005/study_1p7b_20261008_types22/fit_shared_maps22_cpu.py": "31e39c2ba68f23dae7d525ab2180965a165e54e49186e3cc5e2b2019eae51057",
+    "/home/denghaoran/pq_exploration_20261005/study_1p7b_20261008_types22/fit_types22_cpu.py": "2e29f066259b8b6ad32d1a9e8059fa03930140dabe3c4e32a5b041323f56b02c",
+    "/home/denghaoran/pq_exploration_20261005/study_1p7b_20261008_types22/resources22.py": "fd6f3e910844eb30e32e854723b3907d9536da90d73c1902010222f975c70a7b",
+    "/home/denghaoran/pq_exploration_20261005/study_1p7b_20261008_mixed21/joint_pq21_cpu.py": "2a576ca6f3d2c00dd4e005ef362ba2c8351e6ed10fb29b40d8c865f32876da3f",
+    "/home/denghaoran/pq_exploration_20261005/study_1p7b_20261008_mixed21/joint_rq21_cpu.py": "4e73379b1d7843fd3cd228fa7f710f40cec5eee7b5e973a16d0efa352cc125d0",
+    "/home/denghaoran/pq_exploration_20261005/study_1p7b_20261008_mixed21/joint_ib21_cpu.py": "e23f8e596227bc7c0eef9281a25848bfdab2ed3475998b5f1db72ca0fe56cbed",
+    "/home/denghaoran/pq_exploration_20261005/study_1p7b_20261008_mixed21/resource21_feasibility.py": "91a9d444e490680d65e7d92b1e699ee3440eb06cec89818a95ce06c8ae29f6eb"
+  },
+  "math_checks": {
+    "pq": {
+      "active_bins": 8256,
+      "ordinary_mapping_exact": true,
+      "entropy_mapping_exact": true,
+      "empty_mapping_exact": true
+    },
+    "rq": {
+      "active_bins": 8256,
+      "ordinary_mapping_exact": true,
+      "entropy_mapping_exact": true,
+      "empty_mapping_exact": true
+    },
+    "ib": {
+      "active_bins": 8256,
+      "ordinary_mapping_exact": true,
+      "entropy_mapping_exact": true,
+      "empty_mapping_exact": true
+    }
+  },
+  "outputs": {
+    "pq": {
+      "global_control": {
+        "units": 1,
+        "initial_objective": 15305.986785258125,
+        "initial_train_pair_error": 15305.986785258125,
+        "final_objective": 15305.986785258125,
+        "final_train_pair_error": 15305.986785258125,
+        "trace": [
+          {
+            "step": 1,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 2,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 3,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 4,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 5,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 6,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 7,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 8,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 9,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 10,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 11,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 12,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 13,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 14,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 15,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 16,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 17,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 18,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 19,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 20,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 21,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 22,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 23,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          },
+          {
+            "step": 24,
+            "objective": 15305.986785258125,
+            "train_pair_error": 15305.986785258125,
+            "global_entropy_bits": 8.717868917353655,
+            "before_center_distortion": 15305.986785258296,
+            "after_center_distortion": 15305.986785258296
+          }
+        ],
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1331135428,
+          "memory_MiB": 1269.469669342041,
+          "memory_breakdown": {
+            "tables": 251658240,
+            "indices": 1056964608,
+            "scales": 22020096,
+            "centers": 1920,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568
+          },
+          "index_bits": 12,
+          "table_entry_bytes": 4,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "arithmetic_margin_including_reciprocals": 9633400,
+          "weights_group64": 0,
+          "layers_group64": 0
+        }
+      },
+      "projection_maps": {
+        "units": 7,
+        "initial_objective": 15305.986785257917,
+        "initial_train_pair_error": 15305.986785257917,
+        "final_objective": 15068.074625734891,
+        "final_train_pair_error": 15068.074625734891,
+        "trace": [
+          {
+            "step": 1,
+            "objective": 15077.565108943341,
+            "train_pair_error": 15077.565108943341,
+            "global_entropy_bits": 8.728156179074679,
+            "before_center_distortion": 15305.986785256215,
+            "after_center_distortion": 15305.986785256215
+          },
+          {
+            "step": 2,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15077.565108941839,
+            "after_center_distortion": 15076.066489831035
+          },
+          {
+            "step": 3,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 4,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 5,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 6,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 7,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 8,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 9,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 10,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 11,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 12,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 13,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 14,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 15,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 16,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 17,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 18,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 19,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 20,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 21,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 22,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 23,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          },
+          {
+            "step": 24,
+            "objective": 15068.074625734891,
+            "train_pair_error": 15068.074625734891,
+            "global_entropy_bits": 8.72810394288563,
+            "before_center_distortion": 15068.074625733552,
+            "after_center_distortion": 15068.074625733552
+          }
+        ],
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1331135428,
+          "memory_MiB": 1269.469669342041,
+          "memory_breakdown": {
+            "tables": 251658240,
+            "indices": 1056964608,
+            "scales": 22020096,
+            "centers": 1920,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568
+          },
+          "index_bits": 12,
+          "table_entry_bytes": 4,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "arithmetic_margin_including_reciprocals": 9633400,
+          "weights_group64": 0,
+          "layers_group64": 0
+        },
+        "distortion_vs_control_pct": -1.5543732191927506,
+        "objective_vs_control_pct": -1.5543732191927506
+      },
+      "layer_maps": {
+        "units": 196,
+        "initial_objective": 15305.986785258043,
+        "initial_train_pair_error": 15305.986785258043,
+        "final_objective": 14329.17512717509,
+        "final_train_pair_error": 14329.17512717509,
+        "trace": [
+          {
+            "step": 1,
+            "objective": 14376.550203739964,
+            "train_pair_error": 14376.550203739964,
+            "global_entropy_bits": 8.730272663900204,
+            "before_center_distortion": 15305.986785257448,
+            "after_center_distortion": 15305.986785257448
+          },
+          {
+            "step": 2,
+            "objective": 14356.543220110092,
+            "train_pair_error": 14356.543220110092,
+            "global_entropy_bits": 8.7302531406843,
+            "before_center_distortion": 14376.55020374126,
+            "after_center_distortion": 14373.957757064787
+          },
+          {
+            "step": 3,
+            "objective": 14346.740121154025,
+            "train_pair_error": 14346.740121154025,
+            "global_entropy_bits": 8.730265391503714,
+            "before_center_distortion": 14356.54322011132,
+            "after_center_distortion": 14356.200129713949
+          },
+          {
+            "step": 4,
+            "objective": 14340.55007622291,
+            "train_pair_error": 14340.55007622291,
+            "global_entropy_bits": 8.730210871162418,
+            "before_center_distortion": 14346.740121154753,
+            "after_center_distortion": 14346.534629082335
+          },
+          {
+            "step": 5,
+            "objective": 14334.291411479866,
+            "train_pair_error": 14334.291411479866,
+            "global_entropy_bits": 8.73017655227549,
+            "before_center_distortion": 14340.550076223471,
+            "after_center_distortion": 14340.167628152469
+          },
+          {
+            "step": 6,
+            "objective": 14329.17512717509,
+            "train_pair_error": 14329.17512717509,
+            "global_entropy_bits": 8.730046517560332,
+            "before_center_distortion": 14334.291411480646,
+            "after_center_distortion": 14333.805634694332
+          },
+          {
+            "step": 7,
+            "objective": 14329.17512717509,
+            "train_pair_error": 14329.17512717509,
+            "global_entropy_bits": 8.730046517560332,
+            "before_center_distortion": 14329.175127175547,
+            "after_center_distortion": 14329.175127175547
+          },
+          {
+            "step": 8,
+            "objective": 14329.17512717509,
+            "train_pair_error": 14329.17512717509,
+            "global_entropy_bits": 8.730046517560332,
+            "before_center_distortion": 14329.175127175547,
+            "after_center_distortion": 14329.175127175547
+          },
+          {
+            "step": 9,
+            "objective": 14329.17512717509,
+            "train_pair_error": 14329.17512717509,
+            "global_entropy_bits": 8.730046517560332,
+            "before_center_distortion": 14329.175127175547,
+            "after_center_distortion": 14329.175127175547
+          },
+          {
+            "step": 10,
+            "objective": 14329.17512717509,
+            "train_pair_error": 14329.17512717509,
+            "global_entropy_bits": 8.730046517560332,
+            "before_center_distortion": 14329.175127175547,
+            "after_center_distortion": 14329.175127175547
+          },
+          {
+            "step": 11,
+            "objective": 14329.17512717509,
+            "train_pair_error": 14329.17512717509,
+            "global_entropy_bits": 8.730046517560332,
+            "before_center_distortion": 14329.175127175547,
+            "after_center_distortion": 14329.175127175547
+          },
+          {
+            "step": 12,
+            "objective": 14329.17512717509,
+            "train_pair_error": 14329.17512717509,
+            "global_entropy_bits": 8.730046517560332,
+            "before_center_distortion": 14329.175127175547,
+            "after_center_distortion": 14329.175127175547
+          },
+          {
+            "step": 13,
+            "objective": 14329.17512717509,
+            "train_pair_error": 14329.17512717509,
+            "global_entropy_bits": 8.730046517560332,
+            "before_center_distortion": 14329.175127175547,
+            "after_center_distortion": 14329.175127175547
+          },
+          {
+            "step": 14,
+            "objective": 14329.17512717509,
+            "train_pair_error": 14329.17512717509,
+            "global_entropy_bits": 8.730046517560332,
+            "before_center_distortion": 14329.175127175547,
+            "after_center_distortion": 14329.175127175547
+          },
+          {
+            "step": 15,
+            "objective": 14329.17512717509,
+            "train_pair_error": 14329.17512717509,
+            "global_entropy_bits": 8.730046517560332,
+            "before_center_distortion": 14329.175127175547,
+            "after_center_distortion": 14329.175127175547
+          },
+          {
+            "step": 16,
+            "objective": 14329.17512717509,
+            "train_pair_error": 14329.17512717509,
+            "global_entropy_bits": 8.730046517560332,
+            "before_center_distortion": 14329.175127175547,
+            "after_center_distortion": 14329.175127175547
+          },
+          {
+            "step": 17,
+            "objective": 14329.17512717509,
+            "train_pair_error": 14329.17512717509,
+            "global_entropy_bits": 8.730046517560332,
+            "before_center_distortion": 14329.175127175547,
+            "after_center_distortion": 14329.175127175547
+          },
+          {
+            "step": 18,
+            "objective": 14329.17512717509,
+            "train_pair_error": 14329.17512717509,
+            "global_entropy_bits": 8.730046517560332,
+            "before_center_distortion": 14329.175127175547,
+            "after_center_distortion": 14329.175127175547
+          },
+          {
+            "step": 19,
+            "objective": 14329.17512717509,
+            "train_pair_error": 14329.17512717509,
+            "global_entropy_bits": 8.730046517560332,
+            "before_center_distortion": 14329.175127175547,
+            "after_center_distortion": 14329.175127175547
+          },
+          {
+            "step": 20,
+            "objective": 14329.17512717509,
+            "train_pair_error": 14329.17512717509,
+            "global_entropy_bits": 8.730046517560332,
+            "before_center_distortion": 14329.175127175547,
+            "after_center_distortion": 14329.175127175547
+          },
+          {
+            "step": 21,
+            "objective": 14329.17512717509,
+            "train_pair_error": 14329.17512717509,
+            "global_entropy_bits": 8.730046517560332,
+            "before_center_distortion": 14329.175127175547,
+            "after_center_distortion": 14329.175127175547
+          },
+          {
+            "step": 22,
+            "objective": 14329.17512717509,
+            "train_pair_error": 14329.17512717509,
+            "global_entropy_bits": 8.730046517560332,
+            "before_center_distortion": 14329.175127175547,
+            "after_center_distortion": 14329.175127175547
+          },
+          {
+            "step": 23,
+            "objective": 14329.17512717509,
+            "train_pair_error": 14329.17512717509,
+            "global_entropy_bits": 8.730046517560332,
+            "before_center_distortion": 14329.175127175547,
+            "after_center_distortion": 14329.175127175547
+          },
+          {
+            "step": 24,
+            "objective": 14329.17512717509,
+            "train_pair_error": 14329.17512717509,
+            "global_entropy_bits": 8.730046517560332,
+            "before_center_distortion": 14329.175127175547,
+            "after_center_distortion": 14329.175127175547
+          }
+        ],
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1331135428,
+          "memory_MiB": 1269.469669342041,
+          "memory_breakdown": {
+            "tables": 251658240,
+            "indices": 1056964608,
+            "scales": 22020096,
+            "centers": 1920,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568
+          },
+          "index_bits": 12,
+          "table_entry_bytes": 4,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "arithmetic_margin_including_reciprocals": 9633400,
+          "weights_group64": 0,
+          "layers_group64": 0
+        },
+        "distortion_vs_control_pct": -6.381892731175254,
+        "objective_vs_control_pct": -6.381892731175254
+      }
+    },
+    "rq": {
+      "global_control": {
+        "units": 1,
+        "initial_objective": 21026.033102346933,
+        "initial_train_pair_error": 21026.033102346933,
+        "final_objective": 21026.033102346933,
+        "final_train_pair_error": 21026.033102346933,
+        "trace": [
+          {
+            "step": 1,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 2,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 3,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 4,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 5,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 6,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 7,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 8,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 9,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 10,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 11,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 12,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 13,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 14,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 15,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 16,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 17,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 18,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 19,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 20,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 21,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 22,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 23,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          },
+          {
+            "step": 24,
+            "objective": 21026.033102346933,
+            "train_pair_error": 21026.033102346933,
+            "global_entropy_bits": 8.466273857222879,
+            "before_center_distortion": 21026.03310234612,
+            "after_center_distortion": 21026.03310234612
+          }
+        ],
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1331135616,
+          "memory_MiB": 1269.4698486328125,
+          "memory_breakdown": {
+            "tables": 251658240,
+            "indices": 1056964608,
+            "scales": 22020096,
+            "centers": 1920,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568,
+            "residual_component_centers": 188
+          },
+          "index_bits": 12,
+          "table_entry_bytes": 4,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "arithmetic_margin_including_reciprocals": 9633400,
+          "weights_group64": 0,
+          "layers_group64": 0
+        }
+      },
+      "projection_maps": {
+        "units": 7,
+        "initial_objective": 21026.03310234674,
+        "initial_train_pair_error": 21026.03310234674,
+        "final_objective": 20528.737499561656,
+        "final_train_pair_error": 20528.737499561656,
+        "trace": [
+          {
+            "step": 1,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 21026.033102347355,
+            "after_center_distortion": 21026.033102347355
+          },
+          {
+            "step": 2,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 3,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 4,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 5,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 6,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 7,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 8,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 9,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 10,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 11,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 12,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 13,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 14,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 15,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 16,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 17,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 18,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 19,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 20,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 21,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 22,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 23,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          },
+          {
+            "step": 24,
+            "objective": 20528.737499561656,
+            "train_pair_error": 20528.737499561656,
+            "global_entropy_bits": 8.483247898562666,
+            "before_center_distortion": 20528.73749956127,
+            "after_center_distortion": 20528.73749956127
+          }
+        ],
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1331135616,
+          "memory_MiB": 1269.4698486328125,
+          "memory_breakdown": {
+            "tables": 251658240,
+            "indices": 1056964608,
+            "scales": 22020096,
+            "centers": 1920,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568,
+            "residual_component_centers": 188
+          },
+          "index_bits": 12,
+          "table_entry_bytes": 4,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "arithmetic_margin_including_reciprocals": 9633400,
+          "weights_group64": 0,
+          "layers_group64": 0
+        },
+        "distortion_vs_control_pct": -2.3651422993801408,
+        "objective_vs_control_pct": -2.3651422993801408
+      },
+      "layer_maps": {
+        "units": 196,
+        "initial_objective": 21026.033102346908,
+        "initial_train_pair_error": 21026.033102346908,
+        "final_objective": 19430.192869504837,
+        "final_train_pair_error": 19430.192869504837,
+        "trace": [
+          {
+            "step": 1,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 21026.033102345522,
+            "after_center_distortion": 21026.033102345522
+          },
+          {
+            "step": 2,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 3,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 4,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 5,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 6,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 7,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 8,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 9,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 10,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 11,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 12,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 13,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 14,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 15,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 16,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 17,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 18,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 19,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 20,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 21,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 22,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 23,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          },
+          {
+            "step": 24,
+            "objective": 19430.192869504837,
+            "train_pair_error": 19430.192869504837,
+            "global_entropy_bits": 8.48447667079178,
+            "before_center_distortion": 19430.192869504,
+            "after_center_distortion": 19430.192869504
+          }
+        ],
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1331135616,
+          "memory_MiB": 1269.4698486328125,
+          "memory_breakdown": {
+            "tables": 251658240,
+            "indices": 1056964608,
+            "scales": 22020096,
+            "centers": 1920,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568,
+            "residual_component_centers": 188
+          },
+          "index_bits": 12,
+          "table_entry_bytes": 4,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "arithmetic_margin_including_reciprocals": 9633400,
+          "weights_group64": 0,
+          "layers_group64": 0
+        },
+        "distortion_vs_control_pct": -7.589830307381984,
+        "objective_vs_control_pct": -7.589830307381984
+      }
+    },
+    "ib": {
+      "global_control": {
+        "units": 1,
+        "initial_objective": 69517.20036966079,
+        "initial_train_pair_error": 15365.308945591278,
+        "final_objective": 69517.20036966079,
+        "final_train_pair_error": 15365.308945591278,
+        "trace": [
+          {
+            "step": 1,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 2,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 3,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 4,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 5,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 6,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 7,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 8,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 9,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 10,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 11,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 12,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 13,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 14,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 15,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 16,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 17,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 18,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 19,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 20,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 21,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 22,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 23,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          },
+          {
+            "step": 24,
+            "objective": 69517.20036966079,
+            "train_pair_error": 15365.308945591278,
+            "global_entropy_bits": 8.68728139804955,
+            "before_center_distortion": 15365.30894559106,
+            "after_center_distortion": 15365.30894559106
+          }
+        ],
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1331135428,
+          "memory_MiB": 1269.469669342041,
+          "memory_breakdown": {
+            "tables": 251658240,
+            "indices": 1056964608,
+            "scales": 22020096,
+            "centers": 1920,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568
+          },
+          "index_bits": 12,
+          "table_entry_bytes": 4,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "arithmetic_margin_including_reciprocals": 9633400,
+          "weights_group64": 0,
+          "layers_group64": 0
+        }
+      },
+      "projection_maps": {
+        "units": 7,
+        "initial_objective": 69517.20036966058,
+        "initial_train_pair_error": 15365.308945591074,
+        "final_objective": 66296.75925200945,
+        "final_train_pair_error": 18137.433902158817,
+        "trace": [
+          {
+            "step": 1,
+            "objective": 68197.5407894284,
+            "train_pair_error": 15469.244297700325,
+            "global_entropy_bits": 8.458902121742492,
+            "before_center_distortion": 15365.308945589397,
+            "after_center_distortion": 15365.308945589397
+          },
+          {
+            "step": 2,
+            "objective": 67319.37325704575,
+            "train_pair_error": 16117.900638441337,
+            "global_entropy_bits": 8.213962410824296,
+            "before_center_distortion": 15469.244297699006,
+            "after_center_distortion": 15468.645502874624
+          },
+          {
+            "step": 3,
+            "objective": 66868.40709651308,
+            "train_pair_error": 16708.4182809818,
+            "global_entropy_bits": 8.046883059930458,
+            "before_center_distortion": 16117.900638440484,
+            "after_center_distortion": 16117.900638440484
+          },
+          {
+            "step": 4,
+            "objective": 66666.41561254424,
+            "train_pair_error": 17101.332686207566,
+            "global_entropy_bits": 7.951445675771179,
+            "before_center_distortion": 16708.418280980906,
+            "after_center_distortion": 16708.384980751885
+          },
+          {
+            "step": 5,
+            "objective": 66565.1239021287,
+            "train_pair_error": 17354.266693558096,
+            "global_entropy_bits": 7.894619249071481,
+            "before_center_distortion": 17101.332686206326,
+            "after_center_distortion": 17101.048791717236
+          },
+          {
+            "step": 6,
+            "objective": 66500.12950870286,
+            "train_pair_error": 17520.33025715202,
+            "global_entropy_bits": 7.857551929000052,
+            "before_center_distortion": 17354.266693557416,
+            "after_center_distortion": 17354.266693557416
+          },
+          {
+            "step": 7,
+            "objective": 66455.7904024311,
+            "train_pair_error": 17634.245076174924,
+            "global_entropy_bits": 7.832164147609105,
+            "before_center_distortion": 17520.330257151047,
+            "after_center_distortion": 17520.330257151047
+          },
+          {
+            "step": 8,
+            "objective": 66415.43203739474,
+            "train_pair_error": 17736.293142512415,
+            "global_entropy_bits": 7.809318689958353,
+            "before_center_distortion": 17634.24507617417,
+            "after_center_distortion": 17633.96269754565
+          },
+          {
+            "step": 9,
+            "objective": 66383.61667970805,
+            "train_pair_error": 17824.829471311747,
+            "global_entropy_bits": 7.790011350182422,
+            "before_center_distortion": 17736.293142512044,
+            "after_center_distortion": 17736.293142512044
+          },
+          {
+            "step": 10,
+            "objective": 66357.87093309281,
+            "train_pair_error": 17906.852360063265,
+            "global_entropy_bits": 7.772722638067395,
+            "before_center_distortion": 17824.829471311255,
+            "after_center_distortion": 17824.829471311255
+          },
+          {
+            "step": 11,
+            "objective": 66343.10769309136,
+            "train_pair_error": 17958.447338452243,
+            "global_entropy_bits": 7.762077164731727,
+            "before_center_distortion": 17906.852360062712,
+            "after_center_distortion": 17906.852360062712
+          },
+          {
+            "step": 12,
+            "objective": 66333.68669977694,
+            "train_pair_error": 18002.202155040683,
+            "global_entropy_bits": 7.753546470566724,
+            "before_center_distortion": 17958.44733845173,
+            "after_center_distortion": 17958.44733845173
+          },
+          {
+            "step": 13,
+            "objective": 66323.24522163946,
+            "train_pair_error": 18045.32881977497,
+            "global_entropy_bits": 7.744952836644433,
+            "before_center_distortion": 18002.202155039933,
+            "after_center_distortion": 18002.181737258306
+          },
+          {
+            "step": 14,
+            "objective": 66314.69862456211,
+            "train_pair_error": 18083.992872920884,
+            "global_entropy_bits": 7.7373790992792415,
+            "before_center_distortion": 18045.328819774288,
+            "after_center_distortion": 18045.328819774288
+          },
+          {
+            "step": 15,
+            "objective": 66306.22246789579,
+            "train_pair_error": 18105.96733498517,
+            "global_entropy_bits": 7.732494078891201,
+            "before_center_distortion": 18083.992872920076,
+            "after_center_distortion": 18083.992872920076
+          },
+          {
+            "step": 16,
+            "objective": 66301.04657961085,
+            "train_pair_error": 18125.988487853003,
+            "global_entropy_bits": 7.728451860214513,
+            "before_center_distortion": 18105.96733498433,
+            "after_center_distortion": 18105.96733498433
+          },
+          {
+            "step": 17,
+            "objective": 66298.5526861792,
+            "train_pair_error": 18136.450072453943,
+            "global_entropy_bits": 7.726373486212137,
+            "before_center_distortion": 18125.988487852235,
+            "after_center_distortion": 18125.988487852235
+          },
+          {
+            "step": 18,
+            "objective": 66297.04313760182,
+            "train_pair_error": 18135.068947835938,
+            "global_entropy_bits": 7.726352883883315,
+            "before_center_distortion": 18136.45007245319,
+            "after_center_distortion": 18136.45007245319
+          },
+          {
+            "step": 19,
+            "objective": 66296.85125425279,
+            "train_pair_error": 18136.36541255932,
+            "global_entropy_bits": 7.7261141166273015,
+            "before_center_distortion": 18135.068947835134,
+            "after_center_distortion": 18135.068947835134
+          },
+          {
+            "step": 20,
+            "objective": 66296.78429192366,
+            "train_pair_error": 18137.418769333308,
+            "global_entropy_bits": 7.7259343901754916,
+            "before_center_distortion": 18136.365412558545,
+            "after_center_distortion": 18136.365412558545
+          },
+          {
+            "step": 21,
+            "objective": 66296.76743886627,
+            "train_pair_error": 18137.204299423032,
+            "global_entropy_bits": 7.725966092728532,
+            "before_center_distortion": 18137.418769332526,
+            "after_center_distortion": 18137.418769332526
+          },
+          {
+            "step": 22,
+            "objective": 66296.76405354234,
+            "train_pair_error": 18137.116026878553,
+            "global_entropy_bits": 7.725979710704793,
+            "before_center_distortion": 18137.204299422254,
+            "after_center_distortion": 18137.204299422254
+          },
+          {
+            "step": 23,
+            "objective": 66296.75925200945,
+            "train_pair_error": 18137.433902158817,
+            "global_entropy_bits": 7.725927945490268,
+            "before_center_distortion": 18137.116026877764,
+            "after_center_distortion": 18137.116026877764
+          },
+          {
+            "step": 24,
+            "objective": 66296.75925200945,
+            "train_pair_error": 18137.433902158817,
+            "global_entropy_bits": 7.725927945490268,
+            "before_center_distortion": 18137.433902158078,
+            "after_center_distortion": 18137.433902158078
+          }
+        ],
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1331135428,
+          "memory_MiB": 1269.469669342041,
+          "memory_breakdown": {
+            "tables": 251658240,
+            "indices": 1056964608,
+            "scales": 22020096,
+            "centers": 1920,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568
+          },
+          "index_bits": 12,
+          "table_entry_bytes": 4,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "arithmetic_margin_including_reciprocals": 9633400,
+          "weights_group64": 0,
+          "layers_group64": 0
+        },
+        "distortion_vs_control_pct": 18.041452771198173,
+        "objective_vs_control_pct": -4.6325817215401415
+      },
+      "layer_maps": {
+        "units": 196,
+        "initial_objective": 69517.20036966071,
+        "initial_train_pair_error": 15365.3089455912,
+        "final_objective": 56568.755593224254,
+        "final_train_pair_error": 20223.136641677407,
+        "trace": [
+          {
+            "step": 1,
+            "objective": 63055.87264808719,
+            "train_pair_error": 15012.580351519306,
+            "global_entropy_bits": 7.707313419592213,
+            "before_center_distortion": 15365.308945590026,
+            "after_center_distortion": 15365.308945590026
+          },
+          {
+            "step": 2,
+            "objective": 57963.059566614946,
+            "train_pair_error": 17683.140057616325,
+            "global_entropy_bits": 6.461879470195616,
+            "before_center_distortion": 15012.580351519731,
+            "after_center_distortion": 15009.298816719294
+          },
+          {
+            "step": 3,
+            "objective": 57040.29944871582,
+            "train_pair_error": 19479.238545075998,
+            "global_entropy_bits": 6.0257083750570635,
+            "before_center_distortion": 17683.1400576227,
+            "after_center_distortion": 17682.69811778252
+          },
+          {
+            "step": 4,
+            "objective": 56847.17954758952,
+            "train_pair_error": 19988.89792712027,
+            "global_entropy_bits": 5.912965472952102,
+            "before_center_distortion": 19479.23854508146,
+            "after_center_distortion": 19478.392356996832
+          },
+          {
+            "step": 5,
+            "objective": 56768.34094439984,
+            "train_pair_error": 20136.732079211743,
+            "global_entropy_bits": 5.876601645971845,
+            "before_center_distortion": 19988.897927128943,
+            "after_center_distortion": 19988.897927128943
+          },
+          {
+            "step": 6,
+            "objective": 56713.32011752753,
+            "train_pair_error": 20201.401422029034,
+            "global_entropy_bits": 5.857400429590847,
+            "before_center_distortion": 20136.73207922013,
+            "after_center_distortion": 20136.73207922013
+          },
+          {
+            "step": 7,
+            "objective": 56675.98246485101,
+            "train_pair_error": 20224.022657845333,
+            "global_entropy_bits": 5.847781564525316,
+            "before_center_distortion": 20201.40142203604,
+            "after_center_distortion": 20201.40142203604
+          },
+          {
+            "step": 8,
+            "objective": 56652.22352767109,
+            "train_pair_error": 20236.919523585915,
+            "global_entropy_bits": 5.841901081564009,
+            "before_center_distortion": 20224.02265785316,
+            "after_center_distortion": 20224.02265785316
+          },
+          {
+            "step": 9,
+            "objective": 56635.975797311905,
+            "train_pair_error": 20245.38795704591,
+            "global_entropy_bits": 5.837936007315797,
+            "before_center_distortion": 20236.919523592725,
+            "after_center_distortion": 20236.919523592725
+          },
+          {
+            "step": 10,
+            "objective": 56624.11024874198,
+            "train_pair_error": 20251.6447789804,
+            "global_entropy_bits": 5.835028738002917,
+            "before_center_distortion": 20245.387957052684,
+            "after_center_distortion": 20245.387957052684
+          },
+          {
+            "step": 11,
+            "objective": 56614.74478951584,
+            "train_pair_error": 20254.593916930757,
+            "global_entropy_bits": 5.833053176888383,
+            "before_center_distortion": 20251.644778988142,
+            "after_center_distortion": 20251.644778988142
+          },
+          {
+            "step": 12,
+            "objective": 56607.017474820124,
+            "train_pair_error": 20258.553616618145,
+            "global_entropy_bits": 5.831178295328772,
+            "before_center_distortion": 20254.593916938833,
+            "after_center_distortion": 20254.593916938833
+          },
+          {
+            "step": 13,
+            "objective": 56600.201149356246,
+            "train_pair_error": 20254.84534162912,
+            "global_entropy_bits": 5.830679688385148,
+            "before_center_distortion": 20258.55361662646,
+            "after_center_distortion": 20258.55361662646
+          },
+          {
+            "step": 14,
+            "objective": 56594.80486684226,
+            "train_pair_error": 20251.604605099434,
+            "global_entropy_bits": 5.830333886345007,
+            "before_center_distortion": 20254.8453416375,
+            "after_center_distortion": 20254.8453416375
+          },
+          {
+            "step": 15,
+            "objective": 56590.4150057732,
+            "train_pair_error": 20253.81683397178,
+            "global_entropy_bits": 5.8292747504288265,
+            "before_center_distortion": 20251.604605107514,
+            "after_center_distortion": 20251.604605107514
+          },
+          {
+            "step": 16,
+            "objective": 56586.372140482315,
+            "train_pair_error": 20253.371798186545,
+            "global_entropy_bits": 5.828697571007834,
+            "before_center_distortion": 20253.816833979865,
+            "after_center_distortion": 20253.816833979865
+          },
+          {
+            "step": 17,
+            "objective": 56583.051089618246,
+            "train_pair_error": 20251.278280836996,
+            "global_entropy_bits": 5.828500644754924,
+            "before_center_distortion": 20253.37179819527,
+            "after_center_distortion": 20253.37179819527
+          },
+          {
+            "step": 18,
+            "objective": 56580.17173821862,
+            "train_pair_error": 20248.454774749523,
+            "global_entropy_bits": 5.828491685807624,
+            "before_center_distortion": 20251.278280844534,
+            "after_center_distortion": 20251.278280844534
+          },
+          {
+            "step": 19,
+            "objective": 56577.732812176444,
+            "train_pair_error": 20245.05262906924,
+            "global_entropy_bits": 5.82864620968157,
+            "before_center_distortion": 20248.454774757793,
+            "after_center_distortion": 20248.454774757793
+          },
+          {
+            "step": 20,
+            "objective": 56575.8571410221,
+            "train_pair_error": 20240.843883103254,
+            "global_entropy_bits": 5.829020491666528,
+            "before_center_distortion": 20245.052629076687,
+            "after_center_distortion": 20245.052629076687
+          },
+          {
+            "step": 21,
+            "objective": 56574.192287809914,
+            "train_pair_error": 20233.614969784616,
+            "global_entropy_bits": 5.829913102332365,
+            "before_center_distortion": 20240.84388311102,
+            "after_center_distortion": 20240.84388311102
+          },
+          {
+            "step": 22,
+            "objective": 56572.45942238091,
+            "train_pair_error": 20229.36739101411,
+            "global_entropy_bits": 5.83031652355845,
+            "before_center_distortion": 20233.6149697926,
+            "after_center_distortion": 20233.6149697926
+          },
+          {
+            "step": 23,
+            "objective": 56570.58882252559,
+            "train_pair_error": 20225.524785676036,
+            "global_entropy_bits": 5.830632881234916,
+            "before_center_distortion": 20229.367391021933,
+            "after_center_distortion": 20229.367391021933
+          },
+          {
+            "step": 24,
+            "objective": 56568.755593224254,
+            "train_pair_error": 20223.136641677407,
+            "global_entropy_bits": 5.830721903058541,
+            "before_center_distortion": 20225.524785683723,
+            "after_center_distortion": 20225.524785683723
+          }
+        ],
+        "resources": {
+          "lookups": 704643072,
+          "additions": 704987136,
+          "multiplications": 12099780,
+          "reciprocals": 516292,
+          "arithmetic_including_reciprocals": 717603208,
+          "memory_bytes": 1331135428,
+          "memory_MiB": 1269.469669342041,
+          "memory_breakdown": {
+            "tables": 251658240,
+            "indices": 1056964608,
+            "scales": 22020096,
+            "centers": 1920,
+            "scratch": 421892,
+            "guards_and_headroom": 67104,
+            "table_dispatch": 1568
+          },
+          "index_bits": 12,
+          "table_entry_bytes": 4,
+          "score_mJ": 2.975368242,
+          "score_including_reciprocal_proxy_mJ": 2.9760394216,
+          "gates": {
+            "lookup": true,
+            "arithmetic": true,
+            "memory": true
+          },
+          "arithmetic_margin_including_reciprocals": 9633400,
+          "weights_group64": 0,
+          "layers_group64": 0
+        },
+        "distortion_vs_control_pct": 31.61555497053621,
+        "objective_vs_control_pct": -18.6262460334746
+      }
+    }
+  },
+  "entropy_global_normalizer": 1.105784677086016e-05,
+  "entropy_coefficient": 8.846277416688128e-06,
+  "book_path": "/tmp/denghaoran_qwen3_1p7b_20261008_types22/shared_maps22_cpu.pt",
+  "book_sha256": "f29705e88ddb918cc9d112837ce372b5bb29a918ae316c802e9367bc27a06635",
+  "book_bytes": 80431538,
+  "cpu_threads": 4,
+  "cuda_initialized": false,
+  "seconds": 241.66575360298157,
+  "limitations": [
+    "Only TRAIN pairwise objective; no PPL/MMLU or full-model generalization measurement.",
+    "Shared-table/mapping deployment and packed banks are not yet implemented or GPU verified.",
+    "Conditional mappings are an offline encoder, not additional runtime tables. Actual encoded banks must verify this claim.",
+    "Single fixed initialization and24 extra updates; no accuracy study is registered."
+  ]
+}
