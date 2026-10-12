@@ -1,0 +1,113 @@
+{
+  "completed": true,
+  "entry_name": "ib_mixed",
+  "bank_sha256": "614a501e88dd3597c1045c65d4f15296f1c9b7953f352630609ad74e8be33189",
+  "protocol_sha256": "7fea121b77cc1abf7f197014116b6ea91d8f50260276eca0b73bdd4d1bb09ffc",
+  "evaluation_manifest_sha256": "a5e083119daf46304b9164e328489f8d2345277f737dc047276a78bcbfc29ee3",
+  "task": "qnli",
+  "metrics": {
+    "total": 5463,
+    "correct": 2897,
+    "accuracy": 0.5302947098663738
+  },
+  "questions": 5463,
+  "requests_sha256": "979f57a76d963502359e1e9b7807a7265e6448951350bc6e878ecf4806441a62",
+  "chunks": [
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/000000.json",
+      "sha256": "84f5edd1f4027369e4afce7670b09df2c66f93cbb83cf4e59a7bd3e998bf1a03"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/000256.json",
+      "sha256": "78a3d7f0aeead6bc1ded78f7e9b0026c6f1d5fb34e00ad3d727e74b21c2c645d"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/000512.json",
+      "sha256": "368b2796cc123d59fd547ade7d5a726b886eedf703f5c2a6563277ff2b6de37f"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/000768.json",
+      "sha256": "d0a1316f9f911e20d0d320b5b6c3f1aed58a2f4b28d91b837c38fefddbc7e2d4"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/001024.json",
+      "sha256": "f251c3ace33d233ae6b520f3c83031a6af6ebea61952d3b48a416151a9e05de0"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/001280.json",
+      "sha256": "48bbfe4bc53a1de9f6057ca6a1515be5bdf33bfc14c64160443e1bca64528da8"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/001536.json",
+      "sha256": "2a232dfa22f9e77fab65a7b5ae11bdb538347a13d856222f02897cce7c8ced31"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/001792.json",
+      "sha256": "50e591119b06d5203d322602c87a43519e5b8b46475648c102c652f73c05a3ed"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/002048.json",
+      "sha256": "d98274502a821b077e9a96348c7742425d011a933fba314f76cc25056e171097"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/002304.json",
+      "sha256": "ba76509cdaed5cb799e185d5ef5a41af10135eebb777f694306c23e70fa2249b"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/002560.json",
+      "sha256": "47683f2702192f4917ff872ffe46617e4431c47ca1b66f4e943af00e273dbea8"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/002816.json",
+      "sha256": "89896521bb2fdd6a34f1c983496651aec34e00b453f8d45eea3c2b5eeed882ab"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/003072.json",
+      "sha256": "e23f1a4553f9074012e2fe3ae1cf8d50023796cd7a26feb60502f17fb2a76506"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/003328.json",
+      "sha256": "5ad4b1faf0bfea03d4eacea9343b3222d1b7c083b89bc658af4f2d5f091e0c92"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/003584.json",
+      "sha256": "eff41fd41e76fafe18b7c1dec504f1b75f52fa141491486c76b863d910ea9c73"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/003840.json",
+      "sha256": "4df7a845f1aaa4a35e897ad68d046878a1ee3c24e7752daf6aa62e460c23a56e"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/004096.json",
+      "sha256": "9aa7533bf042506d1df0cff95f2839386bc39fd5a3c2ec3d7f126c446888566f"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/004352.json",
+      "sha256": "8f96dbbfd2dbb483c4d4401a81b4e0b2adc823057c538edd8d4d39a4f61af69f"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/004608.json",
+      "sha256": "badd54ec1e60aebd638084308f815052275b0237fda892eef606a5e33a9e31e7"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/004864.json",
+      "sha256": "9d9c6032eeb2b98dd48d74e0e40b385cc8f0d6e3eb243b9c62c027059419f0a9"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/005120.json",
+      "sha256": "8464834498090d88f03d60dd401923beed4d174809e6d60ebb51ea3caf0bd4ae"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/qnli/005376.json",
+      "sha256": "7dcedb6ee503c0ae167195c7947bcce4083ccdf935cc25ea80cfb44f5412f5fd"
+    }
+  ],
+  "seconds": 103.71971416473389,
+  "created_utc": "2026-10-09T17:58:34.751837+00:00",
+  "gpu": {
+    "visible": "1",
+    "uuid": "GPU-640aa88f-98d5-2bd4-6cf0-2eebacacf09f"
+  },
+  "peak_allocated_GiB": 9.117892742156982,
+  "peak_reserved_GiB": 11.0625
+}

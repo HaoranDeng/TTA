@@ -72,6 +72,68 @@ selected configurations, not a selection of the best TEST or MMLU scores.
 · [Frozen selections](pq_exploration/study_1p7b_20261008_mixed21/overfit21_frozen.json)
 · [Protocol](pq_exploration/study_1p7b_20261008_mixed21/protocol21.json)
 
+#### Additional benchmarks — Qwen3-1.7B, frozen round-21 models
+
+Completed on **2026-10-10 01:17 UTC (2026-10-09 18:17 PDT)**: **32/32 model-task results,
+81,170 questions per model, 324,680 predictions**. These are the same original FP16 and frozen
+PQ/RQ/IB mixed configurations in Table 1. The new scores did not tune or select models.
+PPL and ordinary MMLU in Table 1 **reuse round 21**, rather than being newly measured here.
+
+**GLUE six-task subset:** zero-shot, complete public validation splits; MNLI uses matched validation.
+All scores below are percentages. MRPC and QQP report accuracy / positive-class F1.
+No official complete-GLUE aggregate is claimed.
+
+| Method | MNLI | MRPC acc / F1 | QNLI | QQP acc / F1 | RTE | SST-2 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| FP16 | 48.130 | 59.069 / 69.801 | 51.107 | 63.421 / 65.893 | 70.397 | 85.436 |
+| PQ | 45.257 | 65.196 / 76.412 | 52.590 | 77.047 / 69.721 | 68.953 | 84.174 |
+| RQ | 46.215 | 63.725 / 75.251 | 51.290 | 61.996 / 65.412 | 75.090 | 85.665 |
+| IB | 45.461 | 65.441 / 75.044 | 53.029 | 76.332 / 69.211 | 71.841 | 80.849 |
+
+Question counts per model: MNLI 9,815; MRPC 408; QNLI 5,463; QQP 40,430; RTE 277; SST-2 872.
+
+**SQuAD v2:** 11,873 validation questions, zero-shot raw prompt, greedy generation with newline/EOS stopping and a 256-token limit. The no-answer threshold was fixed at 1.0 before evaluation; no best-threshold fitting on test labels. Deltas are percentage points versus FP16.
+
+| Method | EM | F1 | EM delta (pp) | F1 delta (pp) |
+| --- | ---: | ---: | ---: | ---: |
+| FP16 | 13.762 | 23.997 | +0.000 | +0.000 |
+| PQ | 12.886 | 23.679 | -0.876 | -0.318 |
+| RQ | 12.145 | 22.808 | -1.617 | -1.189 |
+| IB | 12.735 | 23.514 | -1.028 | -0.483 |
+
+Absolute SQuAD scores are low in this fixed setup: FP16 achieves only 0.101% EM on the 5,945 unanswerable questions. This common rejection failure must not be attributed solely to quantization or compared directly with the paper's different-protocol SQuAD score.
+
+**MMLU-Pro:** all 12,032 test questions; five-shot `leaderboard_mmlu_pro`, first validation examples and direct option likelihood, micro accuracy, no generated CoT or chat template. It is distinct from ordinary MMLU.
+
+| Method | Correct / total | Accuracy | Delta vs FP16 (pp) |
+| --- | ---: | ---: | ---: |
+| FP16 | 3,868 / 12,032 | 32.148% | +0.000 |
+| PQ | 3,813 / 12,032 | 31.690% | -0.457 |
+| RQ | 3,832 / 12,032 | 31.848% | -0.299 |
+| IB | 3,816 / 12,032 | 31.715% | -0.432 |
+
+Relative to FP16, PQ/RQ/IB PPL changes are **-1.203% / -0.416% / -1.775%**, all within
+the maximum **+3% PPL** gate. Resident memory decreases **52.636% / 52.586% / 52.120%**,
+while the logical E_ref proxy increases **24.299% / 24.339% / 24.702%**. GLUE changes vary by task;
+ordinary MMLU, MMLU-Pro and SQuAD EM/F1 decrease for all three quantized models. Lower PPL alone
+does not establish overall quality improvement or elimination of overfitting. Historical WikiText
+and MMLU were repeatedly inspected; semantic duplicates and pretraining contamination were not removed.
+LUT-LLM paper scores are separately labeled different-protocol references in the report; no matching
+LUT-LLM accuracy was measured here. E_ref is **not measured FPGA energy**.
+
+[Final Chinese report](pq_exploration/benchmarks_1p7b_20261008/BENCHMARK_REPORT_ZH.txt)
+· [Complete metrics and subject breakdowns](pq_exploration/benchmarks_1p7b_20261008/benchmark_summary.json)
+· [Frozen protocol](pq_exploration/benchmarks_1p7b_20261008/protocol.json)
+· [Request-binding audit](pq_exploration/benchmarks_1p7b_20261008/request_binding_audit.json)
+· [Source/model/data provenance audit](pq_exploration/benchmarks_1p7b_20261008/final_provenance_audit.json)
+· [Publication and evidence scope](pq_exploration/benchmarks_1p7b_20261008/PUBLICATION_NOTES.txt)
+
+Full aggregation and independent request binding verified all 32 results and 324,680 predictions.
+The retained evidence contains all 2,584 prediction chunks and eight frozen request tensors;
+2,740 local files were hash-checked. This Git publication contains the reports, task-result metadata,
+frozen protocol and audit summaries. Full predictions, request tensors, model weights and runtime
+logs remain in the experiment archive identified in the publication notes.
+
 ### Table 2. Comparison with bit-plane tables — Qwen3-0.6B
 
 Historical W8A8 bit-plane and joint-VQ experiments. Measured PPL uses WikiText-2 test,

@@ -1,0 +1,11 @@
+Qwen3-1.7B added benchmark publication — 2026-10-12
+
+Scope: complete final results for original FP16 and the three frozen round-21 mixed PQ/RQ/IB models. All 32 model-task results and 324680 predictions passed full independent aggregation and request-binding checks. This publication does not run or modify any experiment.
+
+The report, metrics, 32 task-result metadata files, four model completion records, four smoke-check records, frozen protocol, source manifest and audit records are copied byte-for-byte from the verified local results. SHA-256 values in PUBLICATION_MANIFEST.json identify the exact published bytes. Absolute paths in original JSON and report text are historical experiment provenance, not public download URLs. The audit scripts refer to these original paths; this repository is not a self-contained reproduction package.
+
+The complete retained evidence archive is final_evidence_20261010T0129Z.tar.gz (50927831 bytes).
+Archive SHA-256: 864bcb32ad9a688c359f8a00f356a38dd2febc96371c4b42dbbc76579b59a3c1
+It contains 2740 verified files, including all 2584 prediction chunks, eight frozen request tensors, logs, metadata and bound sources. The archive is retained locally under the benchmark directory and is not uploaded in this Git commit. Its internal evidence_manifest.json maps remote source paths to archive paths. Original model checkpoints and quantized banks are retained separately and hash-verified in final_provenance_audit.json.
+
+PPL and ordinary MMLU reuse round 21. Additional task scores did not select or tune the models. LUT-LLM paper accuracy is only a different-protocol reference; E_ref is a logical proxy, not FPGA measured energy. Integrity verification is not evidence of pretraining decontamination or removal of overfitting.

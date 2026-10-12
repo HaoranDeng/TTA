@@ -1,0 +1,89 @@
+{
+  "completed": true,
+  "entry_name": "fp16",
+  "bank_sha256": null,
+  "protocol_sha256": "7fea121b77cc1abf7f197014116b6ea91d8f50260276eca0b73bdd4d1bb09ffc",
+  "evaluation_manifest_sha256": "a5e083119daf46304b9164e328489f8d2345277f737dc047276a78bcbfc29ee3",
+  "checks": {
+    "mrpc": {
+      "fixtures": 4,
+      "integer_reference_exact": true,
+      "tokenization_matches_harness": true,
+      "scoring_path": "standard HFLM with identical-context logits reuse, batch4",
+      "max_reference_logprob_error": 0.0
+    },
+    "rte": {
+      "fixtures": 4,
+      "integer_reference_exact": true,
+      "tokenization_matches_harness": true,
+      "scoring_path": "standard HFLM with identical-context logits reuse, batch4",
+      "max_reference_logprob_error": 0.0
+    },
+    "sst2": {
+      "fixtures": 4,
+      "integer_reference_exact": true,
+      "tokenization_matches_harness": true,
+      "scoring_path": "standard HFLM with identical-context logits reuse, batch4",
+      "max_reference_logprob_error": 0.0
+    },
+    "mnli": {
+      "fixtures": 4,
+      "integer_reference_exact": true,
+      "tokenization_matches_harness": true,
+      "scoring_path": "standard HFLM with identical-context logits reuse, batch4",
+      "max_reference_logprob_error": 0.0
+    },
+    "qnli": {
+      "fixtures": 4,
+      "integer_reference_exact": true,
+      "tokenization_matches_harness": true,
+      "scoring_path": "standard HFLM with identical-context logits reuse, batch4",
+      "max_reference_logprob_error": 0.0
+    },
+    "qqp": {
+      "fixtures": 4,
+      "integer_reference_exact": true,
+      "tokenization_matches_harness": true,
+      "scoring_path": "standard HFLM with identical-context logits reuse, batch4",
+      "max_reference_logprob_error": 0.0
+    },
+    "leaderboard_mmlu_pro": {
+      "fixtures": 4,
+      "integer_reference_exact": true,
+      "tokenization_matches_harness": true,
+      "scoring_path": "standard HFLM with identical-context logits reuse, batch4",
+      "max_reference_logprob_error": 0.0
+    },
+    "squadv2": {
+      "training_fixtures": 2,
+      "greedy_tokens_equal": true,
+      "max_noanswer_logprob_error": 0.0,
+      "noanswer_tokens": [
+        [
+          650,
+          9217,
+          480
+        ],
+        [
+          650,
+          9217,
+          480
+        ]
+      ]
+    }
+  },
+  "conversion": null,
+  "fused": {
+    "complete": true,
+    "linears": 0,
+    "checks": [],
+    "scope": "FP16 exactly represents integer operands; FP32 group dots and original reduction tree, fusion disabled. Evaluation only."
+  },
+  "gpu": {
+    "visible": "1",
+    "uuid": "GPU-640aa88f-98d5-2bd4-6cf0-2eebacacf09f"
+  },
+  "peak_allocated_GiB": 6.219176292419434,
+  "peak_reserved_GiB": 6.91015625,
+  "created_utc": "2026-10-08T22:35:49.249764+00:00"
+}

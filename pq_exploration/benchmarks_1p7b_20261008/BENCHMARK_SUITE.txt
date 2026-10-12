@@ -1,0 +1,30 @@
+Qwen3-1.7B benchmark suite extension — 2026-10-08
+
+Scope
+Add the three suites listed in LUT-LLM Table III: GLUE (the paper's six subtasks), SQuAD v2, and MMLU-Pro. Continue reporting WikiText PPL and ordinary MMLU separately. GLUE coverage here does not constitute the complete GLUE benchmark or an official GLUE leaderboard score.
+
+Frozen model set
+Original FP16 and the existing round21 document-monitor selections: pq_mixed, rq_mixed, ib_mixed. No new training, calibration, model selection, prompt search, or no-answer threshold search based on these benchmark scores. The incomplete round22 experiments are not silently substituted.
+
+Evaluation protocol
+- GLUE: MNLI matched, MRPC, QNLI, QQP, RTE, SST-2; complete public validation splits; zero-shot standard lm-evaluation-harness prompts. Report accuracy for each task and positive-class F1 for MRPC/QQP.
+- SQuAD v2: complete public validation split; zero-shot standard squadv2 prompt; greedy generation; stop on newline or EOS; at most 256 generated tokens. Use official EM/F1 and a fixed no-answer probability threshold of 1.0, matching the metric default. Do not promote evaluation-label-optimized best-EM/best-F1 to primary metrics.
+- MMLU-Pro: complete test split; lm-evaluation-harness leaderboard_mmlu_pro protocol with five fixed first_n validation demonstrations and direct option likelihood. Report micro accuracy and per-category counts. This is distinct from ordinary MMLU and from generated-chain-of-thought MMLU-Pro.
+- No chat template. No context truncation is allowed during request preparation. Prompt/token boundaries and one-token multiple-choice candidates are checked explicitly.
+- Dataset revisions and all request bytes are frozen before scoring. The protocol records complete question counts, revisions, model hashes, task-source hashes and package versions. Data caches and predictions reside in owned scratch storage, outside the nearly full network home.
+
+Verification and execution
+Each model must pass fixture checks before the full queue starts. Multiple-choice likelihoods are compared with standard HFLM; the fused quantized backend is checked against the original reference backend. SQuAD generation and no-answer likelihood are checked on training fixtures. All full results retain per-example predictions and are independently reaggregated.
+
+The deployed scorer now calls HFLM directly for multiple-choice likelihoods. It uses batch size four and reuses logits only for exactly identical contexts; it does not reuse KV prefixes across different questions. Multiple-choice results are checkpointed in source-order chunks of 256 questions, SQuAD results in chunks of 32. An initial fixture-only attempt exposed a batching difference in the previous optimized last-token scorer; its source/manifest/logs are retained under failed_attempt_01. No full benchmark results were produced by that attempt. The protocol, datasets and model choices remain unchanged.
+
+The queue uses one explicitly selected GPU with sequential model workers, respecting the user's maximum of two GPUs and the repository's memory-consolidation rule. Each worker uses four CPU threads. Existing/foreign jobs must be checked before launch, and the worker refuses a GPU occupied by another user.
+
+Reporting
+Keep the existing Method | Lookups | Additions | Multiplications | On-chip memory | PPL | MMLU | E_ref table. Add a separate table for the six GLUE tasks, SQuAD v2 EM/F1, and MMLU-Pro. Include FP16 and LUT-LLM; the latter remains unmeasured under our protocol. Paper scores are a separately labeled reference because the paper does not provide a complete matching prompt/training/evaluation recipe. No FPGA energy or speed improvement is inferred from the accuracy results.
+
+Sources
+https://arxiv.org/html/2511.06174v2#S5.T3
+https://github.com/EleutherAI/lm-evaluation-harness/tree/main/lm_eval/tasks/glue
+https://github.com/EleutherAI/lm-evaluation-harness/blob/main/lm_eval/tasks/squadv2/task.py
+https://github.com/EleutherAI/lm-evaluation-harness/blob/main/lm_eval/tasks/leaderboard/mmlu_pro/mmlu_pro.yaml

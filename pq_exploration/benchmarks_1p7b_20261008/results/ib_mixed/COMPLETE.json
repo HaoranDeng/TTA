@@ -1,0 +1,18 @@
+{
+  "completed": true,
+  "entry_name": "ib_mixed",
+  "bank_sha256": "614a501e88dd3597c1045c65d4f15296f1c9b7953f352630609ad74e8be33189",
+  "protocol_sha256": "7fea121b77cc1abf7f197014116b6ea91d8f50260276eca0b73bdd4d1bb09ffc",
+  "evaluation_manifest_sha256": "a5e083119daf46304b9164e328489f8d2345277f737dc047276a78bcbfc29ee3",
+  "tasks": [
+    "mrpc",
+    "rte",
+    "sst2",
+    "mnli",
+    "qnli",
+    "qqp",
+    "leaderboard_mmlu_pro",
+    "squadv2"
+  ],
+  "created_utc": "2026-10-10T01:17:28.397358+00:00"
+}

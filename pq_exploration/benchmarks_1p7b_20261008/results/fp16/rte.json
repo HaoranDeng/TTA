@@ -1,0 +1,33 @@
+{
+  "completed": true,
+  "entry_name": "fp16",
+  "bank_sha256": null,
+  "protocol_sha256": "7fea121b77cc1abf7f197014116b6ea91d8f50260276eca0b73bdd4d1bb09ffc",
+  "evaluation_manifest_sha256": "a5e083119daf46304b9164e328489f8d2345277f737dc047276a78bcbfc29ee3",
+  "task": "rte",
+  "metrics": {
+    "total": 277,
+    "correct": 195,
+    "accuracy": 0.703971119133574
+  },
+  "questions": 277,
+  "requests_sha256": "19c856250f244b7e0e649415cc018542ad51a0f8b46b5a47db436067f3e15260",
+  "chunks": [
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/fp16/rte/000000.json",
+      "sha256": "13d42332ab2d7ec36044d4dfe259048eb6019b72c2a6aee3c1b84d75adf7c02d"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/fp16/rte/000256.json",
+      "sha256": "c52f58b94094d0494a239fbdd2b89d3b664cb8fcfab244f3b877725bfde379b7"
+    }
+  ],
+  "seconds": 3.116360902786255,
+  "created_utc": "2026-10-08T22:43:18.645637+00:00",
+  "gpu": {
+    "visible": "1",
+    "uuid": "GPU-640aa88f-98d5-2bd4-6cf0-2eebacacf09f"
+  },
+  "peak_allocated_GiB": 4.4896368980407715,
+  "peak_reserved_GiB": 5.267578125
+}

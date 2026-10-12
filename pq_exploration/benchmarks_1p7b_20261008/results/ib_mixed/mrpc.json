@@ -1,0 +1,34 @@
+{
+  "completed": true,
+  "entry_name": "ib_mixed",
+  "bank_sha256": "614a501e88dd3597c1045c65d4f15296f1c9b7953f352630609ad74e8be33189",
+  "protocol_sha256": "7fea121b77cc1abf7f197014116b6ea91d8f50260276eca0b73bdd4d1bb09ffc",
+  "evaluation_manifest_sha256": "a5e083119daf46304b9164e328489f8d2345277f737dc047276a78bcbfc29ee3",
+  "task": "mrpc",
+  "metrics": {
+    "total": 408,
+    "correct": 267,
+    "accuracy": 0.6544117647058824,
+    "f1": 0.7504424778761062
+  },
+  "questions": 408,
+  "requests_sha256": "1eabb8043ac1b50eb6b6663de23c9418b1cc36d82bb20f3ddb41201d57c5d14f",
+  "chunks": [
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/mrpc/000000.json",
+      "sha256": "5f9e63797c8e96c47d1a78e202f9bed475f765cb7a11fa7288af664fed3e1c09"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/mrpc/000256.json",
+      "sha256": "375d696d185403a64f850211068c6a70a53bd350a8074a2667142ecea38756c6"
+    }
+  ],
+  "seconds": 8.337013244628906,
+  "created_utc": "2026-10-09T17:53:31.969738+00:00",
+  "gpu": {
+    "visible": "1",
+    "uuid": "GPU-640aa88f-98d5-2bd4-6cf0-2eebacacf09f"
+  },
+  "peak_allocated_GiB": 9.117892742156982,
+  "peak_reserved_GiB": 9.716796875
+}

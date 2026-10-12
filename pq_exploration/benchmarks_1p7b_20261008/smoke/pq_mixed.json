@@ -1,0 +1,2488 @@
+{
+  "completed": true,
+  "entry_name": "pq_mixed",
+  "bank_sha256": "006d02e26e43cacc9e8f9482ae09014f68034126ac94d011bb64c64ac59fba2e",
+  "protocol_sha256": "7fea121b77cc1abf7f197014116b6ea91d8f50260276eca0b73bdd4d1bb09ffc",
+  "evaluation_manifest_sha256": "a5e083119daf46304b9164e328489f8d2345277f737dc047276a78bcbfc29ee3",
+  "checks": {
+    "mrpc": {
+      "fixtures": 4,
+      "integer_reference_exact": true,
+      "tokenization_matches_harness": true,
+      "scoring_path": "standard HFLM with identical-context logits reuse, batch4",
+      "max_reference_logprob_error": 0.0
+    },
+    "rte": {
+      "fixtures": 4,
+      "integer_reference_exact": true,
+      "tokenization_matches_harness": true,
+      "scoring_path": "standard HFLM with identical-context logits reuse, batch4",
+      "max_reference_logprob_error": 0.0
+    },
+    "sst2": {
+      "fixtures": 4,
+      "integer_reference_exact": true,
+      "tokenization_matches_harness": true,
+      "scoring_path": "standard HFLM with identical-context logits reuse, batch4",
+      "max_reference_logprob_error": 0.0
+    },
+    "mnli": {
+      "fixtures": 4,
+      "integer_reference_exact": true,
+      "tokenization_matches_harness": true,
+      "scoring_path": "standard HFLM with identical-context logits reuse, batch4",
+      "max_reference_logprob_error": 0.0
+    },
+    "qnli": {
+      "fixtures": 4,
+      "integer_reference_exact": true,
+      "tokenization_matches_harness": true,
+      "scoring_path": "standard HFLM with identical-context logits reuse, batch4",
+      "max_reference_logprob_error": 0.0
+    },
+    "qqp": {
+      "fixtures": 4,
+      "integer_reference_exact": true,
+      "tokenization_matches_harness": true,
+      "scoring_path": "standard HFLM with identical-context logits reuse, batch4",
+      "max_reference_logprob_error": 0.0
+    },
+    "leaderboard_mmlu_pro": {
+      "fixtures": 4,
+      "integer_reference_exact": true,
+      "tokenization_matches_harness": true,
+      "scoring_path": "standard HFLM with identical-context logits reuse, batch4",
+      "max_reference_logprob_error": 0.0
+    },
+    "squadv2": {
+      "training_fixtures": 2,
+      "greedy_tokens_equal": true,
+      "max_noanswer_logprob_error": 0.0,
+      "noanswer_tokens": [
+        [
+          650,
+          9217,
+          480
+        ],
+        [
+          650,
+          9217,
+          480
+        ]
+      ]
+    }
+  },
+  "conversion": {
+    "linears": 196,
+    "resources": {
+      "lookups": 704643072,
+      "additions": 705052672,
+      "multiplications": 13836484,
+      "reciprocals": 516292,
+      "arithmetic_including_reciprocals": 719405448,
+      "memory_bytes": 1335002308,
+      "memory_MiB": 1273.157413482666,
+      "memory_breakdown": {
+        "tables": 251658240,
+        "indices": 1056964608,
+        "scales": 25493504,
+        "centers": 1920,
+        "scratch": 815108,
+        "guards_and_headroom": 67104,
+        "table_dispatch": 1568,
+        "mixed_group_metadata": 256
+      },
+      "index_bits": 12,
+      "table_entry_bytes": 4,
+      "score_mJ": 2.9776521716,
+      "score_including_reciprocal_proxy_mJ": 2.9783233512000002,
+      "gates": {
+        "lookup": true,
+        "arithmetic": true,
+        "memory": true
+      },
+      "arithmetic_margin_including_reciprocals": 7831160,
+      "weights_group64": 222298112,
+      "layers_group64": 55
+    },
+    "bank_audit": {
+      "linears": 196,
+      "weight_pairs": 704643072,
+      "packed_words_bytes": 1056965392,
+      "scale_bytes": 25493504,
+      "padding_and_guard_bytes": 784,
+      "guard_covered_by_existing_budget": true
+    },
+    "actual_gpu_layer_proofs": [
+      {
+        "module": "model.layers.0.self_attn.q_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.0.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.0.self_attn.v_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.0.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.0.mlp.gate_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.0.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.0.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.1.self_attn.q_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.1.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.1.self_attn.v_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.1.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.1.mlp.gate_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.1.mlp.up_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.1.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.2.self_attn.q_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.2.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.2.self_attn.v_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.2.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.2.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.2.mlp.up_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.2.mlp.down_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.3.self_attn.q_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.3.self_attn.k_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.3.self_attn.v_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.3.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.3.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.3.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.3.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.4.self_attn.q_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.4.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.4.self_attn.v_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.4.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.4.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.4.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.4.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.5.self_attn.q_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.5.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.5.self_attn.v_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.5.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.5.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.5.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.5.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.6.self_attn.q_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.6.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.6.self_attn.v_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.6.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.6.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.6.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.6.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.7.self_attn.q_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.7.self_attn.k_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.7.self_attn.v_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.7.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.7.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.7.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.7.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.8.self_attn.q_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.8.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.8.self_attn.v_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.8.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.8.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.8.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.8.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.9.self_attn.q_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.9.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.9.self_attn.v_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.9.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.9.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.9.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.9.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.10.self_attn.q_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.10.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.10.self_attn.v_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.10.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.10.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.10.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.10.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.11.self_attn.q_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.11.self_attn.k_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.11.self_attn.v_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.11.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.11.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.11.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.11.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.12.self_attn.q_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.12.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.12.self_attn.v_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.12.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.12.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.12.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.12.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.13.self_attn.q_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.13.self_attn.k_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.13.self_attn.v_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.13.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.13.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.13.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.13.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.14.self_attn.q_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.14.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.14.self_attn.v_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.14.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.14.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.14.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.14.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.15.self_attn.q_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.15.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.15.self_attn.v_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.15.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.15.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.15.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.15.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.16.self_attn.q_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.16.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.16.self_attn.v_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.16.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.16.mlp.gate_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.16.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.16.mlp.down_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.17.self_attn.q_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.17.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.17.self_attn.v_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.17.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.17.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.17.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.17.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.18.self_attn.q_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.18.self_attn.k_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.18.self_attn.v_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.18.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.18.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.18.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.18.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.19.self_attn.q_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.19.self_attn.k_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.19.self_attn.v_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.19.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.19.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.19.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.19.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.20.self_attn.q_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.20.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.20.self_attn.v_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.20.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.20.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.20.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.20.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.21.self_attn.q_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.21.self_attn.k_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.21.self_attn.v_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.21.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.21.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.21.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.21.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.22.self_attn.q_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.22.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.22.self_attn.v_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.22.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.22.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.22.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.22.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.23.self_attn.q_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.23.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.23.self_attn.v_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.23.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.23.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.23.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.23.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.24.self_attn.q_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.24.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.24.self_attn.v_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.24.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.24.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.24.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.24.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.25.self_attn.q_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.25.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.25.self_attn.v_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.25.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.25.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.25.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.25.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.26.self_attn.q_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.26.self_attn.k_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.26.self_attn.v_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.26.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.26.mlp.gate_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.26.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.26.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.27.self_attn.q_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.27.self_attn.k_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.27.self_attn.v_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.27.self_attn.o_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.27.mlp.gate_proj",
+        "group": 64,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.27.mlp.up_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      },
+      {
+        "module": "model.layers.27.mlp.down_proj",
+        "group": 128,
+        "exact": true,
+        "max_abs": 0.0
+      }
+    ],
+    "actual_gpu_verified": true,
+    "backend": "grouped_reference",
+    "group64_linears": 55
+  },
+  "fused": {
+    "complete": true,
+    "linears": 196,
+    "checks": [
+      {
+        "module": "model.layers.0.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.0.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.0.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.0.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.0.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.0.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.0.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.1.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.1.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.1.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.1.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.1.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.1.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.1.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.2.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.2.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.2.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.2.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.2.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.2.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.2.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.3.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.3.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.3.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.3.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.3.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.3.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.3.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.4.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.4.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.4.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.4.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.4.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.4.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.4.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.5.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.5.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.5.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.5.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.5.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.5.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.5.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.6.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.6.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.6.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.6.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.6.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.6.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.6.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.7.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.7.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.7.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.7.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.7.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.7.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.7.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.8.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.8.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.8.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.8.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.8.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.8.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.8.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.9.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.9.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.9.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.9.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.9.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.9.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.9.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.10.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.10.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.10.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.10.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.10.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.10.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.10.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.11.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.11.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.11.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.11.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.11.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.11.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.11.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.12.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.12.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.12.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.12.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.12.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.12.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.12.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.13.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.13.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.13.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.13.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.13.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.13.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.13.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.14.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.14.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.14.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.14.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.14.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.14.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.14.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.15.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.15.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.15.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.15.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.15.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.15.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.15.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.16.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.16.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.16.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.16.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.16.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.16.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.16.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.17.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.17.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.17.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.17.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.17.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.17.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.17.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.18.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.18.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.18.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.18.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.18.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.18.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.18.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.19.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.19.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.19.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.19.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.19.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.19.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.19.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.20.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.20.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.20.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.20.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.20.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.20.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.20.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.21.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.21.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.21.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.21.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.21.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.21.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.21.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.22.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.22.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.22.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.22.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.22.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.22.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.22.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.23.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.23.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.23.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.23.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.23.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.23.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.23.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.24.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.24.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.24.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.24.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.24.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.24.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.24.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.25.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.25.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.25.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.25.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.25.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.25.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.25.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.26.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.26.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.26.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.26.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.26.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.26.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.26.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.27.self_attn.q_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.27.self_attn.k_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.27.self_attn.v_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.27.self_attn.o_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.27.mlp.gate_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 2072640.0
+      },
+      {
+        "module": "model.layers.27.mlp.up_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      },
+      {
+        "module": "model.layers.27.mlp.down_proj",
+        "exact": true,
+        "max_abs": 0.0,
+        "integer_sum_bound": 4145280.0
+      }
+    ],
+    "scope": "FP16 exactly represents integer operands; FP32 group dots and original reduction tree, fusion disabled. Evaluation only."
+  },
+  "gpu": {
+    "visible": "1",
+    "uuid": "GPU-640aa88f-98d5-2bd4-6cf0-2eebacacf09f"
+  },
+  "peak_allocated_GiB": 14.895384788513184,
+  "peak_reserved_GiB": 22.03515625,
+  "created_utc": "2026-10-08T22:41:11.709030+00:00"
+}

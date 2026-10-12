@@ -8,3 +8,7 @@ Excluded: model checkpoints and packed banks, raw datasets and token tensors, fu
 Round 21: complete PPL for all ten models; full MMLU for six new models; four explicitly reused historical MMLU records. Round 22: nine numerically checked banks; no new holdout PPL/MMLU.
 
 Manifest SHA256 values below describe exact published file bytes; the manifest and this index are excluded from that manifest to avoid self-reference.
+
+Added benchmark publication — 2026-10-12
+
+The Qwen3-1.7B added benchmark suite is complete: 32/32 model-task results and 324680 predictions. See pq_exploration/benchmarks_1p7b_20261008/PUBLICATION_NOTES.txt for exact published/retained scope and the complete evidence archive hash. Existing round reports and the reorganized two-comparison README are preserved; benchmark tables supplement the round-21 comparison.

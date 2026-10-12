@@ -1,0 +1,12 @@
+{
+  "created_utc": "2026-10-08T22:35:07.202200+00:00",
+  "protocol_sha256": "7fea121b77cc1abf7f197014116b6ea91d8f50260276eca0b73bdd4d1bb09ffc",
+  "source_sha256": {
+    "evaluate_benchmarks.py": "e92a3f2bbeeb4a6110b887799291d3551aa6a2ac625d7b00d1352482762ba78e",
+    "run_benchmarks.py": "a85f4bea77b19126d36bff9bbce1808dc36322eecb37231158d753bbe81443c6",
+    "aggregate_benchmarks.py": "937dd56fafb4f508a032a21bb803d384f8157d2261297eca2aa4ff1dd1831ec2"
+  },
+  "batch_policy": "Standard HFLM multiple-choice/generation/teacher-forcing batch4; identical-context logit reuse enabled; no KV-prefix reuse across different questions",
+  "resource_policy": "one explicitly selected GPU; sequential model workers; four CPU threads each",
+  "tasks": "complete GLUE six validation splits, complete MMLU-Pro test, complete SQuAD v2 validation"
+}

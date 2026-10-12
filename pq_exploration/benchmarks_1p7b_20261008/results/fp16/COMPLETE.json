@@ -1,0 +1,18 @@
+{
+  "completed": true,
+  "entry_name": "fp16",
+  "bank_sha256": null,
+  "protocol_sha256": "7fea121b77cc1abf7f197014116b6ea91d8f50260276eca0b73bdd4d1bb09ffc",
+  "evaluation_manifest_sha256": "a5e083119daf46304b9164e328489f8d2345277f737dc047276a78bcbfc29ee3",
+  "tasks": [
+    "mrpc",
+    "rte",
+    "sst2",
+    "mnli",
+    "qnli",
+    "qqp",
+    "leaderboard_mmlu_pro",
+    "squadv2"
+  ],
+  "created_utc": "2026-10-09T02:49:59.445880+00:00"
+}

@@ -1,0 +1,29 @@
+{
+  "completed": true,
+  "created_utc": "2026-10-10T01:32:58.102308+00:00",
+  "archive_sha256": "864bcb32ad9a688c359f8a00f356a38dd2febc96371c4b42dbbc76579b59a3c1",
+  "archive_bytes": 50927831,
+  "evidence_directory": "C:\\Users\\dengh\\Desktop\\LUT-LLM\\pq_exploration\\benchmarks_1p7b_20261008\\final_evidence_20261010T0129Z",
+  "verified_files": 2740,
+  "verified_task_results": 32,
+  "verified_predictions": 324680,
+  "verified_prediction_chunks": 2584,
+  "per_model_questions": {
+    "fp16": 81170,
+    "pq_mixed": 81170,
+    "rq_mixed": 81170,
+    "ib_mixed": 81170
+  },
+  "source_and_protocol_unchanged": true,
+  "round21_summary_sha256": "c2cc6f1da6a58e83f4f9e148561a930926d0c7d762bc0414a600350777b10df8",
+  "request_binding_audit_sha256": "38eaeb73507de1b7fe137e226e32d41c778b0a9014076e83dc49b2d3ef31fef1",
+  "final_provenance_audit_sha256": "35fd2a43003ef187b2adcafcc5a73f0aeb78175e5d8f11ac03436f11065d8e99",
+  "note": "Complete prediction chunks, all frozen request tensors, runtime outputs, bound sources and logs are preserved in the evidence directory. Original absolute remote paths in metadata are retained; evidence_manifest.json maps them to local archive paths. Model weights/banks stay at their original locations and are hash verified in final_provenance_audit.json.",
+  "final_report_sha256": "17ebd3e5d5b0b93c4b0f7b00e7337bdf4c0b6b6c291fd41ca550dc2438c00988",
+  "readme_sha256": "a51c95710e46aa6a96c84dde33dcfa568c00d9da5239edc93b629e4b81a91848",
+  "report_created_utc": "2026-10-10T01:34:46.946668+00:00",
+  "report_delivered_utc": "2026-10-10T01:35:43.792273+00:00",
+  "automation_status": "PAUSED",
+  "chat_retained": true,
+  "handoff_sha256": "6210775d6775d768bb3950f45c3949d5a477afbc957846509560b0cd29ec1030"
+}

@@ -1,0 +1,41 @@
+{
+  "completed": true,
+  "entry_name": "ib_mixed",
+  "bank_sha256": "614a501e88dd3597c1045c65d4f15296f1c9b7953f352630609ad74e8be33189",
+  "protocol_sha256": "7fea121b77cc1abf7f197014116b6ea91d8f50260276eca0b73bdd4d1bb09ffc",
+  "evaluation_manifest_sha256": "a5e083119daf46304b9164e328489f8d2345277f737dc047276a78bcbfc29ee3",
+  "task": "sst2",
+  "metrics": {
+    "total": 872,
+    "correct": 705,
+    "accuracy": 0.8084862385321101
+  },
+  "questions": 872,
+  "requests_sha256": "a4a0622d953135bc1e9b33b98b2a0cf7efb3af48c666373b0912aee63ff77d8b",
+  "chunks": [
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/sst2/000000.json",
+      "sha256": "f99d97bbe4489b9436a341fa1d25fc849c89ee27d60d7568981ac2223bef1ba7"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/sst2/000256.json",
+      "sha256": "16ea72d31275f37508465ad155f19622ff7fefc21450ad778ac84598d1291b10"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/sst2/000512.json",
+      "sha256": "c82c4752285b0be23756b4af64345c9f0ecf929bbf5639ae630ba87cbd55e77d"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/ib_mixed/sst2/000768.json",
+      "sha256": "1fd1a010d9de15d71a92b9b06b1ae6ac7a23b2be8d35ec01f5d457a818978107"
+    }
+  ],
+  "seconds": 14.74529767036438,
+  "created_utc": "2026-10-09T17:53:52.914629+00:00",
+  "gpu": {
+    "visible": "1",
+    "uuid": "GPU-640aa88f-98d5-2bd4-6cf0-2eebacacf09f"
+  },
+  "peak_allocated_GiB": 9.117892742156982,
+  "peak_reserved_GiB": 11.0625
+}

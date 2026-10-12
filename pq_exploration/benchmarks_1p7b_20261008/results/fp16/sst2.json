@@ -1,0 +1,41 @@
+{
+  "completed": true,
+  "entry_name": "fp16",
+  "bank_sha256": null,
+  "protocol_sha256": "7fea121b77cc1abf7f197014116b6ea91d8f50260276eca0b73bdd4d1bb09ffc",
+  "evaluation_manifest_sha256": "a5e083119daf46304b9164e328489f8d2345277f737dc047276a78bcbfc29ee3",
+  "task": "sst2",
+  "metrics": {
+    "total": 872,
+    "correct": 745,
+    "accuracy": 0.8543577981651376
+  },
+  "questions": 872,
+  "requests_sha256": "a4a0622d953135bc1e9b33b98b2a0cf7efb3af48c666373b0912aee63ff77d8b",
+  "chunks": [
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/fp16/sst2/000000.json",
+      "sha256": "9cd6b3efe1800a7fb2a59f64c6a7e35c893f5e3443a5a2c7d7cd40bf6293736b"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/fp16/sst2/000256.json",
+      "sha256": "abe6f712e22f177634cd134e5d49b9da588dee36c8a64988336936d628357cc7"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/fp16/sst2/000512.json",
+      "sha256": "184a98876b68c4dab9b0d8f35b61cfec215440336f7813582d684600788b905b"
+    },
+    {
+      "path": "/tmp/denghaoran_qwen3_1p7b_benchmarks_20261008/results/fp16/sst2/000768.json",
+      "sha256": "fecf1d6c241bfd44556654711840ef6c8eb18b96a08a641598f7becc7b2ee673"
+    }
+  ],
+  "seconds": 9.150950908660889,
+  "created_utc": "2026-10-08T22:43:27.942209+00:00",
+  "gpu": {
+    "visible": "1",
+    "uuid": "GPU-640aa88f-98d5-2bd4-6cf0-2eebacacf09f"
+  },
+  "peak_allocated_GiB": 4.4896368980407715,
+  "peak_reserved_GiB": 5.267578125
+}
